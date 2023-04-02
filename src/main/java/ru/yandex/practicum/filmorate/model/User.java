@@ -10,15 +10,15 @@ import java.time.LocalDate;
 @RequiredArgsConstructor
 public class User {
 
-    @EqualsAndHashCode.Include
-    private final String email;
-    @EqualsAndHashCode.Include
-    private final String login;
-    @EqualsAndHashCode.Include
-    private String name;
-    @EqualsAndHashCode.Include
-    private final LocalDate birthday;
     @EqualsAndHashCode.Exclude
+    private final String email;
+    @EqualsAndHashCode.Exclude
+    private final String login;
+    @EqualsAndHashCode.Exclude
+    private String name;
+    @EqualsAndHashCode.Exclude
+    private final LocalDate birthday;
+    @EqualsAndHashCode.Include
     private int id;
 
 }
