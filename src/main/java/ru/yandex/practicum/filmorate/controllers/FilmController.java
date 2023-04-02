@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.controllers;
 
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,18 +18,18 @@ import static org.springframework.http.HttpStatus.*;
 @Slf4j
 public class FilmController {
 
-    private final HashMap<Integer, Film> films = new HashMap<>();
     private static int idFilmSequence = 1;
+    private final HashMap<Integer, Film> films = new HashMap<>();
 
     @PostMapping("/films")
-    public ResponseEntity<Film> addNewFilm(@RequestBody Film film) {
+    public ResponseEntity<Film> addNewFilm(@Valid @RequestBody Film film) {
         log.info("Получен запрос на создание фильма.");
         try {
             if (validateFilm(film) && !films.containsValue(film)) {
                 film.setId(setId());
                 films.put(film.getId(), film);
                 return new ResponseEntity<>(film, CREATED);
-            } else if (validateFilm(film) && films.containsKey(film.getId())) {
+            } else if (films.containsKey(film.getId())) {
                 log.info("Такой фильм уже существует.");
                 return new ResponseEntity<>(film, BAD_REQUEST);
             }
@@ -40,7 +41,7 @@ public class FilmController {
     }
 
     @PutMapping("/films")
-    public ResponseEntity<Film> updateFilm(@RequestBody Film film) {
+    public ResponseEntity<Film> updateFilm(@Valid @RequestBody Film film) {
         log.info("Получен запрос на обновление фильма.");
         try {
             if (validateFilm(film) && !films.containsKey(film.getId())) {
@@ -63,9 +64,7 @@ public class FilmController {
     }
 
     private boolean validateFilm(Film film) throws ValidationException {
-        if (film.getName().isEmpty()) {
-            throw new ValidationException("Название фильма не может быть пустым.");
-        } else if (film.getDescription().length() > 199) {
+        if (film.getDescription().length() > 199) {
             throw new ValidationException("Описание фильма не может быть больше 200 символов.");
         } else if (film.getReleaseDate().isBefore(LocalDate.of(1895, Month.DECEMBER, 28))) {
             throw new ValidationException("Дата релиза фильма не может быть раньше 28 декабря 1895 года.");

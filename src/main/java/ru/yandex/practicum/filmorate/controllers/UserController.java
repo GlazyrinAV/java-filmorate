@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.controllers;
 
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,11 +18,11 @@ import static org.springframework.http.HttpStatus.*;
 @Slf4j
 public class UserController {
 
-    private final HashMap<Integer, User> users = new HashMap<>();
     private static int idUserSequence = 1;
+    private final HashMap<Integer, User> users = new HashMap<>();
 
     @PostMapping("/users")
-    public ResponseEntity<User> addNewUser(@RequestBody User user) {
+    public ResponseEntity<User> addNewUser(@Valid @RequestBody User user) {
         log.info("Получен запрос на создание пользователя.");
         try {
             if (validateUser(user) && !users.containsValue(user)) {
@@ -43,7 +44,7 @@ public class UserController {
     }
 
     @PutMapping("/users")
-    public ResponseEntity<User> updateUser(@RequestBody User user) {
+    public ResponseEntity<User> updateUser(@Valid @RequestBody User user) {
         log.info("Получен запрос на обновление пользователя.");
         try {
             if (validateUser(user) && !users.containsKey(user.getId())) {
@@ -66,11 +67,7 @@ public class UserController {
     }
 
     private boolean validateUser(User user) throws ValidationException {
-        if (user.getEmail().isEmpty() || !user.getEmail().contains("@")) {
-            throw new ValidationException("Неправильно указана электронная почта.");
-        } else if (user.getLogin().isEmpty() || user.getLogin().contains(" ")) {
-            throw new ValidationException("Неверно указан логин.");
-        } else if (user.getBirthday().isAfter(LocalDate.now())) {
+        if (user.getBirthday().isAfter(LocalDate.now())) {
             throw new ValidationException("Неверно указана дата рождения.");
         }
         return true;
