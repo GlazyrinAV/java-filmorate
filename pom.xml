@@ -14,7 +14,7 @@
 	<name>filmorate</name>
 	<description>Сервис, который будет работать с фильмами и оценками пользователей, а также возвращать топ-5 фильмов, рекомендованных к просмотру.</description>
 	<properties>
-		<java.version>20</java.version>
+		<java.version>19</java.version>
 	</properties>
 	<dependencies>
 		<dependency>
