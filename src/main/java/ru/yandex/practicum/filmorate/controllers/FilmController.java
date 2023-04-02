@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.controllers;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
@@ -9,29 +10,33 @@ import java.time.Month;
 import java.util.HashMap;
 
 @RestController
+@Slf4j
 public class FilmController {
 
+    private int idFilmSequence = 1;
     private final HashMap<Integer, Film> films = new HashMap<>();
 
-    @PostMapping("/film")
+    @PostMapping("/films")
     public Film addNewFilm(@RequestBody Film film) {
+        film.setId(setId());
         try {
-            if (validateFilm(film) && !films.containsKey(film.getId())) {
+            if (validateFilm(film) && !films.containsValue(film)) {
                 films.put(film.getId(), film);
                 return film;
             } else if (validateFilm(film) && films.containsKey(film.getId())) {
-                System.out.println("Такой фильм уже существует.");
+                log.info("Такой фильм уже существует.");
             }
         } catch (ValidationException e) {
-            System.out.println(e.getMessage());
+            log.info(e.getMessage());
         }
-        return null;
+        return film;
     }
 
-    @PutMapping("/film")
+    @PutMapping("/films")
     public Film updateFilm(@RequestBody Film film) {
         try {
             if (validateFilm(film) && !films.containsKey(film.getId())) {
+                film.setId(setId());
                 films.put(film.getId(), film);
                 return film;
             } else if (validateFilm(film) && films.containsKey(film.getId())) {
@@ -39,9 +44,9 @@ public class FilmController {
                 return film;
             }
         } catch (ValidationException e) {
-            System.out.println(e.getMessage());
+            log.info(e.getMessage());
         }
-        return null;
+        return film;
     }
 
     @GetMapping("/films")
@@ -60,5 +65,8 @@ public class FilmController {
             throw new ValidationException("Продолжительность фильма должна быть больше нуля.");
         }
         return true;
+    }
+    private int setId() {
+        return idFilmSequence++;
     }
 }
