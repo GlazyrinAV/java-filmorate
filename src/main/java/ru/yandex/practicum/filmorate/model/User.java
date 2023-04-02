@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.model;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Past;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +24,7 @@ public class User {
     @EqualsAndHashCode.Exclude
     private String name;
 
+    @Past(message = "Неверно указана дата рождения.")
     @EqualsAndHashCode.Exclude
     private final LocalDate birthday;
 
