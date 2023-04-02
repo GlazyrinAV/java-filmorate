@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.controllers;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
@@ -9,29 +10,33 @@ import java.util.HashMap;
 
 
 @RestController
+@Slf4j
 public class UserController {
 
+    private int idUserSequence = 1;
     private final HashMap<Integer, User> users = new HashMap<>();
 
-    @PostMapping("/user")
+    @PostMapping("/users")
     public User addNewUser(@RequestBody User user) {
+        user.setId(setId());
         try {
-            if (validateUser(user) && !users.containsKey(user.getId())) {
+            if (validateUser(user) && !users.containsValue(user)) {
                 users.put(user.getId(), user);
                 return user;
-            } else if (validateUser(user) && users.containsKey(user.getId())) {
-                System.out.println("Такой пользователь уже существует.");
+            } else if (validateUser(user) && users.containsValue(user)) {
+                log.info("Такой пользователь уже существует.");
             }
         } catch (ValidationException e) {
-            System.out.println(e.getMessage());
+            log.info(e.getMessage());
         }
-        return null;
+        return user;
     }
 
-    @PutMapping("/user")
+    @PutMapping("/users")
     public User updateUser(@RequestBody User user) {
         try {
             if (validateUser(user) && !users.containsKey(user.getId())) {
+                user.setId(setId());
                 users.put(user.getId(), user);
                 return user;
             } else if (validateUser(user) && users.containsKey(user.getId())) {
@@ -39,9 +44,9 @@ public class UserController {
                 return user;
             }
         } catch (ValidationException e) {
-            System.out.println(e.getMessage());
+            log.info(e.getMessage());
         }
-        return null;
+        return user;
     }
 
     @GetMapping("/users")
@@ -60,5 +65,9 @@ public class UserController {
             user.setName(user.getLogin());
         }
         return true;
+    }
+
+    private int setId() {
+        return idUserSequence++;
     }
 }
