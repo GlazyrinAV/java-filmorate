@@ -26,7 +26,7 @@ public class UserController {
             if (user.getName() == null) {
                 user.setName(user.getLogin());
             }
-            user.setId(setId());
+            user.setId(setNewId());
             users.put(user.getId(), user);
             return new ResponseEntity<>(user, CREATED);
         } else {
@@ -52,7 +52,7 @@ public class UserController {
         return new ResponseEntity<>(users.values(), OK);
     }
 
-    private int setId() {
+    private int setNewId() {
         return idUserSequence++;
     }
 }
