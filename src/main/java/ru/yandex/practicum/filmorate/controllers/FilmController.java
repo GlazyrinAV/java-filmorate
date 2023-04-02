@@ -17,14 +17,15 @@ import static org.springframework.http.HttpStatus.*;
 @Slf4j
 public class FilmController {
 
+    private final LocalDate FIRST_FILM = LocalDate.of(1895, Month.DECEMBER, 28);
     private static int idFilmSequence = 1;
     private final HashMap<Integer, Film> films = new HashMap<>();
 
     @PostMapping("/films")
     public ResponseEntity<Film> addNewFilm(@Valid @RequestBody Film film) {
         log.info("Получен запрос на создание фильма.");
-        if (!films.containsValue(film) && film.getReleaseDate().isAfter(LocalDate.of(1895, Month.DECEMBER, 28))) {
-            film.setId(setId());
+        if (!films.containsValue(film) && film.getReleaseDate().isAfter(FIRST_FILM)) {
+            film.setId(setNewId());
             films.put(film.getId(), film);
             return new ResponseEntity<>(film, CREATED);
         } else {
@@ -36,11 +37,11 @@ public class FilmController {
     @PutMapping("/films")
     public ResponseEntity<Film> updateFilm(@Valid @RequestBody Film film) {
         log.info("Получен запрос на обновление фильма.");
-        if (!films.containsKey(film.getId())) {
-            return new ResponseEntity<>(film, NOT_FOUND);
-        } else {
+        if (films.containsKey(film.getId()) && film.getReleaseDate().isAfter(FIRST_FILM)) {
             films.replace(film.getId(), film);
             return new ResponseEntity<>(film, OK);
+        } else {
+            return new ResponseEntity<>(film, NOT_FOUND);
         }
     }
 
@@ -50,7 +51,7 @@ public class FilmController {
         return new ResponseEntity<>(films.values(), OK);
     }
 
-    private int setId() {
+    private int setNewId() {
         return idFilmSequence++;
     }
 }
