@@ -12,7 +12,6 @@ import java.time.LocalDate;
 @Data
 @RequiredArgsConstructor
 public class Film {
-
     @NotBlank(message = "Неверно указано название фильма.")
     @EqualsAndHashCode.Exclude
     private final String name;
@@ -30,6 +29,4 @@ public class Film {
 
     @EqualsAndHashCode.Include
     private int id;
-
-
 }

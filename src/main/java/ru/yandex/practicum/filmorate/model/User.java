@@ -14,6 +14,7 @@ import java.time.LocalDate;
 public class User {
 
     @Email(message = "Неверно указан электронный адрес.")
+    @NotBlank(message = "Неверно указан электронный адрес.")
     @EqualsAndHashCode.Exclude
     private final String email;
 
@@ -30,5 +31,4 @@ public class User {
 
     @EqualsAndHashCode.Include
     private int id;
-
 }
