@@ -14,6 +14,7 @@
 	<name>filmorate</name>
 	<description>Сервис, который будет работать с фильмами и оценками пользователей, а также возвращать топ-5 фильмов, рекомендованных к просмотру.</description>
 	<properties>
+		<java.version>11</java.version>
 	</properties>
 	<dependencies>
 
@@ -47,7 +48,6 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
-				<version>3.1.0-SNAPSHOT</version>
 			</plugin>
 		</plugins>
 	</build>
