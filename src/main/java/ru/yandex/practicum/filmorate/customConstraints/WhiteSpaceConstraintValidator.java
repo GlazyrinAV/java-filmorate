@@ -4,6 +4,7 @@ import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
 public class WhiteSpaceConstraintValidator implements ConstraintValidator<WhiteSpaceConstraint, String> {
+
     @Override
     public void initialize(WhiteSpaceConstraint constraintAnnotation) {
         ConstraintValidator.super.initialize(constraintAnnotation);
