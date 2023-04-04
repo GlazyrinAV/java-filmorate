@@ -4,6 +4,7 @@ package ru.yandex.practicum.filmorate.model;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
+import ru.yandex.practicum.filmorate.customConstraints.WhiteSpaceConstraint;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
@@ -20,6 +21,7 @@ public class User {
     private final String email;
 
     @NotBlank(message = "Неверно указан логин.")
+    @WhiteSpaceConstraint
     private final String login;
 
     private String name;
