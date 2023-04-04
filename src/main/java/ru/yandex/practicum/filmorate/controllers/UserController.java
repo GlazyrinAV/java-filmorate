@@ -10,7 +10,8 @@ import ru.yandex.practicum.filmorate.model.User;
 
 import javax.validation.Valid;
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static org.springframework.http.HttpStatus.*;
 
@@ -20,7 +21,7 @@ import static org.springframework.http.HttpStatus.*;
 public class UserController {
 
     private static int idUserSequence = 1;
-    private final HashMap<Integer, User> users = new HashMap<>();
+    private final Map<Integer, User> users = new ConcurrentHashMap<>();
 
     @PostMapping("/users")
     public ResponseEntity<User> addNewUser(@Valid @RequestBody User user) {
