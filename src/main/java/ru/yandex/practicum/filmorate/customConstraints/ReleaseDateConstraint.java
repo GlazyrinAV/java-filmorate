@@ -13,6 +13,8 @@ import java.lang.annotation.Target;
 @Constraint(validatedBy = {ReleaseDateConstraintValidator.class})
 public @interface ReleaseDateConstraint {
     String message() default "Дата создания фильма не может быть раньше 28.12.1895 года.";
+
     Class<?>[] groups() default {};
+
     Class<? extends Payload>[] payload() default {};
 }

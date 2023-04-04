@@ -12,6 +12,8 @@ import java.lang.annotation.Target;
 @Constraint(validatedBy = {DurationConstraintValidator.class})
 public @interface DurationConstraint {
     String message() default "Продолженность фильма не может быть отрицательной.";
+
     Class<?>[] groups() default {};
+
     Class<? extends Payload>[] payload() default {};
 }

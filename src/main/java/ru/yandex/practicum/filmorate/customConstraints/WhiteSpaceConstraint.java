@@ -12,6 +12,8 @@ import java.lang.annotation.Target;
 @Constraint(validatedBy = {WhiteSpaceConstraintValidator.class})
 public @interface WhiteSpaceConstraint {
     String message() default "Логин не может содержать пробелов.";
+
     Class<?>[] groups() default {};
+
     Class<? extends Payload>[] payload() default {};
 }
