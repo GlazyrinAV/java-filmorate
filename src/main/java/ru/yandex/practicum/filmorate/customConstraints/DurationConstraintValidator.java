@@ -1,7 +1,5 @@
 package ru.yandex.practicum.filmorate.customConstraints;
 
-import ru.yandex.practicum.filmorate.model.Film;
-
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import java.time.Duration;
