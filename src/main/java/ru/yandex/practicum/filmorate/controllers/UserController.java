@@ -1,9 +1,7 @@
 package ru.yandex.practicum.filmorate.controllers;
 
-
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.User;
@@ -26,16 +24,13 @@ public class UserController {
     @PostMapping("/users")
     public ResponseEntity<User> addNewUser(@Valid @RequestBody User user) {
         log.info("Получен запрос на создание пользователя.");
-        if (!users.containsValue(user) && !StringUtils.containsWhitespace(user.getLogin())) {
+        if (!users.containsValue(user)) {
             if (user.getName() == null) {
                 user.setName(user.getLogin());
             }
             user.setId(setNewId());
             users.put(user.getId(), user);
             return new ResponseEntity<>(user, CREATED);
-        } else if (!users.containsValue(user) && StringUtils.containsWhitespace(user.getLogin())) {
-            log.info("Логин не может содержать пробелы.");
-            return new ResponseEntity<>(user, BAD_REQUEST);
         } else {
             log.info("Такой пользователь уже существует.");
             return new ResponseEntity<>(user, BAD_REQUEST);
@@ -47,9 +42,6 @@ public class UserController {
         log.info("Получен запрос на обновление пользователя.");
         if (!users.containsKey(user.getId())) {
             return new ResponseEntity<>(user, NOT_FOUND);
-        } else if (users.containsKey(user.getId()) && StringUtils.containsWhitespace(user.getLogin())) {
-            log.info("Логин не может содержать пробелы.");
-            return new ResponseEntity<>(user, BAD_REQUEST);
         } else {
             users.replace(user.getId(), user);
             return new ResponseEntity<>(user, OK);
