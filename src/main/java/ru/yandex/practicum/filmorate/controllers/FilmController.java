@@ -11,7 +11,8 @@ import javax.validation.Valid;
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static org.springframework.http.HttpStatus.*;
 
@@ -22,7 +23,7 @@ public class FilmController {
 
     private static int idFilmSequence = 1;
     private final LocalDate firstFilm = LocalDate.of(1895, Month.DECEMBER, 28);
-    private final HashMap<Integer, Film> films = new HashMap<>();
+    private final Map<Integer, Film> films = new ConcurrentHashMap<>();
 
     @PostMapping("/films")
     public ResponseEntity<Film> addNewFilm(@Valid @RequestBody Film film) {
