@@ -1,13 +1,8 @@
 package ru.yandex.practicum.filmorate.model;
 
-
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
-import ru.yandex.practicum.filmorate.adapters.DurationDesirializator;
-import ru.yandex.practicum.filmorate.adapters.DurationSerializator;
 import ru.yandex.practicum.filmorate.customConstraints.DurationConstraint;
 import ru.yandex.practicum.filmorate.customConstraints.ReleaseDateConstraint;
 
@@ -29,8 +24,6 @@ public class Film {
     @ReleaseDateConstraint
     private final LocalDate releaseDate;
 
-    @JsonDeserialize(using = DurationDesirializator.class)
-    @JsonSerialize(using = DurationSerializator.class)
     @DurationConstraint
     private final Duration duration;
 
