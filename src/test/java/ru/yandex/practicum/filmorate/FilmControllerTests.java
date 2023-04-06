@@ -3,17 +3,13 @@ package ru.yandex.practicum.filmorate;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import org.json.JSONException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import ru.yandex.practicum.filmorate.model.Film;
@@ -43,12 +39,12 @@ public class FilmControllerTests {
     }
 
     @Test
-    public void NewFilmNormal() throws JSONException, JsonProcessingException {
+    public void NewFilmNormal() throws JsonProcessingException {
         Film film = new Film("1", "1", LocalDate.now(), Duration.ofMinutes(100));
         ObjectMapper jsonMapper = new ObjectMapper();
         jsonMapper.registerModule(new JavaTimeModule());
         HttpHeaders headers = new HttpHeaders();
-        headers.add("Content-type", "application/json");
+        headers.setContentType(MediaType.APPLICATION_JSON);
         String string = jsonMapper.writeValueAsString(film);
         HttpEntity<String> entity = new HttpEntity<>(string, headers);
         URI uri = URI.create("http://localhost:" + port + "/films");
@@ -58,11 +54,11 @@ public class FilmControllerTests {
 
     @ParameterizedTest
     @MethodSource("filmWithWrongParameters")
-    public void NewFilmWrongParametrs(Film film) throws JsonProcessingException {
+    public void NewFilmWrongParameters(Film film) throws JsonProcessingException {
         ObjectMapper jsonMapper = new ObjectMapper();
         jsonMapper.registerModule(new JavaTimeModule());
         HttpHeaders headers = new HttpHeaders();
-        headers.add("Content-type", "application/json");
+        headers.setContentType(MediaType.APPLICATION_JSON);
         String string = jsonMapper.writeValueAsString(film);
         HttpEntity<String> entity = new HttpEntity<>(string, headers);
         URI uri = URI.create("http://localhost:" + port + "/films");

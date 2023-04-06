@@ -2,10 +2,10 @@ package ru.yandex.practicum.filmorate.model;
 
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.RequiredArgsConstructor;
 import ru.yandex.practicum.filmorate.customConstraints.DurationConstraint;
 import ru.yandex.practicum.filmorate.customConstraints.ReleaseDateConstraint;
 
@@ -15,7 +15,6 @@ import java.time.Duration;
 import java.time.LocalDate;
 
 @Data
-@RequiredArgsConstructor
 @EqualsAndHashCode(of = "id")
 public class Film {
     @NotBlank(message = "Неверно указано название фильма.")
@@ -25,6 +24,7 @@ public class Film {
     private final String description;
 
     @ReleaseDateConstraint
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private final LocalDate releaseDate;
 
     @DurationConstraint
@@ -34,12 +34,10 @@ public class Film {
 
     @JsonCreator
     public Film(@JsonProperty("name") String name, @JsonProperty("description") String description,
-                @JsonProperty("releaseDate") LocalDate releaseDate, @JsonProperty("duration") Duration duration,
-                @JsonProperty("id") int id) {
+                @JsonProperty("releaseDate") LocalDate releaseDate, @JsonProperty("duration") Duration duration) {
         this.name = name;
         this.description = description;
         this.releaseDate = releaseDate;
         this.duration = duration;
-        this.id = id;
     }
 }
