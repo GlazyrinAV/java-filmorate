@@ -58,7 +58,7 @@ public class UserControllerTests {
     }
 
     @Test
-    public void getFilmNormal() {
+    public void getUserNormal() {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<String> entity = new HttpEntity<>(
