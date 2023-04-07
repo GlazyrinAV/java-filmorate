@@ -10,6 +10,7 @@ import org.springframework.http.*;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.User;
 
 import java.net.URI;
 import java.util.stream.Stream;
@@ -55,5 +56,20 @@ public class FilmControllerTests {
                 }
         );
         Assertions.assertSame(exception.getStatusCode(), HttpStatus.BAD_REQUEST);
+    }
+
+
+    @Test
+    public void getFilmNormal() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<String> entity = new HttpEntity<>(
+                "{\"name\":\"nisieiusmod\",\"description\":\"adipisicing\",\"releaseDate\":\"1967-03-25\",\"duration\":100}", headers);
+        URI uri = URI.create("http://localhost:" + port + "/films");
+        new RestTemplate().postForEntity(uri, entity, User.class);
+        ResponseEntity<String> response = new RestTemplate().getForEntity(uri, String.class);
+        Assertions.assertSame(response.getStatusCode(), HttpStatus.OK);
+        Assertions.assertEquals("[{\"name\":\"nisieiusmod\",\"description\":\"adipisicing\"," +
+                "\"releaseDate\":\"1967-03-25\",\"duration\":100.000000000,\"id\":1}]", response.getBody());
     }
 }
