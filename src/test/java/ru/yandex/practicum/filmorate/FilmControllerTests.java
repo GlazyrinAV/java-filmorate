@@ -1,8 +1,5 @@
 package ru.yandex.practicum.filmorate;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -15,9 +12,6 @@ import org.springframework.web.client.RestTemplate;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import java.net.URI;
-import java.time.Duration;
-import java.time.LocalDate;
-import java.time.Month;
 import java.util.stream.Stream;
 
 @SpringBootTest(classes = FilmorateApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -26,27 +20,23 @@ public class FilmControllerTests {
     @LocalServerPort
     private int port;
 
-    static Stream<Film> filmWithWrongParameters() {
+    static Stream<String> filmWithWrongParameters() {
         return Stream.of(
-                new Film("", "1", LocalDate.now(), Duration.ofMinutes(100)),
-                new Film("1", "1111111111111111111111111111111111111111111111111111111111111111111111111111111111111" +
-                        "11111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111" +
-                        "111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111",
-                        LocalDate.now(), Duration.ofMinutes(100)),
-                new Film("1", "1", LocalDate.of(1700, Month.APRIL, 6), Duration.ofMinutes(100)),
-                new Film("1", "1", LocalDate.now(), Duration.ofMinutes(-100))
+                "{\"name\":\"\",\"description\":\"adipisicing\",\"releaseDate\":\"1967-03-25\",\"duration\":100}",
+                "{\"name\":\"nisieiusmod\",\"description\":\"Пятеро друзей ( комик-группа «Шарло»), приезжают в город" +
+                        " Бризуль. Здесь они хотят разыскать господина Огюста Куглова, который задолжал им деньги, " +
+                        "а именно 20 миллионов. о Куглов, который за время «своего отсутствия», стал кандидатом " +
+                        "Коломбани.\",\"releaseDate\":\"1967-03-25\",\"duration\":100}",
+                "{\"name\":\"nisieiusmod\",\"description\":\"adipisicing\",\"releaseDate\":\"1798-03-25\",\"duration\":100}",
+                "{\"name\":\"nisieiusmod\",\"description\":\"adipisicing\",\"releaseDate\":\"1967-03-25\",\"duration\":-100}"
         );
     }
 
     @Test
-    public void NewFilmNormal() throws JsonProcessingException {
-        Film film = new Film("1", "1", LocalDate.now(), Duration.ofMinutes(100));
-        ObjectMapper jsonMapper = new ObjectMapper();
-        jsonMapper.registerModule(new JavaTimeModule());
+    public void NewFilmNormal() {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        String string = jsonMapper.writeValueAsString(film);
-        HttpEntity<String> entity = new HttpEntity<>(string, headers);
+        HttpEntity<String> entity = new HttpEntity<>("{\"name\":\"nisieiusmod\",\"description\":\"adipisicing\",\"releaseDate\":\"1967-03-25\",\"duration\":100}", headers);
         URI uri = URI.create("http://localhost:" + port + "/films");
         ResponseEntity<Film> response = new RestTemplate().postForEntity(uri, entity, Film.class);
         Assertions.assertSame(response.getStatusCode(), HttpStatus.CREATED);
@@ -54,12 +44,9 @@ public class FilmControllerTests {
 
     @ParameterizedTest
     @MethodSource("filmWithWrongParameters")
-    public void NewFilmWrongParameters(Film film) throws JsonProcessingException {
-        ObjectMapper jsonMapper = new ObjectMapper();
-        jsonMapper.registerModule(new JavaTimeModule());
+    public void NewFilmWrongParameters(String string) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        String string = jsonMapper.writeValueAsString(film);
         HttpEntity<String> entity = new HttpEntity<>(string, headers);
         URI uri = URI.create("http://localhost:" + port + "/films");
         HttpClientErrorException.BadRequest exception = Assertions.assertThrows(HttpClientErrorException.BadRequest.class, () -> {
