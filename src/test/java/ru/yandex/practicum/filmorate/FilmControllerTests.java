@@ -36,7 +36,8 @@ public class FilmControllerTests {
     public void NewFilmNormal() {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<String> entity = new HttpEntity<>("{\"name\":\"nisieiusmod\",\"description\":\"adipisicing\",\"releaseDate\":\"1967-03-25\",\"duration\":100}", headers);
+        HttpEntity<String> entity = new HttpEntity<>(
+                "{\"name\":\"nisieiusmod\",\"description\":\"adipisicing\",\"releaseDate\":\"1967-03-25\",\"duration\":100}", headers);
         URI uri = URI.create("http://localhost:" + port + "/films");
         ResponseEntity<Film> response = new RestTemplate().postForEntity(uri, entity, Film.class);
         Assertions.assertSame(response.getStatusCode(), HttpStatus.CREATED);

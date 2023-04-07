@@ -36,7 +36,8 @@ public class UserControllerTests {
     public void NewUseNormal() {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<String> entity = new HttpEntity<>("{\"login\":\"dolore\",\"name\":\"NickName\",\"email\":\"mail@mail.ru\",\"birthday\":\"1946-08-20\"}", headers);
+        HttpEntity<String> entity = new HttpEntity<>(
+                "{\"login\":\"dolore\",\"name\":\"NickName\",\"email\":\"mail@mail.ru\",\"birthday\":\"1946-08-20\"}", headers);
         URI uri = URI.create("http://localhost:" + port + "/users");
         ResponseEntity<User> response = new RestTemplate().postForEntity(uri, entity, User.class);
         Assertions.assertSame(response.getStatusCode(), HttpStatus.CREATED);
@@ -55,20 +56,18 @@ public class UserControllerTests {
         );
         Assertions.assertSame(exception.getStatusCode(), HttpStatus.BAD_REQUEST);
     }
-//
-//    @Test
-//    public void getFilmNormal() throws JsonProcessingException {
-//        User user = new User("a@mail.ru", "ABC", "CBA", LocalDate.of(1986, Month.APRIL, 13));
-//        ObjectMapper jsonMapper = new ObjectMapper();
-//        jsonMapper.registerModule(new JavaTimeModule());
-//        HttpHeaders headers = new HttpHeaders();
-//        headers.setContentType(MediaType.APPLICATION_JSON);
-//        String string = jsonMapper.writeValueAsString(user);
-//        HttpEntity<String> entity = new HttpEntity<>(string, headers);
-//        URI uri = URI.create("http://localhost:" + port + "/users");
-//        ResponseEntity<User> response = new RestTemplate().postForEntity(uri, entity, User.class);
-//        User user2 = new User("a@mail.ru", "ABC", "CBA", LocalDate.of(1986, Month.APRIL, 13));
-//
-//        Assertions.assertSame(response.getStatusCode(), HttpStatus.CREATED);
-//    }
+
+    @Test
+    public void getFilmNormal() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<String> entity = new HttpEntity<>(
+                "{\"login\":\"dolore\",\"name\":\"NickName\",\"email\":\"mail@mail.ru\",\"birthday\":\"1946-08-20\"}", headers);
+        URI uri = URI.create("http://localhost:" + port + "/users");
+        new RestTemplate().postForEntity(uri, entity, User.class);
+        ResponseEntity<String> response = new RestTemplate().getForEntity(uri, String.class);
+        Assertions.assertSame(response.getStatusCode(), HttpStatus.OK);
+        Assertions.assertEquals("[{\"email\":\"mail@mail.ru\",\"login\":\"dolore\",\"name\":\"NickName\"," +
+                "\"birthday\":\"1946-08-20\",\"id\":1}]", response.getBody());
+    }
 }
