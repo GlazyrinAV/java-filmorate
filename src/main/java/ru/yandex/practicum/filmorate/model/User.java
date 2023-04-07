@@ -1,9 +1,7 @@
 package ru.yandex.practicum.filmorate.model;
 
 
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import ru.yandex.practicum.filmorate.customConstraints.WhiteSpaceConstraint;
@@ -32,14 +30,4 @@ public class User {
     private final LocalDate birthday;
 
     private transient int id;
-
-    @JsonCreator
-    public User(@JsonProperty("email") String email, @JsonProperty("login") String login,
-                @JsonProperty("name") String name, @JsonProperty("birthday") LocalDate birthday) {
-        this.email = email;
-        this.name = name;
-        this.login = login;
-        this.birthday = birthday;
-        this.id = 0;
-    }
 }
