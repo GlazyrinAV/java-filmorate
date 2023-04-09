@@ -18,7 +18,7 @@ import static org.springframework.http.HttpStatus.*;
 @Slf4j
 public class UserController {
 
-    private static int idUserSequence = 1;
+    private int idUserSequence = 1;
     private final Map<Integer, User> users = new ConcurrentHashMap<>();
 
     @PostMapping("/users")
@@ -54,7 +54,17 @@ public class UserController {
         return new ResponseEntity<>(users.values(), OK);
     }
 
+    @ExceptionHandler(RuntimeException.class)
+    public final ResponseEntity<Exception> handleAllExceptions(RuntimeException ex) {
+        return new ResponseEntity<Exception>(ex, INTERNAL_SERVER_ERROR);
+    }
+
     private int setNewId() {
         return idUserSequence++;
+    }
+
+    @DeleteMapping("/resetUsers")
+    public void resetForTests() {
+        idUserSequence = 1;
     }
 }
