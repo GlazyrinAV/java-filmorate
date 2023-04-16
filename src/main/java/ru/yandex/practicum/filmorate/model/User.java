@@ -17,7 +17,8 @@ import java.time.LocalDate;
 @EqualsAndHashCode(of = "id")
 public class User {
 
-    @Email(message = "Неверно указан электронный адрес.")
+    @Email(regexp = "^(?=.{1,64}@)[A-Za-z0-9_-]+(\\.[A-Za-z0-9_-]+)*@[^-][A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})$"
+            ,message = "Неверно указан электронный адрес.")
     @NotBlank(message = "Неверно указан электронный адрес.")
     private final String email;
 
