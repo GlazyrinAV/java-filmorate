@@ -45,6 +45,11 @@ public class InMemoryUserStorage implements UserStorage {
         return users.values();
     }
 
+    @Override
+    public User findFilm(int userId) {
+        return users.get(userId);
+    }
+
     public void resetUsersForTest() {
         idUserSequence = 1;
     }
