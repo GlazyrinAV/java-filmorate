@@ -10,6 +10,4 @@ public class UserService {
     @Autowired
     InMemoryUserStorage storage;
 
-    private static int idUserSequence = 1;
-
 }
