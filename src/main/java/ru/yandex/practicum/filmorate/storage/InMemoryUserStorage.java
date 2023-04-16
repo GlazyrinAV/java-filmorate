@@ -1,15 +1,13 @@
 package ru.yandex.practicum.filmorate.storage;
 
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exceptions.UserAlreadyExistsException;
+import ru.yandex.practicum.filmorate.exceptions.UserNotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-
-import static org.springframework.http.HttpStatus.*;
 
 @Component
 public class InMemoryUserStorage implements UserStorage {
@@ -26,7 +24,7 @@ public class InMemoryUserStorage implements UserStorage {
             }
             user.setId(setNewId());
             users.put(user.getId(), user);
-            return new ResponseEntity<>(user, CREATED);
+            return user;
         } else {
             throw new UserAlreadyExistsException("Такой пользователь уже существует.");
         }
@@ -35,16 +33,16 @@ public class InMemoryUserStorage implements UserStorage {
     @Override
     public User updateUser(User user) {
         if (!users.containsKey(user.getId())) {
-            return new ResponseEntity<>(user, NOT_FOUND);
+            throw new UserNotFoundException("Пользователь не найден.");
         } else {
             users.replace(user.getId(), user);
-            return new ResponseEntity<>(user, OK);
+            return user;
         }
     }
 
     @Override
     public Collection<User> findAllUsers() {
-        return new ResponseEntity<>(users.values(), OK);
+        return users.values();
     }
 
     public void resetUsersForTest() {

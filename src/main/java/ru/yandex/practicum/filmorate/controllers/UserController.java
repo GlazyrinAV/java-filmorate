@@ -22,19 +22,16 @@ public class UserController {
     @PostMapping("/users")
     public ResponseEntity<User> addNewUser(@Valid @RequestBody User user) {
         log.info("Получен запрос на создание пользователя.");
-
     }
 
     @PutMapping("/users")
     public ResponseEntity<User> updateUser(@Valid @RequestBody User user) {
         log.info("Получен запрос на обновление пользователя.");
-
     }
 
     @GetMapping("/users")
     public ResponseEntity<Collection<User>> getAllUsers() {
         log.info("Получен запрос на получение списка пользователей.");
-
     }
 
     @DeleteMapping("/resetUsers")
