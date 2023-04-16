@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exceptions.FilmAlreadyExistsException;
 import ru.yandex.practicum.filmorate.exceptions.FilmNotFoundException;
+import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import java.util.Collection;
@@ -22,6 +23,7 @@ public class InMemoryFilmStorage implements FilmStorage {
         if (!films.containsValue(film)) {
             film.setId(setNewId());
             films.put(film.getId(), film);
+            log.info("Фильм добавлен.");
             return film;
         } else {
             log.info("Такой фильм уже существует.");
@@ -33,9 +35,11 @@ public class InMemoryFilmStorage implements FilmStorage {
     public Film updateFilm(Film film) {
         if (films.containsKey(film.getId())) {
             films.replace(film.getId(), film);
+            log.info("Данные о фильме c ID " + film.getId() + " обновлены.");
             return film;
         } else {
-            throw new FilmNotFoundException("Фильм не найден.");
+            log.info("Фильм c ID " + film.getId() + " не найден.");
+            throw new FilmNotFoundException("Фильм c ID " + film.getId() + " не найден.");
         }
     }
 
@@ -46,7 +50,15 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public Film findFilm(int filmId) {
-        return films.get(filmId);
+        if (filmId <= 0) {
+            log.info("Указанный ID меньше или равен нулю.");
+            throw new ValidationException("ID не может быть меньше или равно нулю.");
+        } else if (!films.containsKey(filmId)) {
+            log.info("Фильм c ID " + filmId + " не найден.");
+            throw new FilmNotFoundException("Фильм c ID " + filmId + " не найден.");
+        } else {
+            return films.get(filmId);
+        }
     }
 
     public void resetFilmsForTests() {
