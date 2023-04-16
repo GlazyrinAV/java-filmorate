@@ -18,7 +18,7 @@ import static org.springframework.http.HttpStatus.*;
 @Slf4j
 public class FilmController {
 
-    private int idFilmSequence = 1;
+    private static int idFilmSequence = 1;
     private final Map<Integer, Film> films = new ConcurrentHashMap<>();
 
     @PostMapping("/films")
@@ -51,17 +51,12 @@ public class FilmController {
         return new ResponseEntity<>(films.values(), OK);
     }
 
-    @ExceptionHandler(RuntimeException.class)
-    public final ResponseEntity<Exception> handleAllExceptions(RuntimeException ex) {
-        return new ResponseEntity<Exception>(ex, INTERNAL_SERVER_ERROR);
+    @DeleteMapping("/resetFilms")
+    public void resetForTests() {
+        idFilmSequence = 1;
     }
 
     private int setNewId() {
         return idFilmSequence++;
-    }
-
-    @DeleteMapping("/resetFilms")
-    public void resetForTests() {
-        idFilmSequence = 1;
     }
 }
