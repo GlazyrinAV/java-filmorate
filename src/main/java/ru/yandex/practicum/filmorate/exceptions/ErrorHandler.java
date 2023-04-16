@@ -20,7 +20,13 @@ public class ErrorHandler {
         return new ErrorResponse("error", exception.getMessage());
     }
 
-    public class ErrorResponse {
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse ValidationException(ValidationException exception) {
+        return new ErrorResponse("error", exception.getMessage());
+    }
+
+    public static class ErrorResponse {
 
         String error;
 

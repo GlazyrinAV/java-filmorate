@@ -46,7 +46,7 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public User findFilm(int userId) {
+    public User findUser(int userId) {
         return users.get(userId);
     }
 
