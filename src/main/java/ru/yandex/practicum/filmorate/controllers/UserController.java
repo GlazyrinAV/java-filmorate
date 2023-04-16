@@ -1,15 +1,15 @@
 package ru.yandex.practicum.filmorate.controllers;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.UserService;
 
 import javax.validation.Valid;
 import java.util.Collection;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 import static org.springframework.http.HttpStatus.*;
 
@@ -18,8 +18,11 @@ import static org.springframework.http.HttpStatus.*;
 @Slf4j
 public class UserController {
 
-    private static int idUserSequence = 1;
-    private final Map<Integer, User> users = new ConcurrentHashMap<>();
+    @Autowired
+    UserService userService;
+
+
+
 
     @PostMapping("/users")
     public ResponseEntity<User> addNewUser(@Valid @RequestBody User user) {
