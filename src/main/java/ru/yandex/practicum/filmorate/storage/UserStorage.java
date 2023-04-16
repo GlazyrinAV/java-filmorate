@@ -6,10 +6,11 @@ import java.util.Collection;
 
 public interface UserStorage {
 
-    public User addNewUser(User user);
+    User addNewUser(User user);
 
-    public User updateUser(User user);
+    User updateUser(User user);
 
-    public Collection<User> findAllUsers();
+    Collection<User> findAllUsers();
 
+    User findFilm(int userId);
 }

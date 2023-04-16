@@ -44,6 +44,11 @@ public class InMemoryFilmStorage implements FilmStorage {
         return films.values();
     }
 
+    @Override
+    public Film findFilm(int filmId) {
+        return films.get(filmId);
+    }
+
     public void resetFilmsForTests() {
         idFilmSequence = 1;
     }

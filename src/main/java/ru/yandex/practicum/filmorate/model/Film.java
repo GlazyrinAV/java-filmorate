@@ -13,10 +13,15 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import java.time.Duration;
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
 @EqualsAndHashCode(of = "id")
 public class Film {
+
+    private final Set<Integer> liked = new HashSet<>();
+
     @NotBlank(message = "Неверно указано название фильма.")
     private final String name;
 
