@@ -42,7 +42,8 @@ public class UserControllerTests {
         String user = "{\"login\":\"dolore\",\"name\":\"NickName\",\"email\":\"mail@mail.ru\",\"birthday\":\"1946-08-20\"}";
         mockMvc.perform(post("/users").contentType(MediaType.APPLICATION_JSON).content(user))
                 .andExpect(status().isCreated())
-                .andExpect(content().string(containsString("{\"email\":\"mail@mail.ru\",\"login\":\"dolore\",\"name\":\"NickName\",\"birthday\":\"1946-08-20\",\"id\":1}")));
+                .andExpect(content().string(containsString("{\"email\":\"mail@mail.ru\",\"login\":\"dolore\"," +
+                        "\"name\":\"NickName\",\"birthday\":\"1946-08-20\",\"id\":1}")));
     }
 
     @Test
@@ -51,7 +52,8 @@ public class UserControllerTests {
         mockMvc.perform(post("/users").contentType(MediaType.APPLICATION_JSON).content(user));
         mockMvc.perform(get("/users"))
                 .andExpect(status().isOk())
-                .andExpect(content().string(containsString("{\"email\":\"mail@mail.ru\",\"login\":\"dolore\",\"name\":\"NickName\",\"birthday\":\"1946-08-20\",\"id\":1}")));
+                .andExpect(content().string(containsString("{\"email\":\"mail@mail.ru\",\"login\":\"dolore\"," +
+                        "\"name\":\"NickName\",\"birthday\":\"1946-08-20\",\"id\":1}")));
     }
 
     @ParameterizedTest
@@ -68,7 +70,8 @@ public class UserControllerTests {
                 "{\"login\":\"dolore\",\"name\":\"NickName\",\"email\":\"@mail.ru\",\"birthday\":\"1946-08-20\"}",
                 "{\"login\":\"dolore\",\"name\":\"NickName\",\"email\":\"a@\",\"birthday\":\"1946-08-20\"}",
                 "{\"login\":\"dolore\",\"name\":\"NickName\",\"email\":\"a a@mail.ru\",\"birthday\":\"1946-08-20\"}",
-                "{\"login\":\"dolore\",\"name\":\"NickName\",\"email\":\"mail@mail.ru\",\"birthday\":\"3000-08-20\"}"
+                "{\"login\":\"dolore\",\"name\":\"NickName\",\"email\":\"mail@mail.ru\",\"birthday\":\"3000-08-20\"}",
+                "{\"login\":\"dolore\",\"name\":\"NickName\",\"email\":\"масо@mail.ru\",\"birthday\":\"3000-08-20\"}"
         );
     }
 }
