@@ -51,6 +51,11 @@ public class FilmController {
         return new ResponseEntity<>(films.values(), OK);
     }
 
+    @DeleteMapping("/resetFilms")
+    public void resetForTests() {
+        idFilmSequence = 1;
+    }
+
     private int setNewId() {
         return idFilmSequence++;
     }

@@ -43,7 +43,7 @@ public class FilmControllerTests {
         mockMvc.perform(post("/films").contentType(MediaType.APPLICATION_JSON).content(film))
                 .andExpect(status().isCreated())
                 .andExpect(content().string(containsString("{\"name\":\"nisieiusmod\",\"description\":\"adipisicing\"," +
-                        "\"releaseDate\":\"1967-03-25\",\"duration\":100.000000000,\"id\":1}")));
+                        "\"releaseDate\":\"1967-03-25\",\"duration\":100,\"id\":1}")));
     }
 
     @Test
@@ -54,7 +54,7 @@ public class FilmControllerTests {
         mockMvc.perform(get("/films"))
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("[{\"name\":\"nisieiusmod\",\"description\":\"adipisicing\"," +
-                        "\"releaseDate\":\"1967-03-25\",\"duration\":100.000000000,\"id\":1}]")));
+                        "\"releaseDate\":\"1967-03-25\",\"duration\":100,\"id\":1}]")));
     }
 
     @ParameterizedTest
