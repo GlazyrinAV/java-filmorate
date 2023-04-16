@@ -10,6 +10,4 @@ public class FilmService {
     @Autowired
     InMemoryFilmStorage storage;
 
-    private static int idFilmSequence = 1;
-
 }
