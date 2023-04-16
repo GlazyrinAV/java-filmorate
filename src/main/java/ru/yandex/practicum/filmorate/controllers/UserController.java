@@ -54,7 +54,13 @@ public class UserController {
         return new ResponseEntity<>(users.values(), OK);
     }
 
+    @DeleteMapping("/resetUsers")
+    public void resetForTests() {
+        idUserSequence = 1;
+    }
+
     private int setNewId() {
         return idUserSequence++;
     }
+
 }
