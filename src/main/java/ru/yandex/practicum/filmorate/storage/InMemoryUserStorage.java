@@ -1,8 +1,10 @@
 package ru.yandex.practicum.filmorate.storage;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exceptions.UserAlreadyExistsException;
 import ru.yandex.practicum.filmorate.exceptions.UserNotFoundException;
+import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.Collection;
@@ -10,11 +12,11 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Component
+@Slf4j
 public class InMemoryUserStorage implements UserStorage {
 
-    private final Map<Integer, User> users = new ConcurrentHashMap<>();
-
     private static int idUserSequence = 1;
+    private final Map<Integer, User> users = new ConcurrentHashMap<>();
 
     @Override
     public User addNewUser(User user) {
@@ -24,8 +26,10 @@ public class InMemoryUserStorage implements UserStorage {
             }
             user.setId(setNewId());
             users.put(user.getId(), user);
+            log.info("Пользователь добавлен.");
             return user;
         } else {
+            log.info("Такой пользователь уже существует.");
             throw new UserAlreadyExistsException("Такой пользователь уже существует.");
         }
     }
@@ -33,9 +37,11 @@ public class InMemoryUserStorage implements UserStorage {
     @Override
     public User updateUser(User user) {
         if (!users.containsKey(user.getId())) {
-            throw new UserNotFoundException("Пользователь не найден.");
+            log.info("Пользователь c ID " + user.getId() + " не найден.");
+            throw new UserNotFoundException("Пользователь c ID " + user.getId() + " не найден.");
         } else {
             users.replace(user.getId(), user);
+            log.info("Данные о пользователе с ID " + user.getId() + " обновлены.");
             return user;
         }
     }
@@ -47,7 +53,15 @@ public class InMemoryUserStorage implements UserStorage {
 
     @Override
     public User findUser(int userId) {
-        return users.get(userId);
+        if (userId <= 0) {
+            log.info("Указанный ID меньше или равен нулю.");
+            throw new ValidationException("ID не может быть меньше или равно нулю.");
+        } else if (!users.containsKey(userId)) {
+            log.info("Пользователь c ID " + userId + " не найден.");
+            throw new UserNotFoundException("Пользователь c ID " + userId + " не найден.");
+        } else {
+            return users.get(userId);
+        }
     }
 
     public void resetUsersForTest() {

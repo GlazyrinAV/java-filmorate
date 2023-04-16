@@ -16,33 +16,21 @@ public class FilmService {
     InMemoryFilmStorage storage;
 
     public void addLike(int filmId) {
-        if (filmId <= 0) {
-            throw new ValidationException("ID не может быть меньше или равно нулю.");
-        } else if (storage.findFilm(filmId) == null) {
-            throw new ValidationException("Фильм c ID " + filmId + " не найден.");
-        } else {
-            storage.findFilm(filmId).getLiked().add(filmId);
-        }
+        storage.findFilm(filmId).getLiked().add(filmId);
     }
 
     public void removeLike(int filmId) {
-        if (filmId <= 0) {
-            throw new ValidationException("ID не может быть меньше или равно нулю.");
-        } else if (storage.findFilm(filmId) == null) {
-            throw new ValidationException("Фильм c ID " + filmId + " не найден.");
-        } else {
-            storage.findFilm(filmId).getLiked().remove(filmId);
-        }
+        storage.findFilm(filmId).getLiked().remove(filmId);
     }
 
     public Collection<Film> getLikes(int count) {
         if (count <= 0) {
-            throw new ValidationException("ID не может быть меньше или равно нулю.");
+            throw new ValidationException("Значение выводимых фильмов не может быть меньше или равно нулю.");
         } else {
-         return storage.findAllFilms().stream()
-                 .sorted(this::compare)
-                 .limit(count)
-                 .collect(Collectors.toList());
+            return storage.findAllFilms().stream()
+                    .sorted(this::compare)
+                    .limit(count)
+                    .collect(Collectors.toList());
         }
     }
 
