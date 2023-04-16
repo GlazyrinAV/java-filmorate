@@ -12,5 +12,5 @@ public interface UserStorage {
 
     Collection<User> findAllUsers();
 
-    User findFilm(int userId);
+    User findUser(int userId);
 }
