@@ -27,13 +27,11 @@ public class FilmController {
     @PutMapping("/films")
     public ResponseEntity<Film> updateFilm(@Valid @RequestBody Film film) {
         log.info("Получен запрос на обновление фильма.");
-
     }
 
     @GetMapping("/films")
     public ResponseEntity<Collection<Film>> getAllFilms() {
         log.info("Получен запрос на получение списка фильмов.");
-
     }
 
     @DeleteMapping("/resetFilms")
