@@ -55,6 +55,7 @@ public class UserController {
     @ResponseStatus(HttpStatus.OK)
     public User addNewFriend(@PathVariable int id, @PathVariable int friendId) {
         log.info("Получен запрос на добавление друга юзеру ID" + id);
+        userService.addFriend(friendId, id);
             return userService.addFriend(id, friendId);
     }
 
@@ -62,6 +63,7 @@ public class UserController {
     @ResponseStatus(HttpStatus.OK)
     public User removeFriend(@PathVariable int id, @PathVariable int friendId) {
         log.info("Получен запрос на удаление друга у юзера ID" + id);
+        userService.removeFriend(friendId, id);
         return userService.removeFriend(id, friendId);
     }
 
