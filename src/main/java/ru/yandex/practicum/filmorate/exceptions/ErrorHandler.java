@@ -41,7 +41,7 @@ public class ErrorHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public  ErrorResponse MethodArgumentNotValidException(MethodArgumentNotValidException exception) {
+    public  ErrorResponse methodArgumentNotValidException(MethodArgumentNotValidException exception) {
         return new ErrorResponse("error", "Получен неподходящий аргумент или аргумент неправильного типа");
     }
 
