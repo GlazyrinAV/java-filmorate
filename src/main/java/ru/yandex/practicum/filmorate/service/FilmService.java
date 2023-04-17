@@ -15,15 +15,15 @@ public class FilmService {
     @Autowired
     InMemoryFilmStorage storage;
 
-    public void addLike(int filmId) {
-        storage.findFilm(filmId).getLiked().add(filmId);
+    public void addLike(int filmId, int userId) {
+        storage.findFilm(filmId).getLiked().add(userId);
     }
 
-    public void removeLike(int filmId) {
-        storage.findFilm(filmId).getLiked().remove(filmId);
+    public void removeLike(int filmId, int userId) {
+        storage.findFilm(filmId).getLiked().remove(userId);
     }
 
-    public Collection<Film> getLikes(int count) {
+    public Collection<Film> getPopularFilms(int count) {
         if (count <= 0) {
             throw new ValidationException("Значение выводимых фильмов не может быть меньше или равно нулю.");
         } else {
