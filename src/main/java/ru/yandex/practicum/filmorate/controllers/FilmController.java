@@ -44,6 +44,27 @@ public class FilmController {
         return storage.findAllFilms();
     }
 
+    @PutMapping("/films/{id}/like/{userId}")
+    @ResponseStatus(HttpStatus.OK)
+    public void addNewLike(@PathVariable int id, @PathVariable int userId) {
+        log.info("Получен запрос на добавление лайка к фильму " + storage.findFilm(id).getName());
+        filmService.addLike(id, userId);
+    }
+
+    @DeleteMapping("/films/{id}/like/{userId}")
+    @ResponseStatus(HttpStatus.OK)
+    public void removeLike(@PathVariable int id, @PathVariable int userId) {
+        log.info("Получен запрос на удаление лайка к фильму " + storage.findFilm(id).getName());
+        filmService.removeLike(id, userId);
+    }
+
+    @GetMapping("/films/popular")
+    @ResponseStatus(HttpStatus.OK)
+    public Collection<Film> findPopularFilms(@RequestParam(defaultValue = "10") int count) {
+        log.info("Получен запрос на получение первых " + count + " популярных фиьмов.");
+        return filmService.getPopularFilms(count);
+    }
+
     @DeleteMapping("/resetFilms")
     @ResponseStatus(HttpStatus.OK)
     public void resetForTests() {
