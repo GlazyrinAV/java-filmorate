@@ -71,4 +71,8 @@ public class InMemoryUserStorage implements UserStorage {
     private int setNewId() {
         return idUserSequence++;
     }
+
+    public Map<Integer, User> getStorage() {
+        return users;
+    }
 }

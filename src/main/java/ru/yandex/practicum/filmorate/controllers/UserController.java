@@ -44,30 +44,37 @@ public class UserController {
         return storage.findAllUsers();
     }
 
+    @GetMapping("/users/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public User findUserById(@PathVariable int id) {
+        log.info("Получен запрос на поиск пользователя с ID" + id + ".");
+        return storage.findUser(id);
+    }
+
     @PutMapping("/users/{id}/friends/{friendId}")
     @ResponseStatus(HttpStatus.OK)
-    public void addNewFriend(@PathVariable int id, @PathVariable int friendId) {
+    public User addNewFriend(@PathVariable int id, @PathVariable int friendId) {
         log.info("Получен запрос на добавление друга юзеру ID" + id);
-        userService.addFriend(id, friendId);
+            return userService.addFriend(id, friendId);
     }
 
     @DeleteMapping("/users/{id}/friends/{friendId}")
     @ResponseStatus(HttpStatus.OK)
-    public void removeFriend(@PathVariable int id, @PathVariable int friendId) {
+    public User removeFriend(@PathVariable int id, @PathVariable int friendId) {
         log.info("Получен запрос на удаление друга у юзера ID" + id);
-        userService.removeFriend(id, friendId);
+        return userService.removeFriend(id, friendId);
     }
 
     @GetMapping("/users/{id}/friends")
     @ResponseStatus(HttpStatus.OK)
-    public Collection<Integer> findFriendsOfUser(@PathVariable int id) {
+    public Collection<User> findFriendsOfUser(@PathVariable int id) {
         log.info("Получен запрос на получение друзей у юзера ID" + id);
         return userService.findFriends(id);
     }
 
     @GetMapping("/users/{id}/friends/common/{otherId}")
     @ResponseStatus(HttpStatus.OK)
-    public Collection<Integer> findCommonFriends(@PathVariable int id, @PathVariable int otherId) {
+    public Collection<User> findCommonFriends(@PathVariable int id, @PathVariable int otherId) {
         log.info("Получен запрос на получение общих друзей у юзера ID" + id + " и юзера ID" + otherId);
         return userService.findCommonFriends(id, otherId);
     }

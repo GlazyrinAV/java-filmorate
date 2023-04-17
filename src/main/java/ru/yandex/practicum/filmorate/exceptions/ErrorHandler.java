@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.exceptions;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -21,7 +22,7 @@ public class ErrorHandler {
     }
 
     @ExceptionHandler
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse validationException(ValidationException exception) {
         return new ErrorResponse("error", exception.getMessage());
     }
@@ -36,6 +37,12 @@ public class ErrorHandler {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse otherException(RuntimeException exception) {
         return new ErrorResponse("error", "В работе сервера возникла ошибка.");
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public  ErrorResponse MethodArgumentNotValidException(MethodArgumentNotValidException exception) {
+        return new ErrorResponse("error", "Получен неподходящий аргумент или аргумент неправильного типа");
     }
 
     public static class ErrorResponse {
