@@ -44,6 +44,34 @@ public class UserController {
         return storage.findAllUsers();
     }
 
+    @PutMapping("/users/{id}/friends/{friendId}")
+    @ResponseStatus(HttpStatus.OK)
+    public void addNewFriend(@PathVariable int id, @PathVariable int friendId) {
+        log.info("Получен запрос на добавление друга юзеру ID" + id);
+        userService.addFriend(id, friendId);
+    }
+
+    @DeleteMapping("/users/{id}/friends/{friendId}")
+    @ResponseStatus(HttpStatus.OK)
+    public void removeFriend(@PathVariable int id, @PathVariable int friendId) {
+        log.info("Получен запрос на удаление друга у юзера ID" + id);
+        userService.removeFriend(id, friendId);
+    }
+
+    @GetMapping("/users/{id}/friends")
+    @ResponseStatus(HttpStatus.OK)
+    public Collection<Integer> findFriendsOfUser(@PathVariable int id) {
+        log.info("Получен запрос на получение друзей у юзера ID" + id);
+        return userService.findFriends(id);
+    }
+
+    @GetMapping("/users/{id}/friends/common/{otherId}")
+    @ResponseStatus(HttpStatus.OK)
+    public Collection<Integer> findCommonFriends(@PathVariable int id, @PathVariable int otherId) {
+        log.info("Получен запрос на получение общих друзей у юзера ID" + id + " и юзера ID" + otherId);
+        return userService.findCommonFriends(id, otherId);
+    }
+
     @DeleteMapping("/resetUsers")
     @ResponseStatus(HttpStatus.OK)
     public void resetForTests() {
