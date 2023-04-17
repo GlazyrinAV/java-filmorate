@@ -44,6 +44,13 @@ public class FilmController {
         return storage.findAllFilms();
     }
 
+    @GetMapping("/films/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public Film findFilmById(@PathVariable int id) {
+        log.info("Получен запрос на поиск фильма с ID" + id + ".");
+        return storage.findFilm(id);
+    }
+
     @PutMapping("/films/{id}/like/{userId}")
     @ResponseStatus(HttpStatus.OK)
     public void addNewLike(@PathVariable int id, @PathVariable int userId) {
@@ -61,7 +68,7 @@ public class FilmController {
     @GetMapping("/films/popular")
     @ResponseStatus(HttpStatus.OK)
     public Collection<Film> findPopularFilms(@RequestParam(defaultValue = "10") int count) {
-        log.info("Получен запрос на получение первых " + count + " популярных фиьмов.");
+        log.info("Получен запрос на получение первых " + count + " популярных фильмов.");
         return filmService.getPopularFilms(count);
     }
 
