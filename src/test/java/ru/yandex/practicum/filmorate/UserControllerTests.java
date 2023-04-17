@@ -38,22 +38,20 @@ public class UserControllerTests {
     }
 
     @Test
-    public void postFimNormal() throws Exception {
+    public void postUserNormal() throws Exception {
         String user = "{\"login\":\"dolore\",\"name\":\"NickName\",\"email\":\"mail@mail.ru\",\"birthday\":\"1946-08-20\"}";
         mockMvc.perform(post("/users").contentType(MediaType.APPLICATION_JSON).content(user))
                 .andExpect(status().isCreated())
-                .andExpect(content().string(containsString("{\"email\":\"mail@mail.ru\",\"login\":\"dolore\"," +
-                        "\"name\":\"NickName\",\"birthday\":\"1946-08-20\",\"id\":1}")));
+                .andExpect(content().string(containsString("{\"email\":\"mail@mail.ru\",\"login\":\"dolore\",\"name\":\"NickName\",\"birthday\":\"1946-08-20\",\"friends\":[],\"id\":1}")));
     }
 
     @Test
-    public void getFilmNormal() throws Exception {
+    public void getUserWithError() throws Exception {
         String user = "{\"login\":\"dolore\",\"name\":\"NickName\",\"email\":\"mail@mail.ru\",\"birthday\":\"1946-08-20\"}";
         mockMvc.perform(post("/users").contentType(MediaType.APPLICATION_JSON).content(user));
         mockMvc.perform(get("/users"))
                 .andExpect(status().isOk())
-                .andExpect(content().string(containsString("{\"email\":\"mail@mail.ru\",\"login\":\"dolore\"," +
-                        "\"name\":\"NickName\",\"birthday\":\"1946-08-20\",\"id\":1}")));
+                .andExpect(content().string(containsString("[{\"email\":\"mail@mail.ru\",\"login\":\"dolore\",\"name\":\"NickName\",\"birthday\":\"1946-08-20\",\"friends\":[],\"id\":1}]")));
     }
 
     @ParameterizedTest

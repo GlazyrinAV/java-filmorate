@@ -37,24 +37,23 @@ public class FilmControllerTests {
     }
 
     @Test
-    public void postFimNormal() throws Exception {
+    public void postFilmNormal() throws Exception {
         String film = "{\"name\":\"nisieiusmod\",\"description\":\"adipisicing\",\"releaseDate\":\"1967-03-25\"," +
                 "\"duration\":100}";
         mockMvc.perform(post("/films").contentType(MediaType.APPLICATION_JSON).content(film))
                 .andExpect(status().isCreated())
-                .andExpect(content().string(containsString("{\"name\":\"nisieiusmod\",\"description\":\"adipisicing\"," +
-                        "\"releaseDate\":\"1967-03-25\",\"duration\":100.000000000,\"id\":1}")));
+                .andExpect(content().string(containsString("{\"name\":\"nisieiusmod\",\"description\":" +
+                        "\"adipisicing\",\"releaseDate\":\"1967-03-25\",\"duration\":100.000000000,\"liked\":[],\"id\":1}")));
     }
 
     @Test
-    public void getFilmNormal() throws Exception {
+    public void getFilmWithErrors() throws Exception {
         String film = "{\"name\":\"nisieiusmod\",\"description\":\"adipisicing\",\"releaseDate\":\"1967-03-25\"," +
                 "\"duration\":100}";
         mockMvc.perform(post("/films").contentType(MediaType.APPLICATION_JSON).content(film));
         mockMvc.perform(get("/films"))
                 .andExpect(status().isOk())
-                .andExpect(content().string(containsString("[{\"name\":\"nisieiusmod\",\"description\":\"adipisicing\"," +
-                        "\"releaseDate\":\"1967-03-25\",\"duration\":100.000000000,\"id\":1}]")));
+                .andExpect(content().string(containsString("[{\"name\":\"nisieiusmod\",\"description\":\"adipisicing\",\"releaseDate\":\"1967-03-25\",\"duration\":100.000000000,\"liked\":[],\"id\":1}]")));
     }
 
     @ParameterizedTest
