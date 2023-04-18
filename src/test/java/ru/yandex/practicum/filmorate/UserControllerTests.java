@@ -67,38 +67,38 @@ public class UserControllerTests {
     }
 
     @Test
-    public void getFilmsEmpty() {
-        Assertions.assertTrue(storage.findAllUsers().isEmpty(), "Ошибка при получении пустого хранилища фильмов.");
+    public void getUsersEmpty() {
+        Assertions.assertTrue(storage.findAllUsers().isEmpty(), "Ошибка при получении пустого хранилища юзеров.");
     }
 
     @Test
-    public void getFilmsNormal() {
+    public void getUsersNormal() {
         User user = new User("abc@acb.ru", "login", "name", LocalDate.of(1986, Month.APRIL, 13));
         Set<ConstraintViolation<User>> violations = validator.validate(user);
         storage.addNewUser(user);
         Assertions.assertEquals("[User(friends=[], email=abc@acb.ru, login=login, name=name, birthday=1986-04-13, id=1)]", storage.findAllUsers().toString(),
-                "Ошибка при получении их хранилища фильма.");
+                "Ошибка при получении из хранилища существующего юзера.");
     }
 
     @Test
-    public void addNewFilmNormal() {
+    public void addNewUserNormal() {
         User user = new User("abc@acb.ru", "login", "name", LocalDate.of(1986, Month.APRIL, 13));
         Set<ConstraintViolation<User>> violations = validator.validate(user);
         Assertions.assertEquals(storage.addNewUser(user), user, "Ошибка при добавлении нового юзера в хранилище");
     }
 
     @Test
-    public void updateFilmNormal() {
+    public void updateUserNormal() {
         User user = new User("abc@acb.ru", "login", "name", LocalDate.of(1986, Month.APRIL, 13));
         Set<ConstraintViolation<User>> violations = validator.validate(user);
         storage.addNewUser(user);
         User userUpdate = new User("zxc@acb.ru", "nigol", "name", LocalDate.of(1986, Month.APRIL, 13), 1);
         Set<ConstraintViolation<User>> violations2 = validator.validate(userUpdate);
-        Assertions.assertSame(storage.updateUser(userUpdate), userUpdate, "Ошибка при нормальном обновлении фильма.");
+        Assertions.assertSame(storage.updateUser(userUpdate), userUpdate, "Ошибка при нормальном обновлении юзера.");
     }
 
     @Test
-    public void updateFilmWithWrongId() {
+    public void updateUserWithWrongId() {
         User user = new User("abc@acb.ru", "login", "name", LocalDate.of(1986, Month.APRIL, 13));
         Set<ConstraintViolation<User>> violations = validator.validate(user);
         storage.addNewUser(user);
@@ -106,6 +106,6 @@ public class UserControllerTests {
         Set<ConstraintViolation<User>> violations2 = validator.validate(userUpdate);
         UserNotFoundException exception = Assertions.assertThrows(UserNotFoundException.class, () -> storage.updateUser(userUpdate));
         Assertions.assertEquals(exception.getMessage(), "Пользователь c ID 99 не найден.",
-                "Ошибка при обновлении фильма с ошибочным ID.");
+                "Ошибка при обновлении юзера с ошибочным ID.");
     }
 }

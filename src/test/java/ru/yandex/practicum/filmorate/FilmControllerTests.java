@@ -50,7 +50,7 @@ public class FilmControllerTests {
         Set<ConstraintViolation<Film>> violations = validator.validate(film);
         violations.stream().map(ConstraintViolation::getMessage)
                 .forEach(System.out::println);
-        Assertions.assertSame(0, violations.size());
+        Assertions.assertSame(0, violations.size(), "Ошибка при создании нормального фильма.");
     }
 
     @ParameterizedTest
@@ -59,12 +59,12 @@ public class FilmControllerTests {
         Set<ConstraintViolation<Film>> violations = validator.validate(film);
         violations.stream().map(ConstraintViolation::getMessage)
                 .forEach(System.out::println);
-        Assertions.assertSame(1, violations.size());
+        Assertions.assertSame(1, violations.size(), "Ошибка при выявлении ошибок в данных фильма.");
     }
 
     @Test
     public void getFilmsEmpty() {
-        Assertions.assertTrue(filmStorage.findAllFilms().isEmpty());
+        Assertions.assertTrue(filmStorage.findAllFilms().isEmpty(), "Ошибка при получении пустого хранилища фильмов.");
     }
 
     @Test
@@ -72,13 +72,14 @@ public class FilmControllerTests {
         Film film = new Film("Name", "Description", LocalDate.of(1990, Month.APRIL, 13), Duration.ofMinutes(100));
         Set<ConstraintViolation<Film>> violations = validator.validate(film);
         filmStorage.addNewFilm(film);
-        Assertions.assertEquals("[Film(liked=[], name=Name, description=Description, releaseDate=1990-04-13, duration=PT1H40M, id=1)]", filmStorage.findAllFilms().toString());
+        Assertions.assertEquals("[Film(liked=[], name=Name, description=Description, releaseDate=1990-04-13, duration=PT1H40M, id=1)]", filmStorage.findAllFilms().toString(),
+                "Ошибка при получении из хранилища существующего фильма.");
     }
 
     @Test
     public void addNewFilmNormal() {
         Film film = new Film("Name", "Description", LocalDate.of(1990, Month.APRIL, 13), Duration.ofMinutes(100));
         Set<ConstraintViolation<Film>> violations = validator.validate(film);
-        Assertions.assertEquals(filmStorage.addNewFilm(film), film);
+        Assertions.assertEquals(filmStorage.addNewFilm(film), film, "Ошибка при добавлении в хранилище нормального фильма.");
     }
 }
