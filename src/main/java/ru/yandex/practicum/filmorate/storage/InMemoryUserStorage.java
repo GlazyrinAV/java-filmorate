@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class InMemoryUserStorage implements UserStorage {
 
-    private static int idUserSequence = 1;
+    private int idUserSequence = 1;
     private final Map<Integer, User> users = new ConcurrentHashMap<>();
 
     @Override

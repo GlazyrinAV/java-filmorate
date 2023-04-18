@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class InMemoryFilmStorage implements FilmStorage {
 
-    private static int idFilmSequence = 1;
+    private int idFilmSequence = 1;
     private final Map<Integer, Film> films = new ConcurrentHashMap<>();
 
     @Override
