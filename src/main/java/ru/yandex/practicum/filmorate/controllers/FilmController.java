@@ -18,10 +18,10 @@ import java.util.Collection;
 public class FilmController {
 
     @Autowired
-    FilmService filmService;
+    private FilmService filmService;
 
     @Autowired
-    InMemoryFilmStorage storage;
+    private InMemoryFilmStorage storage;
 
     @PostMapping("/films")
     @ResponseStatus(HttpStatus.CREATED)

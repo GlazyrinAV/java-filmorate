@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 public class UserService {
 
     @Autowired
-    InMemoryUserStorage storage;
+    private InMemoryUserStorage storage;
 
     public User addFriend(int userId, int friendId) {
         if (userId <= 0 || friendId <= 0) {
@@ -33,6 +33,7 @@ public class UserService {
         } else {
             log.info("Друг добавлен.");
             storage.findUser(userId).getFriends().add(friendId);
+            storage.findUser(friendId).getFriends().add(userId);
             return storage.findUser(friendId);
         }
     }
@@ -50,6 +51,7 @@ public class UserService {
         } else {
             log.info("Друг удален.");
             storage.findUser(userId).getFriends().remove(friendId);
+            storage.findUser(friendId).getFriends().remove(userId);
             return storage.findUser(friendId);
         }
     }
