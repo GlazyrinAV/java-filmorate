@@ -78,10 +78,4 @@ public class UserController {
         log.info("Получен запрос на получение общих друзей у юзера ID" + id + " и юзера ID" + otherId);
         return userService.findCommonFriends(id, otherId);
     }
-
-    @DeleteMapping("/resetUsers")
-    @ResponseStatus(HttpStatus.OK)
-    public void resetForTests() {
-        storage.resetUsersForTest();
-    }
 }

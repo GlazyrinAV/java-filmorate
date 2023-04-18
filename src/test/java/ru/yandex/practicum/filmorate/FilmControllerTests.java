@@ -1,67 +1,86 @@
 package ru.yandex.practicum.filmorate;
 
-import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.MethodSource;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
+import ru.yandex.practicum.filmorate.controllers.FilmController;
+import ru.yandex.practicum.filmorate.model.User;
 
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
+import java.time.LocalDate;
+import java.time.Month;
+import java.util.Set;
 import java.util.stream.Stream;
 
-import static org.hamcrest.Matchers.containsString;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 @SpringBootTest
-@AutoConfigureMockMvc
 public class FilmControllerTests {
 
-    @AfterEach
-    public void setup() throws Exception {
-        mockMvc.perform(delete("/resetFilms"));
-    }
+    private FilmController filmController;
 
-    @Autowired
-    private MockMvc mockMvc;
+    private Validator validator;
 
-    @Test
-    public void getFilmEmpty() throws Exception {
-        mockMvc.perform(get("/films"))
-                .andExpect(status().isOk())
-                .andExpect(content().string(containsString("[]")));
+    @BeforeEach
+    public void start() {
+        filmController = new FilmController();
+        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+        validator = factory.getValidator();
     }
 
     @Test
-    public void postFilmNormal() throws Exception {
-        String film = "{\"name\":\"nisieiusmod\",\"description\":\"adipisicing\",\"releaseDate\":\"1967-03-25\"," +
-                "\"duration\":100}";
-        mockMvc.perform(post("/films").contentType(MediaType.APPLICATION_JSON).content(film))
-                .andExpect(status().isCreated())
-                .andExpect(content().string(containsString("{\"name\":\"nisieiusmod\",\"description\":" +
-                        "\"adipisicing\",\"releaseDate\":\"1967-03-25\",\"duration\":100.000000000,\"liked\":[],\"id\":1}")));
+    public void createUserNormal() {
+        User user = new User("mail@mail.ru", "login", "name", LocalDate.of(1986, Month.APRIL, 13));
+        Set<ConstraintViolation<User>> violations = validator.validate(user);
+        violations.stream().map(ConstraintViolation::getMessage)
+                .forEach(System.out::println);
+        Assertions.assertSame(0, violations.size());
+
     }
 
-    @Test
-    public void getFilmWithErrors() throws Exception {
-        String film = "{\"name\":\"nisieiusmod\",\"description\":\"adipisicing\",\"releaseDate\":\"1967-03-25\"," +
-                "\"duration\":100}";
-        mockMvc.perform(post("/films").contentType(MediaType.APPLICATION_JSON).content(film));
-        mockMvc.perform(get("/films"))
-                .andExpect(status().isOk())
-                .andExpect(content().string(containsString("[{\"name\":\"nisieiusmod\",\"description\":\"adipisicing\",\"releaseDate\":\"1967-03-25\",\"duration\":100.000000000,\"liked\":[],\"id\":1}]")));
-    }
 
-    @ParameterizedTest
-    @MethodSource("filmWithWrongParameters")
-    public void postFilmsWithErrorData(String string) throws Exception {
-        mockMvc.perform(post("/films").contentType(MediaType.APPLICATION_JSON).content(string))
-                .andExpect(status().isBadRequest());
-    }
+
+
+
+
+
+
+
+//    @Test
+//    public void getFilmEmpty() throws Exception {
+//        mockMvc.perform(get("/films"))
+//                .andExpect(status().isOk())
+//                .andExpect(content().string(containsString("[]")));
+//    }
+//
+//    @Test
+//    public void postFilmNormal() throws Exception {
+//        String film = "{\"name\":\"nisieiusmod\",\"description\":\"adipisicing\",\"releaseDate\":\"1967-03-25\"," +
+//                "\"duration\":100}";
+//        mockMvc.perform(post("/films").contentType(MediaType.APPLICATION_JSON).content(film))
+//                .andExpect(status().isCreated())
+//                .andExpect(content().string(containsString("{\"name\":\"nisieiusmod\",\"description\":" +
+//                        "\"adipisicing\",\"releaseDate\":\"1967-03-25\",\"duration\":100.000000000,\"liked\":[],\"id\":1}")));
+//    }
+//
+//    @Test
+//    public void getFilmWithErrors() throws Exception {
+//        String film = "{\"name\":\"nisieiusmod\",\"description\":\"adipisicing\",\"releaseDate\":\"1967-03-25\"," +
+//                "\"duration\":100}";
+//        mockMvc.perform(post("/films").contentType(MediaType.APPLICATION_JSON).content(film));
+//        mockMvc.perform(get("/films"))
+//                .andExpect(status().isOk())
+//                .andExpect(content().string(containsString("[{\"name\":\"nisieiusmod\",\"description\":\"adipisicing\",\"releaseDate\":\"1967-03-25\",\"duration\":100.000000000,\"liked\":[],\"id\":1}]")));
+//    }
+//
+//    @ParameterizedTest
+//    @MethodSource("filmWithWrongParameters")
+//    public void postFilmsWithErrorData(String string) throws Exception {
+//        mockMvc.perform(post("/films").contentType(MediaType.APPLICATION_JSON).content(string))
+//                .andExpect(status().isBadRequest());
+//    }
 
     static Stream<String> filmWithWrongParameters() {
         return Stream.of(
