@@ -3,25 +3,19 @@ package ru.yandex.practicum.filmorate.controllers;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
-import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
 
 import javax.validation.Valid;
 import java.util.Collection;
 
 @RestController
-@Validated
 @Slf4j
 public class UserController {
 
     @Autowired
     private UserService userService;
-
-    @Autowired
-    private InMemoryUserStorage storage;
 
     @PostMapping("/users")
     @ResponseStatus(HttpStatus.CREATED)
