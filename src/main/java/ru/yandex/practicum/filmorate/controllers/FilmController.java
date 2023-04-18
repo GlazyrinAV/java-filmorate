@@ -1,57 +1,68 @@
 package ru.yandex.practicum.filmorate.controllers;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.service.FilmService;
 
 import javax.validation.Valid;
 import java.util.Collection;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
-import static org.springframework.http.HttpStatus.*;
 
 @RestController
-@Validated
 @Slf4j
 public class FilmController {
 
-    private static int idFilmSequence = 1;
-    private final Map<Integer, Film> films = new ConcurrentHashMap<>();
+    @Autowired
+    private FilmService filmService;
 
     @PostMapping("/films")
-    public ResponseEntity<Film> addNewFilm(@Valid @RequestBody Film film) {
+    @ResponseStatus(HttpStatus.CREATED)
+    public Film addNewFilm(@Valid @RequestBody Film film) {
         log.info("Получен запрос на создание фильма.");
-        if (!films.containsValue(film)) {
-            film.setId(setNewId());
-            films.put(film.getId(), film);
-            return new ResponseEntity<>(film, CREATED);
-        } else {
-            log.info("Такой фильм уже существует.");
-            return new ResponseEntity<>(film, BAD_REQUEST);
-        }
+        return filmService.addNewFilm(film);
     }
 
     @PutMapping("/films")
-    public ResponseEntity<Film> updateFilm(@Valid @RequestBody Film film) {
+    @ResponseStatus(HttpStatus.OK)
+    public Film updateFilm(@Valid @RequestBody Film film) {
         log.info("Получен запрос на обновление фильма.");
-        if (films.containsKey(film.getId())) {
-            films.replace(film.getId(), film);
-            return new ResponseEntity<>(film, OK);
-        } else {
-            return new ResponseEntity<>(film, NOT_FOUND);
-        }
+        return filmService.updateFilm(film);
     }
 
     @GetMapping("/films")
-    public ResponseEntity<Collection<Film>> getAllFilms() {
+    @ResponseStatus(HttpStatus.OK)
+    public Collection<Film> getAllFilms() {
         log.info("Получен запрос на получение списка фильмов.");
-        return new ResponseEntity<>(films.values(), OK);
+        return filmService.findAllFilms();
     }
 
-    private int setNewId() {
-        return idFilmSequence++;
+    @GetMapping("/films/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public Film findFilmById(@PathVariable int id) {
+        log.info("Получен запрос на поиск фильма с ID" + id + ".");
+        return filmService.findFilm(id);
+    }
+
+    @PutMapping("/films/{id}/like/{userId}")
+    @ResponseStatus(HttpStatus.OK)
+    public void addNewLike(@PathVariable int id, @PathVariable int userId) {
+        log.info("Получен запрос на добавление лайка к фильму ");
+        filmService.addLike(id, userId);
+    }
+
+    @DeleteMapping("/films/{id}/like/{userId}")
+    @ResponseStatus(HttpStatus.OK)
+    public void removeLike(@PathVariable int id, @PathVariable int userId) {
+        log.info("Получен запрос на удаление лайка к фильму ");
+        filmService.removeLike(id, userId);
+    }
+
+    @GetMapping("/films/popular")
+    @ResponseStatus(HttpStatus.OK)
+    public Collection<Film> findPopularFilms(@RequestParam(defaultValue = "10") int count) {
+        log.info("Получен запрос на получение первых " + count + " популярных фильмов.");
+        return filmService.getPopularFilms(count);
     }
 }
