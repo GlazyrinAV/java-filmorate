@@ -71,10 +71,4 @@ public class FilmController {
         log.info("Получен запрос на получение первых " + count + " популярных фильмов.");
         return filmService.getPopularFilms(count);
     }
-
-    @DeleteMapping("/resetFilms")
-    @ResponseStatus(HttpStatus.OK)
-    public void resetForTests() {
-        storage.resetFilmsForTests();
-    }
 }
