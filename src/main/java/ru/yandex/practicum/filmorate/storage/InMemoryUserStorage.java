@@ -7,9 +7,12 @@ import ru.yandex.practicum.filmorate.exceptions.UserNotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 @Component
 @Slf4j
@@ -64,15 +67,35 @@ public class InMemoryUserStorage implements UserStorage {
         }
     }
 
+    @Override
+    public User addFriend(int userId, int friendId) {
+        users.get(userId).getFriends().add(friendId);
+        users.get(friendId).getFriends().add(userId);
+        return users.get(friendId);
+    }
+
+    @Override
+    public User removeFriend(int userId, int friendId) {
+        users.get(userId).getFriends().remove(friendId);
+        users.get(friendId).getFriends().remove(userId);
+        return users.get(friendId);
+    }
+
+    @Override
+    public Collection<User> findCommonFriends(int user1Id, int user2Id) {
+        List<Integer> friendsOfUser1 = new ArrayList<>(users.get(user1Id).getFriends());
+        List<Integer> friendsOfUser2 = new ArrayList<>(users.get(user2Id).getFriends());
+        friendsOfUser1.retainAll(friendsOfUser2);
+        return users.values().stream()
+                .filter(user -> friendsOfUser1.contains(user.getId()))
+                .collect(Collectors.toList());
+    }
+
     public void resetUsersForTest() {
         idUserSequence = 1;
     }
 
     private int setNewId() {
         return idUserSequence++;
-    }
-
-    public Map<Integer, User> getStorage() {
-        return users;
     }
 }

@@ -10,7 +10,6 @@ import ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage;
 import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
 
 import java.util.Collection;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -37,7 +36,7 @@ public class FilmService {
             throw new FilmNotFoundException("Фильм c ID " + filmId + " не найден.");
         } else {
             log.info("К фильму добавлен лайк.");
-            filmStorage.findFilm(filmId).getLiked().add(userId);
+            filmStorage.addLike(filmId, userId);
         }
     }
 
@@ -56,7 +55,7 @@ public class FilmService {
             throw new FilmNotFoundException("Фильм c ID " + filmId + " не найден.");
         } else {
             log.info("У фильма удален лайк.");
-            filmStorage.findFilm(filmId).getLiked().remove(userId);
+            filmStorage.removeLike(filmId, userId);
         }
     }
 
@@ -64,14 +63,7 @@ public class FilmService {
         if (count <= 0) {
             throw new ValidationException("Значение выводимых фильмов не может быть меньше или равно нулю.");
         } else {
-            return filmStorage.findAllFilms().stream()
-                    .sorted(this::compare)
-                    .limit(count)
-                    .collect(Collectors.toList());
+            return filmStorage.findPopular(count);
         }
-    }
-
-    private int compare(Film p0, Film p1) {
-        return p1.getLiked().size() - (p0.getLiked().size());
     }
 }

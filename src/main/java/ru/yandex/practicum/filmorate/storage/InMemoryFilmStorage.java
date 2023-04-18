@@ -10,6 +10,7 @@ import ru.yandex.practicum.filmorate.model.Film;
 import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 @Component
 @Slf4j
@@ -61,11 +62,33 @@ public class InMemoryFilmStorage implements FilmStorage {
         }
     }
 
+    @Override
+    public Collection<Film> findPopular(int count) {
+        return films.values().stream()
+                .sorted(this::compare)
+                .limit(count)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public void addLike(int filmId, int userId) {
+        films.get(filmId).getLiked().add(userId);
+    }
+
+    @Override
+    public void removeLike(int filmId, int userId) {
+        films.get(filmId).getLiked().remove(userId);
+    }
+
     public void resetFilmsForTests() {
         idFilmSequence = 1;
     }
 
     private int setNewId() {
         return idFilmSequence++;
+    }
+
+    private int compare(Film p0, Film p1) {
+        return p1.getLiked().size() - (p0.getLiked().size());
     }
 }
