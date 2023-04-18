@@ -3,14 +3,17 @@ package ru.yandex.practicum.filmorate;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.boot.test.context.SpringBootTest;
-import ru.yandex.practicum.filmorate.controllers.FilmController;
-import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.Set;
@@ -19,78 +22,63 @@ import java.util.stream.Stream;
 @SpringBootTest
 public class FilmControllerTests {
 
-    private FilmController filmController;
+    private InMemoryFilmStorage filmStorage;
 
     private Validator validator;
 
+    static Stream<Film> filmWithWrongParameters() {
+        return Stream.of(
+                new Film("", "adipisicing", LocalDate.of(1967, Month.APRIL, 25), Duration.ofMinutes(100)),
+                new Film("name", "adipisicing", LocalDate.of(1800, Month.APRIL, 25), Duration.ofMinutes(100)),
+                new Film("name", "adipisicing", LocalDate.of(1967, Month.APRIL, 25), Duration.ofMinutes(-100)),
+                new Film("name", "nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn" +
+                        "nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn",
+                        LocalDate.of(1967, Month.APRIL, 25), Duration.ofMinutes(100))
+        );
+    }
+
     @BeforeEach
     public void start() {
-        filmController = new FilmController();
+        filmStorage = new InMemoryFilmStorage();
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
         validator = factory.getValidator();
     }
 
     @Test
-    public void createUserNormal() {
-        User user = new User("mail@mail.ru", "login", "name", LocalDate.of(1986, Month.APRIL, 13));
-        Set<ConstraintViolation<User>> violations = validator.validate(user);
+    public void createFilmNormal() {
+        Film film = new Film("Name", "Description", LocalDate.now(), Duration.ofMinutes(100));
+        Set<ConstraintViolation<Film>> violations = validator.validate(film);
         violations.stream().map(ConstraintViolation::getMessage)
                 .forEach(System.out::println);
         Assertions.assertSame(0, violations.size());
-
     }
 
+    @ParameterizedTest
+    @MethodSource("filmWithWrongParameters")
+    public void postFilmsWithErrorData(Film film) {
+        Set<ConstraintViolation<Film>> violations = validator.validate(film);
+        violations.stream().map(ConstraintViolation::getMessage)
+                .forEach(System.out::println);
+        Assertions.assertSame(1, violations.size());
+    }
 
+    @Test
+    public void getFilmsEmpty() {
+        Assertions.assertTrue(filmStorage.findAllFilms().isEmpty());
+    }
 
+    @Test
+    public void getFilmsNormal() {
+        Film film = new Film("Name", "Description", LocalDate.of(1990, Month.APRIL, 13), Duration.ofMinutes(100));
+        Set<ConstraintViolation<Film>> violations = validator.validate(film);
+        filmStorage.addNewFilm(film);
+        Assertions.assertTrue(filmStorage.findAllFilms().toString().equals("[Film(liked=[], name=Name, description=Description, releaseDate=1990-04-13, duration=PT1H40M, id=1)]"));
+    }
 
-
-
-
-
-
-//    @Test
-//    public void getFilmEmpty() throws Exception {
-//        mockMvc.perform(get("/films"))
-//                .andExpect(status().isOk())
-//                .andExpect(content().string(containsString("[]")));
-//    }
-//
-//    @Test
-//    public void postFilmNormal() throws Exception {
-//        String film = "{\"name\":\"nisieiusmod\",\"description\":\"adipisicing\",\"releaseDate\":\"1967-03-25\"," +
-//                "\"duration\":100}";
-//        mockMvc.perform(post("/films").contentType(MediaType.APPLICATION_JSON).content(film))
-//                .andExpect(status().isCreated())
-//                .andExpect(content().string(containsString("{\"name\":\"nisieiusmod\",\"description\":" +
-//                        "\"adipisicing\",\"releaseDate\":\"1967-03-25\",\"duration\":100.000000000,\"liked\":[],\"id\":1}")));
-//    }
-//
-//    @Test
-//    public void getFilmWithErrors() throws Exception {
-//        String film = "{\"name\":\"nisieiusmod\",\"description\":\"adipisicing\",\"releaseDate\":\"1967-03-25\"," +
-//                "\"duration\":100}";
-//        mockMvc.perform(post("/films").contentType(MediaType.APPLICATION_JSON).content(film));
-//        mockMvc.perform(get("/films"))
-//                .andExpect(status().isOk())
-//                .andExpect(content().string(containsString("[{\"name\":\"nisieiusmod\",\"description\":\"adipisicing\",\"releaseDate\":\"1967-03-25\",\"duration\":100.000000000,\"liked\":[],\"id\":1}]")));
-//    }
-//
-//    @ParameterizedTest
-//    @MethodSource("filmWithWrongParameters")
-//    public void postFilmsWithErrorData(String string) throws Exception {
-//        mockMvc.perform(post("/films").contentType(MediaType.APPLICATION_JSON).content(string))
-//                .andExpect(status().isBadRequest());
-//    }
-
-    static Stream<String> filmWithWrongParameters() {
-        return Stream.of(
-                "{\"name\":\"\",\"description\":\"adipisicing\",\"releaseDate\":\"1967-03-25\",\"duration\":100}",
-                "{\"name\":\"nisieiusmod\",\"description\":\"adipisicing\",\"releaseDate\":\"1700-03-25\",\"duration\":100}",
-                "{\"name\":\"nisieiusmod\",\"description\":\"adipisicing\",\"releaseDate\":\"1967-03-25\",\"duration\":-100}",
-                "{\"name\":\"nisieiusmod\",\"description\":\"Пятеродрузей(комик-группа«Шарло»)," +
-                        "приезжают в город Бризуль. Здесь они хотят разыскать господина Огюста Куглова," +
-                        " который задолжал им деньги, аименно 20миллионов. Куглов, который завремя «своего отсутствия»," +
-                        " стал кандидатом Коломбани.\",\"releaseDate\":\"1967-03-25\",\"duration\":100}"
-        );
+    @Test
+    public void addNewFilmNormal() {
+        Film film = new Film("Name", "Description", LocalDate.of(1990, Month.APRIL, 13), Duration.ofMinutes(100));
+        Set<ConstraintViolation<Film>> violations = validator.validate(film);
+        Assertions.assertEquals(filmStorage.addNewFilm(film), film);
     }
 }
