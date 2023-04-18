@@ -7,7 +7,6 @@ import ru.yandex.practicum.filmorate.exceptions.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage;
-import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
 
 import java.util.Collection;
 
@@ -19,7 +18,7 @@ public class FilmService {
     private InMemoryFilmStorage filmStorage;
 
     @Autowired
-    private InMemoryUserStorage userStorage;
+    private UserService userService;
 
     public Film addNewFilm(Film film) {
         return filmStorage.addNewFilm(film);
@@ -47,7 +46,7 @@ public class FilmService {
         } else if (userId <= 0) {
             log.info("Указанный ID юзера меньше или равен нулю.");
             throw new ValidationException("ID юзера не может быть меньше или равно нулю.");
-        } else if (userStorage.findUser(userId) == null) {
+        } else if (userService.findUserById(userId) == null) {
             log.info("Фильм c ID " + filmId + " не найден.");
             throw new FilmNotFoundException("Фильм c ID " + filmId + " не найден.");
         } else {
@@ -66,7 +65,7 @@ public class FilmService {
         } else if (userId <= 0) {
             log.info("Указанный ID юзера меньше или равен нулю.");
             throw new ValidationException("ID юзера не может быть меньше или равно нулю.");
-        } else if (userStorage.findUser(userId) == null) {
+        } else if (userService.findUserById(userId) == null) {
             log.info("Фильм c ID " + filmId + " не найден.");
             throw new FilmNotFoundException("Фильм c ID " + filmId + " не найден.");
         } else {
