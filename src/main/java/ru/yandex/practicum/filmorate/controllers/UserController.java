@@ -18,10 +18,10 @@ import java.util.Collection;
 public class UserController {
 
     @Autowired
-    UserService userService;
+    private UserService userService;
 
     @Autowired
-    InMemoryUserStorage storage;
+    private InMemoryUserStorage storage;
 
     @PostMapping("/users")
     @ResponseStatus(HttpStatus.CREATED)
@@ -55,15 +55,13 @@ public class UserController {
     @ResponseStatus(HttpStatus.OK)
     public User addNewFriend(@PathVariable int id, @PathVariable int friendId) {
         log.info("Получен запрос на добавление друга юзеру ID" + id);
-        userService.addFriend(friendId, id);
-            return userService.addFriend(id, friendId);
+        return userService.addFriend(id, friendId);
     }
 
     @DeleteMapping("/users/{id}/friends/{friendId}")
     @ResponseStatus(HttpStatus.OK)
     public User removeFriend(@PathVariable int id, @PathVariable int friendId) {
         log.info("Получен запрос на удаление друга у юзера ID" + id);
-        userService.removeFriend(friendId, id);
         return userService.removeFriend(id, friendId);
     }
 

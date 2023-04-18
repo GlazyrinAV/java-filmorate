@@ -17,10 +17,10 @@ import java.util.stream.Collectors;
 public class FilmService {
 
     @Autowired
-    InMemoryFilmStorage filmStorage;
+    private InMemoryFilmStorage filmStorage;
 
     @Autowired
-    InMemoryUserStorage userStorage;
+    private InMemoryUserStorage userStorage;
 
     public void addLike(int filmId, int userId) {
         if (filmId <= 0) {
