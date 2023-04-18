@@ -18,6 +18,22 @@ public class UserService {
     @Autowired
     private InMemoryUserStorage storage;
 
+    public User addNewUser(User user) {
+        return storage.addNewUser(user);
+    }
+
+    public User updateUser(User user) {
+        return storage.updateUser(user);
+    }
+
+    public Collection<User> findAllUsers() {
+        return storage.findAllUsers();
+    }
+
+    public User findUserById(int  userId) {
+        return storage.findUser(userId);
+    }
+
     public User addFriend(int userId, int friendId) {
         if (userId <= 0 || friendId <= 0) {
             log.info("Указан ID меньше или равный нулю.");
