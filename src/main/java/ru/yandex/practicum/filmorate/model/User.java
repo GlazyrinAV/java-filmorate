@@ -34,14 +34,14 @@ public class User {
     private final LocalDate birthday;
 
     private int id;
-
-    public User(String email, String login, String name, LocalDate birthday) {
-        this.email = email;
-        this.name = name;
-        this.login = login;
-        this.birthday = birthday;
-        this.id = 0;
-    }
+//
+//    public User(String email, String login, String name, LocalDate birthday) {
+//        this.email = email;
+//        this.name = name;
+//        this.login = login;
+//        this.birthday = birthday;
+//        this.id = 0;
+//    }
 
     public User(String email, String login, String name, LocalDate birthday, int id) {
         this.email = email;

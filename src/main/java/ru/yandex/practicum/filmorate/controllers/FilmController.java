@@ -3,25 +3,19 @@ package ru.yandex.practicum.filmorate.controllers;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
-import ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage;
 
 import javax.validation.Valid;
 import java.util.Collection;
 
 @RestController
-@Validated
 @Slf4j
 public class FilmController {
 
     @Autowired
     private FilmService filmService;
-
-    @Autowired
-    private InMemoryFilmStorage storage;
 
     @PostMapping("/films")
     @ResponseStatus(HttpStatus.CREATED)
@@ -54,14 +48,14 @@ public class FilmController {
     @PutMapping("/films/{id}/like/{userId}")
     @ResponseStatus(HttpStatus.OK)
     public void addNewLike(@PathVariable int id, @PathVariable int userId) {
-        log.info("Получен запрос на добавление лайка к фильму " + storage.findFilm(id).getName());
+        log.info("Получен запрос на добавление лайка к фильму ");
         filmService.addLike(id, userId);
     }
 
     @DeleteMapping("/films/{id}/like/{userId}")
     @ResponseStatus(HttpStatus.OK)
     public void removeLike(@PathVariable int id, @PathVariable int userId) {
-        log.info("Получен запрос на удаление лайка к фильму " + storage.findFilm(id).getName());
+        log.info("Получен запрос на удаление лайка к фильму ");
         filmService.removeLike(id, userId);
     }
 

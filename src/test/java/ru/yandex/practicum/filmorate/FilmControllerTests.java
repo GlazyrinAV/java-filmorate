@@ -28,12 +28,12 @@ public class FilmControllerTests {
 
     static Stream<Film> filmWithWrongParameters() {
         return Stream.of(
-                new Film("", "adipisicing", LocalDate.of(1967, Month.APRIL, 25), Duration.ofMinutes(100)),
-                new Film("name", "adipisicing", LocalDate.of(1800, Month.APRIL, 25), Duration.ofMinutes(100)),
-                new Film("name", "adipisicing", LocalDate.of(1967, Month.APRIL, 25), Duration.ofMinutes(-100)),
+                new Film("", "adipisicing", LocalDate.of(1967, Month.APRIL, 25), Duration.ofMinutes(100), 1),
+                new Film("name", "adipisicing", LocalDate.of(1800, Month.APRIL, 25), Duration.ofMinutes(100), 1),
+                new Film("name", "adipisicing", LocalDate.of(1967, Month.APRIL, 25), Duration.ofMinutes(-100), 1),
                 new Film("name", "nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn" +
                         "nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn",
-                        LocalDate.of(1967, Month.APRIL, 25), Duration.ofMinutes(100))
+                        LocalDate.of(1967, Month.APRIL, 25), Duration.ofMinutes(100), 1)
         );
     }
 
@@ -46,7 +46,7 @@ public class FilmControllerTests {
 
     @Test
     public void createFilmNormal() {
-        Film film = new Film("Name", "Description", LocalDate.now(), Duration.ofMinutes(100));
+        Film film = new Film("Name", "Description", LocalDate.now(), Duration.ofMinutes(100), 1);
         Set<ConstraintViolation<Film>> violations = validator.validate(film);
         violations.stream().map(ConstraintViolation::getMessage)
                 .forEach(System.out::println);
@@ -69,7 +69,7 @@ public class FilmControllerTests {
 
     @Test
     public void getFilmsNormal() {
-        Film film = new Film("Name", "Description", LocalDate.of(1990, Month.APRIL, 13), Duration.ofMinutes(100));
+        Film film = new Film("Name", "Description", LocalDate.of(1990, Month.APRIL, 13), Duration.ofMinutes(100), 1);
         Set<ConstraintViolation<Film>> violations = validator.validate(film);
         filmStorage.addNewFilm(film);
         Assertions.assertEquals("[Film(liked=[], name=Name, description=Description, releaseDate=1990-04-13, duration=PT1H40M, id=1)]", filmStorage.findAllFilms().toString(),
@@ -78,7 +78,7 @@ public class FilmControllerTests {
 
     @Test
     public void addNewFilmNormal() {
-        Film film = new Film("Name", "Description", LocalDate.of(1990, Month.APRIL, 13), Duration.ofMinutes(100));
+        Film film = new Film("Name", "Description", LocalDate.of(1990, Month.APRIL, 13), Duration.ofMinutes(100), 1);
         Set<ConstraintViolation<Film>> violations = validator.validate(film);
         Assertions.assertEquals(filmStorage.addNewFilm(film), film, "Ошибка при добавлении в хранилище нормального фильма.");
     }

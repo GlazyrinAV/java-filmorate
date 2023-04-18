@@ -30,14 +30,14 @@ public class UserControllerTests {
 
     static Stream<User> userWithWrongParameters() {
         return Stream.of(
-                new User("@acb.ru", "login", "name", LocalDate.of(1986, Month.APRIL, 13)),
-                new User("abc@", "login", "name", LocalDate.of(1986, Month.APRIL, 13)),
-                new User("a bc@acb.ru", "login", "name", LocalDate.of(1986, Month.APRIL, 13)),
-                new User("майл@acb.ru", "login", "name", LocalDate.of(1986, Month.APRIL, 13)),
-                new User("abc@acb", "login", "name", LocalDate.of(1986, Month.APRIL, 13)),
-                new User("abc@acb.ru", "", "name", LocalDate.of(1986, Month.APRIL, 13)),
-                new User("abc@acb.ru", "log in", "name", LocalDate.of(1986, Month.APRIL, 13)),
-                new User("abc@acb.ru", "login", "name", LocalDate.of(3000, Month.APRIL, 13))
+                new User("@acb.ru", "login", "name", LocalDate.of(1986, Month.APRIL, 13), 1),
+                new User("abc@", "login", "name", LocalDate.of(1986, Month.APRIL, 13), 1),
+                new User("a bc@acb.ru", "login", "name", LocalDate.of(1986, Month.APRIL, 13), 1),
+                new User("майл@acb.ru", "login", "name", LocalDate.of(1986, Month.APRIL, 13), 1),
+                new User("abc@acb", "login", "name", LocalDate.of(1986, Month.APRIL, 13), 1),
+                new User("abc@acb.ru", "", "name", LocalDate.of(1986, Month.APRIL, 13), 1),
+                new User("abc@acb.ru", "log in", "name", LocalDate.of(1986, Month.APRIL, 13), 1),
+                new User("abc@acb.ru", "login", "name", LocalDate.of(3000, Month.APRIL, 13), 1)
         );
     }
 
@@ -50,7 +50,7 @@ public class UserControllerTests {
 
     @Test
     public void newUserNormal() {
-        User user = new User("abc@acb.ru", "login", "name", LocalDate.of(1986, Month.APRIL, 13));
+        User user = new User("abc@acb.ru", "login", "name", LocalDate.of(1986, Month.APRIL, 13), 1);
         Set<ConstraintViolation<User>> violations = validator.validate(user);
         violations.stream().map(ConstraintViolation::getMessage)
                 .forEach(System.out::println);
@@ -73,7 +73,7 @@ public class UserControllerTests {
 
     @Test
     public void getUsersNormal() {
-        User user = new User("abc@acb.ru", "login", "name", LocalDate.of(1986, Month.APRIL, 13));
+        User user = new User("abc@acb.ru", "login", "name", LocalDate.of(1986, Month.APRIL, 13), 1);
         Set<ConstraintViolation<User>> violations = validator.validate(user);
         storage.addNewUser(user);
         Assertions.assertEquals("[User(friends=[], email=abc@acb.ru, login=login, name=name, birthday=1986-04-13, id=1)]", storage.findAllUsers().toString(),
@@ -82,14 +82,14 @@ public class UserControllerTests {
 
     @Test
     public void addNewUserNormal() {
-        User user = new User("abc@acb.ru", "login", "name", LocalDate.of(1986, Month.APRIL, 13));
+        User user = new User("abc@acb.ru", "login", "name", LocalDate.of(1986, Month.APRIL, 13), 1);
         Set<ConstraintViolation<User>> violations = validator.validate(user);
         Assertions.assertEquals(storage.addNewUser(user), user, "Ошибка при добавлении нового юзера в хранилище");
     }
 
     @Test
     public void updateUserNormal() {
-        User user = new User("abc@acb.ru", "login", "name", LocalDate.of(1986, Month.APRIL, 13));
+        User user = new User("abc@acb.ru", "login", "name", LocalDate.of(1986, Month.APRIL, 13), 1);
         Set<ConstraintViolation<User>> violations = validator.validate(user);
         storage.addNewUser(user);
         User userUpdate = new User("zxc@acb.ru", "nigol", "name", LocalDate.of(1986, Month.APRIL, 13), 1);
@@ -99,7 +99,7 @@ public class UserControllerTests {
 
     @Test
     public void updateUserWithWrongId() {
-        User user = new User("abc@acb.ru", "login", "name", LocalDate.of(1986, Month.APRIL, 13));
+        User user = new User("abc@acb.ru", "login", "name", LocalDate.of(1986, Month.APRIL, 13), 1);
         Set<ConstraintViolation<User>> violations = validator.validate(user);
         storage.addNewUser(user);
         User userUpdate = new User("zxc@acb.ru", "nigol", "name", LocalDate.of(1986, Month.APRIL, 13), 99);
