@@ -21,6 +21,22 @@ public class FilmService {
     @Autowired
     private InMemoryUserStorage userStorage;
 
+    public Film addNewFilm(Film film) {
+        return filmStorage.addNewFilm(film);
+    }
+
+    public Film updateFilm(Film film) {
+        return filmStorage.updateFilm(film);
+    }
+
+    public Collection<Film> findAllFilms()  {
+        return filmStorage.findAllFilms();
+    }
+
+    public Film findFilm(int filmId) {
+        return filmStorage.findFilm(filmId);
+    }
+
     public void addLike(int filmId, int userId) {
         if (filmId <= 0) {
             log.info("Указанный ID фильма меньше или равен нулю.");

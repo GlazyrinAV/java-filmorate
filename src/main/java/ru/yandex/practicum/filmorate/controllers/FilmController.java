@@ -27,28 +27,28 @@ public class FilmController {
     @ResponseStatus(HttpStatus.CREATED)
     public Film addNewFilm(@Valid @RequestBody Film film) {
         log.info("Получен запрос на создание фильма.");
-        return storage.addNewFilm(film);
+        return filmService.addNewFilm(film);
     }
 
     @PutMapping("/films")
     @ResponseStatus(HttpStatus.OK)
     public Film updateFilm(@Valid @RequestBody Film film) {
         log.info("Получен запрос на обновление фильма.");
-        return storage.updateFilm(film);
+        return filmService.updateFilm(film);
     }
 
     @GetMapping("/films")
     @ResponseStatus(HttpStatus.OK)
     public Collection<Film> getAllFilms() {
         log.info("Получен запрос на получение списка фильмов.");
-        return storage.findAllFilms();
+        return filmService.findAllFilms();
     }
 
     @GetMapping("/films/{id}")
     @ResponseStatus(HttpStatus.OK)
     public Film findFilmById(@PathVariable int id) {
         log.info("Получен запрос на поиск фильма с ID" + id + ".");
-        return storage.findFilm(id);
+        return filmService.findFilm(id);
     }
 
     @PutMapping("/films/{id}/like/{userId}")

@@ -27,28 +27,28 @@ public class UserController {
     @ResponseStatus(HttpStatus.CREATED)
     public User addNewUser(@Valid @RequestBody User user) {
         log.info("Получен запрос на создание пользователя.");
-        return storage.addNewUser(user);
+        return userService.addNewUser(user);
     }
 
     @PutMapping("/users")
     @ResponseStatus(HttpStatus.OK)
     public User updateUser(@Valid @RequestBody User user) {
         log.info("Получен запрос на обновление пользователя.");
-        return storage.updateUser(user);
+        return userService.updateUser(user);
     }
 
     @GetMapping("/users")
     @ResponseStatus(HttpStatus.OK)
     public Collection<User> getAllUsers() {
         log.info("Получен запрос на получение списка пользователей.");
-        return storage.findAllUsers();
+        return userService.findAllUsers();
     }
 
     @GetMapping("/users/{id}")
     @ResponseStatus(HttpStatus.OK)
     public User findUserById(@PathVariable int id) {
         log.info("Получен запрос на поиск пользователя с ID" + id + ".");
-        return storage.findUser(id);
+        return userService.findUserById(id);
     }
 
     @PutMapping("/users/{id}/friends/{friendId}")
