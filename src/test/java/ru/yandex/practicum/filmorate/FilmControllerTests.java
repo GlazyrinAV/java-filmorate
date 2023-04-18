@@ -72,7 +72,7 @@ public class FilmControllerTests {
         Film film = new Film("Name", "Description", LocalDate.of(1990, Month.APRIL, 13), Duration.ofMinutes(100));
         Set<ConstraintViolation<Film>> violations = validator.validate(film);
         filmStorage.addNewFilm(film);
-        Assertions.assertTrue(filmStorage.findAllFilms().toString().equals("[Film(liked=[], name=Name, description=Description, releaseDate=1990-04-13, duration=PT1H40M, id=1)]"));
+        Assertions.assertEquals("[Film(liked=[], name=Name, description=Description, releaseDate=1990-04-13, duration=PT1H40M, id=1)]", filmStorage.findAllFilms().toString());
     }
 
     @Test
