@@ -33,16 +33,9 @@ public class Film {
     @DurationConstraint
     private final Duration duration;
 
-    private int id;
-//
-//    public Film(String name, String description, LocalDate releaseDate, Duration duration) {
-//        this.name = name;
-//        this.description = description;
-//        this.releaseDate = releaseDate;
-//        this.duration = duration;
-//    }
+    private Integer id;
 
-    public Film(String name, String description, LocalDate releaseDate, Duration duration, int id) {
+    public Film(String name, String description, LocalDate releaseDate, Duration duration, Integer id) {
         this.name = name;
         this.description = description;
         this.releaseDate = releaseDate;

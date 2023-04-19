@@ -33,17 +33,9 @@ public class User {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private final LocalDate birthday;
 
-    private int id;
-//
-//    public User(String email, String login, String name, LocalDate birthday) {
-//        this.email = email;
-//        this.name = name;
-//        this.login = login;
-//        this.birthday = birthday;
-//        this.id = 0;
-//    }
+    private Integer id;
 
-    public User(String email, String login, String name, LocalDate birthday, int id) {
+    public User(String email, String login, String name, LocalDate birthday, Integer id) {
         this.email = email;
         this.name = name;
         this.login = login;

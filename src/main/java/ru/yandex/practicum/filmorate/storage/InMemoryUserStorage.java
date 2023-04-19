@@ -98,4 +98,8 @@ public class InMemoryUserStorage implements UserStorage {
     private int setNewId() {
         return idUserSequence++;
     }
+
+    public void resetCounter() {
+        idUserSequence = 1;
+    }
 }
