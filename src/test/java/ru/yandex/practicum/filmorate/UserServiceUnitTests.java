@@ -11,9 +11,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import ru.yandex.practicum.filmorate.exceptions.UserNotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.service.FilmService;
 import ru.yandex.practicum.filmorate.service.UserService;
-import ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage;
 import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
 
 import javax.validation.ConstraintViolation;
@@ -32,12 +30,9 @@ public class UserServiceUnitTests {
 
     private static final ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
     private static final Validator validator = factory.getValidator();
-    @Autowired
-    private FilmService filmService;
+
     @Autowired
     private UserService userService;
-    @Autowired
-    private InMemoryFilmStorage storage;
     @Autowired
     private InMemoryUserStorage userStorage;
 
@@ -56,8 +51,6 @@ public class UserServiceUnitTests {
 
     @BeforeEach
     public void start() {
-        storage.findAllFilms().clear();
-        storage.resetCounter();
         userStorage.findAllUsers().clear();
         userStorage.resetCounter();
     }
