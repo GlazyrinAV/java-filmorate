@@ -32,7 +32,7 @@ import java.util.Set;
 import java.util.stream.Stream;
 
 @SpringBootTest
-public class FilmControllerTests {
+public class FilmServiceUnitTests {
 
     private static final ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
     private static final Validator validator = factory.getValidator();
@@ -301,7 +301,7 @@ public class FilmControllerTests {
         filmService.addNewFilm(film);
         Film film2 = new Film("Name2", "Description2", LocalDate.of(1990, Month.APRIL, 13), Duration.ofMinutes(100), null);
         filmService.addNewFilm(film2);
-        User user = new User("abc@acb.ru", "login", "name", LocalDate.of(1986, Month.APRIL, 13), 1);
+        User user = new User("abc@acb.ru", "login", "name", LocalDate.of(1986, Month.APRIL, 13), null);
         userService.addNewUser(user);
         filmService.addLike(1, 1);
         Assertions.assertEquals(filmService.getPopularFilms(10), new ArrayList<>(List.of(film, film2)),
