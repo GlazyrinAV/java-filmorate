@@ -14,7 +14,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Data
-@EqualsAndHashCode(of = "id")
+@EqualsAndHashCode(exclude = "id")
 public class User {
 
     private final Set<Integer> friends = new HashSet<>();
