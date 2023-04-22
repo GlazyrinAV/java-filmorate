@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.exceptions;
 
+import lombok.Data;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -45,23 +46,12 @@ public class ErrorHandler {
         return new ErrorResponse("error", "Получен неподходящий аргумент или аргумент неправильного типа");
     }
 
+    @Data
     public static class ErrorResponse {
 
-        String error;
+        private final String error;
 
-        String description;
+        private final String description;
 
-        public ErrorResponse(String error, String description) {
-            this.error = error;
-            this.description = description;
-        }
-
-        public String getError() {
-            return error;
-        }
-
-        public String getDescription() {
-            return description;
-        }
     }
 }
