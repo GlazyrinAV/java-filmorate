@@ -17,9 +17,11 @@ import java.util.stream.Collectors;
 @Slf4j
 public class UserService {
 
-    @Autowired
-    @Qualifier("UserDbStorage")
-    private UserStorage storage;
+    private final UserStorage storage;
+
+    public UserService(@Qualifier("UserDbStorage") UserStorage storage) {
+        this.storage = storage;
+    }
 
     public User addNewUser(User user) {
         return storage.addNewUser(user);

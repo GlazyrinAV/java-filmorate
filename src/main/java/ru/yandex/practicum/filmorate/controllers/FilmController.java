@@ -14,8 +14,11 @@ import java.util.Collection;
 @Slf4j
 public class FilmController {
 
-    @Autowired
-    private FilmService filmService;
+    private final FilmService filmService;
+
+    public FilmController(FilmService filmService) {
+        this.filmService = filmService;
+    }
 
     @PostMapping("/films")
     @ResponseStatus(HttpStatus.CREATED)

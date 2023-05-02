@@ -1,19 +1,51 @@
 package ru.yandex.practicum.filmorate.storage;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Component;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
+import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.model.User;
 
+import java.sql.Date;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Collection;
 
-@Component
+@Repository
 @Slf4j
 @Qualifier("UserDbStorage")
 public class UserDbStorage implements UserStorage {
+
+    private final JdbcTemplate jdbcTemplate;
+
+    @Autowired
+    public UserDbStorage(JdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
+    }
+
     @Override
     public User addNewUser(User user) {
-        return null;
+        String sqlQuery = "INSERT INTO users (name, login, email, birthday) values (?, ?, ?, ?)";
+        // jdbcTemplate.update(sqlQuery, user.getName(), user.getLogin(), user.getEmail(), user.getBirthday());
+
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+        jdbcTemplate.update(connection -> {
+            PreparedStatement stmt = connection.prepareStatement(sqlQuery, new String[]{"user_id"});
+            stmt.setString(1, user.getName());
+            stmt.setString(2, user.getLogin());
+            stmt.setString(3, user.getEmail());
+            stmt.setDate(4, Date.valueOf(user.getBirthday()));
+            return stmt;
+        }, keyHolder);
+
+        int user_id = keyHolder.getKey().intValue();
+        return findUser(user_id);
     }
 
     @Override
@@ -28,7 +60,18 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public User findUser(int userId) {
-        return null;
+        String sqlQuery = "SELECT * FROM users where user_id = ?";
+        return jdbcTemplate.queryForObject(sqlQuery, this::mapRowToUser, userId);
+    }
+
+    private User mapRowToUser(ResultSet resultSet, int rowNum) throws SQLException {
+        return User.builder()
+                .id(resultSet.getInt("user_id"))
+                .name(resultSet.getString("name"))
+                .login(resultSet.getString("login"))
+                .email(resultSet.getString("email"))
+                .birthday(resultSet.getDate("birthday").toLocalDate())
+                .build();
     }
 
     @Override

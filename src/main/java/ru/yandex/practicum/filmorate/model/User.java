@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.model;
 
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import ru.yandex.practicum.filmorate.customConstraints.WhiteSpaceConstraint;
@@ -15,6 +16,7 @@ import java.util.Set;
 
 @Data
 @EqualsAndHashCode(exclude = "id")
+@Builder
 public class User {
 
     private final Set<Integer> friends = new HashSet<>();

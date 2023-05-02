@@ -14,8 +14,11 @@ import java.util.Collection;
 @Slf4j
 public class UserController {
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
+
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
 
     @PostMapping("/users")
     @ResponseStatus(HttpStatus.CREATED)
