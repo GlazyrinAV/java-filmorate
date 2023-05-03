@@ -16,6 +16,8 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Collection;
+import java.util.Objects;
+import java.util.Optional;
 
 @Repository
 @Slf4j
@@ -32,9 +34,9 @@ public class UserDbStorage implements UserStorage {
     @Override
     public User addNewUser(User user) {
         String sqlQuery = "INSERT INTO users (name, login, email, birthday) values (?, ?, ?, ?)";
-        // jdbcTemplate.update(sqlQuery, user.getName(), user.getLogin(), user.getEmail(), user.getBirthday());
 
         KeyHolder keyHolder = new GeneratedKeyHolder();
+
         jdbcTemplate.update(connection -> {
             PreparedStatement stmt = connection.prepareStatement(sqlQuery, new String[]{"user_id"});
             stmt.setString(1, user.getName());
@@ -44,8 +46,9 @@ public class UserDbStorage implements UserStorage {
             return stmt;
         }, keyHolder);
 
-        int user_id = keyHolder.getKey().intValue();
-        return findUser(user_id);
+        Optional<Integer> user_id = Optional.of(Objects.requireNonNull(keyHolder.getKey()).intValue());
+
+        return findUser(user_id.get());
     }
 
     @Override
