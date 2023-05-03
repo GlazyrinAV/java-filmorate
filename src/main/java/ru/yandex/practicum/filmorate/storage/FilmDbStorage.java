@@ -15,7 +15,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.Duration;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -55,28 +54,31 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public Film updateFilm(Film film) {
-        return null;
+        String sqlQuery = "UPDATE films SET " +
+                "name = ?," +
+                "description = ?," +
+                "release_date = ?," +
+                "duration = ?" +
+                "WHERE film_id = ?";
+        jdbcTemplate.update(sqlQuery,
+                film.getName(),
+                film.getDescription(),
+                Date.valueOf(film.getReleaseDate()),
+                film.getDuration().toMinutes(),
+                film.getId());
+        return findFilm(film.getId());
     }
 
     @Override
     public Collection<Film> findAllFilms() {
-        return null;
+        String sqlQuery = "SELECT * FROM films";
+        return jdbcTemplate.query(sqlQuery, this::mapRowToFilm);
     }
 
     @Override
     public Film findFilm(int filmId) {
         String sqlQuery = "SELECT * FROM films where film_id = ?";
         return jdbcTemplate.queryForObject(sqlQuery, this::mapRowToFilm, filmId);
-    }
-
-    private Film mapRowToFilm(ResultSet resultSet, int rowNum) throws SQLException {
-        return Film.builder()
-                .id(resultSet.getInt("film_id"))
-                .name(resultSet.getString("name"))
-                .description(resultSet.getString("description"))
-                .releaseDate(resultSet.getDate("release_date").toLocalDate())
-                .duration(Duration.ofMinutes(resultSet.getLong("duration")))
-                .build();
     }
 
     @Override
@@ -92,5 +94,15 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     public void removeLike(int filmId, int userId) {
 
+    }
+
+    private Film mapRowToFilm(ResultSet resultSet, int rowNum) throws SQLException {
+        return Film.builder()
+                .id(resultSet.getInt("film_id"))
+                .name(resultSet.getString("name"))
+                .description(resultSet.getString("description"))
+                .releaseDate(resultSet.getDate("release_date").toLocalDate())
+                .duration(Duration.ofMinutes(resultSet.getLong("duration")))
+                .build();
     }
 }

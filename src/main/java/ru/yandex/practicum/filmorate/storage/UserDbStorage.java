@@ -13,8 +13,6 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.Collection;
 import java.util.Objects;
 import java.util.Optional;
@@ -53,28 +51,31 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public User updateUser(User user) {
-        return null;
+        String sqlQuery = "UPDATE users SET " +
+                "name = ?," +
+                "login = ?," +
+                "email = ?," +
+                "birthday = ?" +
+                "WHERE user_id = ?";
+        jdbcTemplate.update(sqlQuery,
+                user.getName(),
+                user.getLogin(),
+                user.getEmail(),
+                Date.valueOf(user.getBirthday()),
+                user.getId());
+        return findUser(user.getId());
     }
 
     @Override
     public Collection<User> findAllUsers() {
-        return null;
+        String sqlQuery = "SELECT * FROM users";
+        return jdbcTemplate.query(sqlQuery, this::mapRowToUser);
     }
 
     @Override
     public User findUser(int userId) {
         String sqlQuery = "SELECT * FROM users where user_id = ?";
         return jdbcTemplate.queryForObject(sqlQuery, this::mapRowToUser, userId);
-    }
-
-    private User mapRowToUser(ResultSet resultSet, int rowNum) throws SQLException {
-        return User.builder()
-                .id(resultSet.getInt("user_id"))
-                .name(resultSet.getString("name"))
-                .login(resultSet.getString("login"))
-                .email(resultSet.getString("email"))
-                .birthday(resultSet.getDate("birthday").toLocalDate())
-                .build();
     }
 
     @Override
@@ -90,5 +91,15 @@ public class UserDbStorage implements UserStorage {
     @Override
     public Collection<User> findCommonFriends(int user1Id, int user2Id) {
         return null;
+    }
+
+    private User mapRowToUser(ResultSet resultSet, int rowNum) throws SQLException {
+        return User.builder()
+                .id(resultSet.getInt("user_id"))
+                .name(resultSet.getString("name"))
+                .login(resultSet.getString("login"))
+                .email(resultSet.getString("email"))
+                .birthday(resultSet.getDate("birthday").toLocalDate())
+                .build();
     }
 }
