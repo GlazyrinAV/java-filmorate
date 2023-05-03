@@ -79,13 +79,28 @@ public class UserDbStorage implements UserStorage {
     }
 
     @Override
-    public User addFriend(int userId, int friendId) {
-        return null;
+    public void addFriend(int userId, int friendId) {
+        String sqlQuery = "INSERT INTO list_of_friends (user_id, friend_id, friendship_status_id) " +
+                "VALUES (?, ?, ?)";
+        int friendship_status;
+        if (findFriendshipStatus(friendId, userId) == 1) {
+            friendship_status = 2;
+        } else {
+            friendship_status = 1;
+        }
+        jdbcTemplate.update(sqlQuery, userId, friendId, friendship_status);
+        if (friendship_status == 2) {
+            String sqlQuery2 = "UPDATE list_of_friends SET " +
+                    "friendship_status_id = ? WHERE user_id = ? AND friend_id = ?";
+            jdbcTemplate.update(sqlQuery2, friendId, userId, friendship_status);
+        }
     }
 
     @Override
-    public User removeFriend(int userId, int friendId) {
-        return null;
+    public void removeFriend(int userId, int friendId) {
+        String sqlQuery = "DELETE FROM list_of_friends WHERE (user_id = ? AND friend_id = ?) OR" +
+                "(user_id = ? AND friend_id = ?)";
+        jdbcTemplate.update(sqlQuery, userId, friendId, friendId, userId);
     }
 
     @Override
@@ -101,5 +116,15 @@ public class UserDbStorage implements UserStorage {
                 .email(resultSet.getString("email"))
                 .birthday(resultSet.getDate("birthday").toLocalDate())
                 .build();
+    }
+
+    private int findFriendshipStatus(int userId, int friendId) {
+        String sqlQuery = "SELECT friendship_status_id FROM list_of_friends" +
+                " WHERE user_id = ? AND friend_id = ?";
+        if (!jdbcTemplate.queryForRowSet(sqlQuery, userId, friendId).next()) {
+            return 1;
+        } else {
+            return jdbcTemplate.queryForRowSet(sqlQuery, userId, friendId).findColumn("friendship_status_id");
+        }
     }
 }

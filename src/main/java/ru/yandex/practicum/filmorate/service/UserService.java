@@ -1,13 +1,11 @@
 package ru.yandex.practicum.filmorate.service;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.UserNotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.util.Collection;
@@ -39,7 +37,7 @@ public class UserService {
         return storage.findUser(userId);
     }
 
-    public User addFriend(int userId, int friendId) {
+    public void addFriend(int userId, int friendId) {
         if (userId <= 0 || friendId <= 0) {
             log.info("Указан ID меньше или равный нулю.");
             throw new ValidationException("ID не может быть меньше или равно нулю.");
@@ -51,11 +49,11 @@ public class UserService {
             throw new UserNotFoundException("Пользователь c ID " + friendId + " не найден.");
         } else {
             log.info("Друг добавлен.");
-            return storage.addFriend(userId, friendId);
+            storage.addFriend(userId, friendId);
         }
     }
 
-    public User removeFriend(int userId, int friendId) {
+    public void removeFriend(int userId, int friendId) {
         if (userId <= 0 || friendId <= 0) {
             log.info("Указан ID меньше или равный нулю.");
             throw new ValidationException("ID не может быть меньше или равно нулю.");
@@ -67,7 +65,7 @@ public class UserService {
             throw new UserNotFoundException("Пользователь c ID " + friendId + " не найден.");
         } else {
             log.info("Друг удален.");
-            return storage.removeFriend(userId, friendId);
+            storage.removeFriend(userId, friendId);
         }
     }
 

@@ -1,7 +1,6 @@
 package ru.yandex.practicum.filmorate.controllers;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.User;
@@ -50,16 +49,16 @@ public class UserController {
 
     @PutMapping("/users/{id}/friends/{friendId}")
     @ResponseStatus(HttpStatus.OK)
-    public User addNewFriend(@PathVariable int id, @PathVariable int friendId) {
+    public void addNewFriend(@PathVariable int id, @PathVariable int friendId) {
         log.info("Получен запрос на добавление друга юзеру ID" + id);
-        return userService.addFriend(id, friendId);
+        userService.addFriend(id, friendId);
     }
 
     @DeleteMapping("/users/{id}/friends/{friendId}")
     @ResponseStatus(HttpStatus.OK)
-    public User removeFriend(@PathVariable int id, @PathVariable int friendId) {
+    public void removeFriend(@PathVariable int id, @PathVariable int friendId) {
         log.info("Получен запрос на удаление друга у юзера ID" + id);
-        return userService.removeFriend(id, friendId);
+        userService.removeFriend(id, friendId);
     }
 
     @GetMapping("/users/{id}/friends")
