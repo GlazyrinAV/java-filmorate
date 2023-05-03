@@ -83,7 +83,7 @@ public class UserServiceUnitTests {
         User user = new User("abc@acb.ru", "login", "name", LocalDate.of(1986, Month.APRIL, 13), 1);
         Set<ConstraintViolation<User>> violations = validator.validate(user);
         userService.addNewUser(user);
-        Assertions.assertEquals("[User(friends=[], email=abc@acb.ru, login=login, name=name, birthday=1986-04-13, id=1)]", userService.findAllUsers().toString(),
+        Assertions.assertEquals("User(email=abc@acb.ru, login=login, name=name, birthday=1986-04-13, id=1)", userService.findUserById(1).toString(),
                 "Ошибка при получении из хранилища существующего юзера.");
     }
 
@@ -172,8 +172,8 @@ public class UserServiceUnitTests {
         User user2 = new User("vcx@acb.ru", "afr", "hh", LocalDate.of(1986, Month.APRIL, 14), null);
         userService.addNewUser(user2);
         userService.addFriend(1, 2);
-        Assertions.assertTrue(userService.findUserById(1).getFriends().toString().equals("[2]") &&
-                userService.findUserById(2).getFriends().toString().equals("[1]"),
+        Assertions.assertTrue(userService.findFriends(1).toString().equals("[2]") &&
+                userService.findFriends(2).toString().equals("[1]"),
                 "Ошибка при нормальном добавлении друга.");
     }
 
@@ -251,8 +251,8 @@ public class UserServiceUnitTests {
         userService.addNewUser(user2);
         userService.addFriend(1, 2);
         userService.removeFriend(1, 2);
-        Assertions.assertTrue(userService.findUserById(1).getFriends().isEmpty() &&
-                        userService.findUserById(2).getFriends().isEmpty(),
+        Assertions.assertTrue(userService.findFriends(1).isEmpty() &&
+                        userService.findFriends(2).isEmpty(),
                 "Ошибка при нормальном удалении друга.");
     }
 

@@ -8,10 +8,7 @@ import ru.yandex.practicum.filmorate.exceptions.UserNotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -22,6 +19,7 @@ public class InMemoryUserStorage implements UserStorage {
 
     private int idUserSequence = 1;
     private final Map<Integer, User> users = new ConcurrentHashMap<>();
+    private final Map<Integer, Set<Integer>> friends = new ConcurrentHashMap<>();
 
     @Override
     public User addNewUser(User user) {
@@ -69,29 +67,34 @@ public class InMemoryUserStorage implements UserStorage {
         }
     }
 
+    private Set<Integer> putFriend(int userId, int friendId) {
+        friends.getOrDefault(userId, new HashSet<>()).add(friendId);
+        return friends.get(userId);
+    }
+
     @Override
     public void addFriend(int userId, int friendId) {
-        users.get(userId).getFriends().add(friendId);
-        users.get(friendId).getFriends().add(userId);
+        friends.put(userId, putFriend(userId, friendId));
+        friends.put(friendId, putFriend(friendId, userId));
     }
 
     @Override
     public void removeFriend(int userId, int friendId) {
-        users.get(userId).getFriends().remove(friendId);
-        users.get(friendId).getFriends().remove(userId);
+        friends.get(userId).remove(friendId);
+        friends.get(friendId).remove(userId);
     }
 
     @Override
     public Collection<User> findFriends(int userId) {
         return users.values().stream()
-                .filter(user -> users.get(userId).getFriends().contains(userId))
+                .filter(user -> friends.get(userId).contains(userId))
                 .collect(Collectors.toList());
     }
 
     @Override
     public Collection<User> findCommonFriends(int user1Id, int user2Id) {
-        List<Integer> friendsOfUser1 = new ArrayList<>(users.get(user1Id).getFriends());
-        List<Integer> friendsOfUser2 = new ArrayList<>(users.get(user2Id).getFriends());
+        List<Integer> friendsOfUser1 = new ArrayList<>(friends.get(user1Id));
+        List<Integer> friendsOfUser2 = new ArrayList<>(friends.get(user2Id));
         friendsOfUser1.retainAll(friendsOfUser2);
         return users.values().stream()
                 .filter(user -> friendsOfUser1.contains(user.getId()))

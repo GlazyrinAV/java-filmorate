@@ -105,7 +105,12 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public Collection<User> findCommonFriends(int user1Id, int user2Id) {
-        return null;
+        String sqlQuery = "SELECT * FROM USERS WHERE " +
+                "(USER_ID IN (SELECT F2.FRIEND_ID FROM LIST_OF_FRIENDS AS F2 " +
+                "JOIN (SELECT FRIEND_ID FROM LIST_OF_FRIENDS WHERE USER_ID = ?)" +
+                " AS F1 ON F1.FRIEND_ID = F2.FRIEND_ID" +
+                " )) AND USER_ID NOT IN (?)";
+        return jdbcTemplate.query(sqlQuery, this::mapRowToUser, user1Id, user2Id);
     }
 
     @Override
