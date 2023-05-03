@@ -108,6 +108,13 @@ public class UserDbStorage implements UserStorage {
         return null;
     }
 
+    @Override
+    public Collection<User> findFriends(int userId) {
+        String sqlQuery = "SELECT * FROM users WHERE user_id IN (" +
+                "SELECT friend_id FROM list_of_friends WHERE user_id = ?)";
+        return jdbcTemplate.query(sqlQuery, this::mapRowToUser, userId);
+    }
+
     private User mapRowToUser(ResultSet resultSet, int rowNum) throws SQLException {
         return User.builder()
                 .id(resultSet.getInt("user_id"))
@@ -122,9 +129,9 @@ public class UserDbStorage implements UserStorage {
         String sqlQuery = "SELECT friendship_status_id FROM list_of_friends" +
                 " WHERE user_id = ? AND friend_id = ?";
         if (!jdbcTemplate.queryForRowSet(sqlQuery, userId, friendId).next()) {
-            return 1;
+            return 0;
         } else {
-            return jdbcTemplate.queryForRowSet(sqlQuery, userId, friendId).findColumn("friendship_status_id");
+            return 1;
         }
     }
 }

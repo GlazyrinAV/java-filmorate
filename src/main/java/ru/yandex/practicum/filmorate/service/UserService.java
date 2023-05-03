@@ -9,7 +9,6 @@ import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.util.Collection;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -77,9 +76,7 @@ public class UserService {
             log.info("Пользователь c ID " + userId + " не найден.");
             throw new UserNotFoundException("Пользователь c ID " + userId + " не найден.");
         } else {
-            return storage.findAllUsers().stream()
-                    .filter(user -> storage.findUser(userId).getFriends().contains(user.getId()))
-                    .collect(Collectors.toList());
+            return storage.findFriends(userId);
         }
     }
 

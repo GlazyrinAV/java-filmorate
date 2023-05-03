@@ -82,6 +82,13 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
+    public Collection<User> findFriends(int userId) {
+        return users.values().stream()
+                .filter(user -> users.get(userId).getFriends().contains(userId))
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public Collection<User> findCommonFriends(int user1Id, int user2Id) {
         List<Integer> friendsOfUser1 = new ArrayList<>(users.get(user1Id).getFriends());
         List<Integer> friendsOfUser2 = new ArrayList<>(users.get(user2Id).getFriends());
