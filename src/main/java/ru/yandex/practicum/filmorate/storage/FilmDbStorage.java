@@ -34,7 +34,7 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     public Film addNewFilm(Film film) {
         String sqlQuery = "INSERT INTO films (name, description, release_date, duration) " +
-                "values (?, ?, ?, ?)";
+                "VALUES (?, ?, ?, ?)";
 
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
@@ -83,17 +83,26 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public Collection<Film> findPopular(int count) {
-        return null;
+        String sqlQuery =
+                "SELECT * FROM films " +
+                "WHERE film_id IN (" +
+                "SELECT COUNT(film_id) " +
+                "FROM film_likes " +
+                "GROUP BY film_id " +
+                "Limit ?)";
+        return jdbcTemplate.query(sqlQuery, this::mapRowToFilm, count);
     }
 
     @Override
     public void addLike(int filmId, int userId) {
-
+        String sqlQuery = "INSERT INTO film_likes (film_id, user_id) VALUES (?, ?)";
+        jdbcTemplate.update(sqlQuery, filmId, userId);
     }
 
     @Override
     public void removeLike(int filmId, int userId) {
-
+        String sqlQuery = "DELETE FROM film_likes WHERE film_id = ? AND user_id = ?";
+        jdbcTemplate.update(sqlQuery, filmId, userId);
     }
 
     private Film mapRowToFilm(ResultSet resultSet, int rowNum) throws SQLException {

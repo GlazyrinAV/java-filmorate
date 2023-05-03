@@ -1,3 +1,4 @@
+DELETE FROM film_likes;
 DELETE FROM users;
 ALTER TABLE users ALTER COLUMN user_id RESTART WITH 1;
 DELETE FROM films;
