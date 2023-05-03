@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.storage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -15,6 +16,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.Duration;
 import java.util.Collection;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -33,8 +35,8 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public Film addNewFilm(Film film) {
-        String sqlQuery = "INSERT INTO films (name, description, release_date, duration) " +
-                "VALUES (?, ?, ?, ?)";
+        String sqlQuery = "INSERT INTO films (name, description, release_date, duration, rating_id) " +
+                "VALUES (?, ?, ?, ?, ?)";
 
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
@@ -44,10 +46,15 @@ public class FilmDbStorage implements FilmStorage {
             stmt.setString(2, film.getDescription());
             stmt.setDate(3, Date.valueOf(film.getReleaseDate()));
             stmt.setLong(4, film.getDuration().toMinutes());
+            stmt.setInt(5, film.getMpa().getId());
             return stmt;
         }, keyHolder);
 
         Optional<Integer> film_id = Optional.of(Objects.requireNonNull(keyHolder.getKey()).intValue());
+
+        String sqlQueryForGenres = "INSERT INTO film_genres (film_id, genre_id) VALUES (?, ?)";
+
+
 
         return findFilm(film_id.get());
     }

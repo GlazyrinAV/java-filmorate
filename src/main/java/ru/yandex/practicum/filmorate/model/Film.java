@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate.model;
 
-
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Builder;
 import lombok.Data;
@@ -12,10 +11,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import java.time.Duration;
 import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Data
 @EqualsAndHashCode(exclude = "id")
@@ -39,11 +35,17 @@ public class Film {
 
     private Integer id;
 
-    public Film(String name, String description, LocalDate releaseDate, Duration duration, Integer id) {
+    private Collection<Genre> genres;
+
+    private Rating mpa;
+
+    public Film(String name, String description, LocalDate releaseDate, Duration duration, Integer id, Collection<Genre> genres, Rating mpa) {
         this.name = name;
         this.description = description;
         this.releaseDate = releaseDate;
         this.duration = duration;
         this.id = id;
+        this.genres = genres;
+        this.mpa = mpa;
     }
 }
