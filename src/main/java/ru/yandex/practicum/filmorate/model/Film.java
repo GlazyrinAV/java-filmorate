@@ -11,7 +11,9 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import java.time.Duration;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 @Data
 @EqualsAndHashCode(exclude = "id")
@@ -35,11 +37,11 @@ public class Film {
 
     private Integer id;
 
-    private Collection<Genre> genres;
+    private List<Genre> genres;
 
     private Rating mpa;
 
-    public Film(String name, String description, LocalDate releaseDate, Duration duration, Integer id, Collection<Genre> genres, Rating mpa) {
+    public Film(String name, String description, LocalDate releaseDate, Duration duration, Integer id, List<Genre> genres, Rating mpa) {
         this.name = name;
         this.description = description;
         this.releaseDate = releaseDate;

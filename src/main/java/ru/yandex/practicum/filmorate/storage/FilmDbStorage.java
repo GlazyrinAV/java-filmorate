@@ -9,6 +9,7 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genre;
 
 import java.sql.Date;
 import java.sql.PreparedStatement;
@@ -16,7 +17,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.Duration;
 import java.util.Collection;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -50,13 +50,28 @@ public class FilmDbStorage implements FilmStorage {
             return stmt;
         }, keyHolder);
 
-        Optional<Integer> film_id = Optional.of(Objects.requireNonNull(keyHolder.getKey()).intValue());
+        Optional<Integer> filmId = Optional.of(Objects.requireNonNull(keyHolder.getKey()).intValue());
 
+        addFilmGenresToDB(film, filmId.get());
+
+        return findFilm(filmId.get());
+    }
+
+    private void addFilmGenresToDB(Film film, int filmId) {
         String sqlQueryForGenres = "INSERT INTO film_genres (film_id, genre_id) VALUES (?, ?)";
+        jdbcTemplate.batchUpdate(sqlQueryForGenres, new BatchPreparedStatementSetter() {
+            @Override
+            public void setValues(PreparedStatement ps, int i) throws SQLException {
+                Genre genre = film.getGenres().get(i);
+                ps.setInt(1, filmId);
+                ps.setInt(2, genre.getId());
+            }
 
-
-
-        return findFilm(film_id.get());
+            @Override
+            public int getBatchSize() {
+                return film.getGenres().size();
+            }
+        });
     }
 
     @Override
