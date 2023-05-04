@@ -163,7 +163,7 @@ public class FilmDbStorage implements FilmStorage {
     private void addFilmGenresToDB(Film film, int filmId) {
         clearFilmGenres(filmId);
 
-        String sqlQueryForGenres = "INSERT INTO film_genres (film_id, genre_id) VALUES (?, ?)";
+        String sqlQueryForGenres = "MERGE INTO film_genres (film_id, genre_id) VALUES (?, ?)";
         if (film.getGenres() != null) {
             jdbcTemplate.batchUpdate(sqlQueryForGenres, new BatchPreparedStatementSetter() {
                 @Override
