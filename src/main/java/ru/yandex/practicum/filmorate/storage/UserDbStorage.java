@@ -44,9 +44,9 @@ public class UserDbStorage implements UserStorage {
             return stmt;
         }, keyHolder);
 
-        Optional<Integer> user_id = Optional.of(Objects.requireNonNull(keyHolder.getKey()).intValue());
+        Optional<Integer> userId = Optional.of(Objects.requireNonNull(keyHolder.getKey()).intValue());
 
-        return findUser(user_id.get());
+        return findUser(userId.get());
     }
 
     private String checkName(User user) {
@@ -90,17 +90,17 @@ public class UserDbStorage implements UserStorage {
     public void addFriend(int userId, int friendId) {
         String sqlQuery = "INSERT INTO list_of_friends (user_id, friend_id, friendship_status_id) " +
                 "VALUES (?, ?, ?)";
-        int friendship_status;
+        int friendshipStatus;
         if (findFriendshipStatus(friendId, userId) == 1) {
-            friendship_status = 2;
+            friendshipStatus = 2;
         } else {
-            friendship_status = 1;
+            friendshipStatus = 1;
         }
-        jdbcTemplate.update(sqlQuery, userId, friendId, friendship_status);
-        if (friendship_status == 2) {
+        jdbcTemplate.update(sqlQuery, userId, friendId, friendshipStatus);
+        if (friendshipStatus == 2) {
             String sqlQuery2 = "UPDATE list_of_friends SET " +
                     "friendship_status_id = ? WHERE user_id = ? AND friend_id = ?";
-            jdbcTemplate.update(sqlQuery2, friendId, userId, friendship_status);
+            jdbcTemplate.update(sqlQuery2, friendId, userId, friendshipStatus);
         }
     }
 
