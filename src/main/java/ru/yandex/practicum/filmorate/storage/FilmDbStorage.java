@@ -161,6 +161,8 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     private void addFilmGenresToDB(Film film, int filmId) {
+        clearFilmGenres(filmId);
+
         String sqlQueryForGenres = "INSERT INTO film_genres (film_id, genre_id) VALUES (?, ?)";
         if (film.getGenres() != null) {
             jdbcTemplate.batchUpdate(sqlQueryForGenres, new BatchPreparedStatementSetter() {
@@ -177,6 +179,12 @@ public class FilmDbStorage implements FilmStorage {
                 }
             });
         }
+    }
+
+    private void clearFilmGenres(int filmId) {
+        String sqlQuery = "DELETE FROM film_genres WHERE film_id = ?";
+        jdbcTemplate.update(sqlQuery, filmId);
+
     }
 
     private List<Genre> getGenresToFilmFromDB(int filmId) {
