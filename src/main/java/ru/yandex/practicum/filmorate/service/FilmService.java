@@ -48,7 +48,10 @@ public class FilmService {
         } else if (userId <= 0) {
             log.info("Указанный ID юзера меньше или равен нулю.");
             throw new ValidationException("ID юзера не может быть меньше или равно нулю.");
-        } else if (userService.findUserById(userId) != null) {
+        } else if (userService.findUserById(userId) == null) {
+            log.info("Фильм c ID " + filmId + " не найден.");
+            throw new FilmNotFoundException("Фильм c ID " + filmId + " не найден.");
+        } else {
             log.info("К фильму добавлен лайк.");
             filmStorage.addLike(filmId, userId);
         }
@@ -64,7 +67,10 @@ public class FilmService {
         } else if (userId <= 0) {
             log.info("Указанный ID юзера меньше или равен нулю.");
             throw new ValidationException("ID юзера не может быть меньше или равно нулю.");
-        } else if (userService.findUserById(userId) != null) {
+        } else if (userService.findUserById(userId) == null) {
+            log.info("Фильм c ID " + filmId + " не найден.");
+            throw new FilmNotFoundException("Фильм c ID " + filmId + " не найден.");
+        } else {
             log.info("У фильма удален лайк.");
             filmStorage.removeLike(filmId, userId);
         }
