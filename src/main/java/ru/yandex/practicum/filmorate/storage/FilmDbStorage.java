@@ -17,11 +17,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.Duration;
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-
+import java.util.*;
 
 @Repository
 @Slf4j
@@ -81,7 +77,12 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     public Collection<Film> findAllFilms() {
         String sqlQuery = "SELECT * FROM films";
-        return jdbcTemplate.query(sqlQuery, this::mapRowToFilm);
+        Collection<Film> films = jdbcTemplate.query(sqlQuery, this::mapRowToFilm);
+        for (Film film : films) {
+            film.setGenres(getGenresToFilmFromDB(film.getId()));
+            film.setMpa(getRatingToFilmFromDB(film.getId()));
+        }
+        return films;
     }
 
     @Override
@@ -96,13 +97,14 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     public Collection<Film> findPopular(int count) {
         String sqlQuery =
-                "SELECT * FROM films " +
-                        "WHERE film_id IN (" +
-                        "SELECT COUNT(film_id) " +
-                        "FROM film_likes " +
-                        "GROUP BY film_id " +
-                        "Limit ?)";
-        return jdbcTemplate.query(sqlQuery, this::mapRowToFilm, count);
+                "SELECT * FROM FILMS LEFT JOIN FILM_LIKES FL on FILMS.FILM_ID = FL.FILM_ID " +
+                        "GROUP BY FILMS.FILM_ID ORDER BY COUNT(FL.USER_ID) DESC LIMIT ?";
+        Collection<Film> films = jdbcTemplate.query(sqlQuery, this::mapRowToFilm, count);
+        for (Film film : films) {
+            film.setGenres(getGenresToFilmFromDB(film.getId()));
+            film.setMpa(getRatingToFilmFromDB(film.getId()));
+        }
+        return films;
     }
 
     @Override
@@ -115,6 +117,16 @@ public class FilmDbStorage implements FilmStorage {
     public void removeLike(int filmId, int userId) {
         String sqlQuery = "DELETE FROM film_likes WHERE film_id = ? AND user_id = ?";
         jdbcTemplate.update(sqlQuery, filmId, userId);
+    }
+
+    public List<Rating> findAllFilmRatings() {
+        String sqlQuery = "SELECT * FROM RATINGS";
+        return jdbcTemplate.query(sqlQuery, this::mapRowToRating);
+    }
+
+    public Rating findRatingById(int ratingId) {
+        String sqlQuery = "SELECT * FROM RATINGS WHERE rating_id = ?";
+        return jdbcTemplate.queryForObject(sqlQuery, this::mapRowToRating, ratingId);
     }
 
     private Film mapRowToFilm(ResultSet resultSet, int rowNum) throws SQLException {
@@ -156,7 +168,11 @@ public class FilmDbStorage implements FilmStorage {
     private List<Genre> getGenresToFilmFromDB(int filmId) {
         String sqlQuery = "SELECT FG.GENRE_ID, G2.GENRE_NAME " +
                 "FROM FILM_GENRES AS FG JOIN GENRES G2 on G2.GENRE_ID = FG.GENRE_ID WHERE FILM_ID = ?";
-        return jdbcTemplate.query(sqlQuery, this::mapRowToGenre, filmId);
+        if (!jdbcTemplate.query(sqlQuery, this::mapRowToGenre, filmId).isEmpty()) {
+            return jdbcTemplate.query(sqlQuery, this::mapRowToGenre, filmId);
+        } else {
+            return new ArrayList<>();
+        }
     }
 
     private Rating getRatingToFilmFromDB(int filmId) {

@@ -7,6 +7,7 @@ import ru.yandex.practicum.filmorate.exceptions.FilmAlreadyExistsException;
 import ru.yandex.practicum.filmorate.exceptions.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Rating;
 
 import java.util.Collection;
 import java.util.Map;
@@ -80,6 +81,16 @@ public class InMemoryFilmStorage implements FilmStorage {
     @Override
     public void removeLike(int filmId, int userId) {
         films.get(filmId).getLiked().remove(userId);
+    }
+
+    @Override
+    public Collection<Rating> findAllFilmRatings() {
+        return null;
+    }
+
+    @Override
+    public Rating findRatingById(int ratingId) {
+        return null;
     }
 
     public void resetFilmsForTests() {
