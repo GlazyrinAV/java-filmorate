@@ -51,8 +51,6 @@ public class ErrorHandler {
     public static class ErrorResponse {
 
         private final String error;
-
         private final String description;
-
     }
 }
