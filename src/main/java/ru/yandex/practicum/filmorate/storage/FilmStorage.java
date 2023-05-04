@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.storage;
 
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Rating;
 
 import java.util.Collection;
@@ -24,4 +25,8 @@ public interface FilmStorage {
     Collection<Rating> findAllFilmRatings();
 
     Rating findRatingById(int ratingId);
+
+    Collection<Genre> findAllGenres();
+
+    Genre findGenreById(int genreId);
 }

@@ -4,9 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.Rating;
 import ru.yandex.practicum.filmorate.service.FilmService;
-import ru.yandex.practicum.filmorate.service.RatingsService;
 
 import javax.validation.Valid;
 import java.util.Collection;
@@ -16,13 +14,10 @@ import java.util.Collection;
 public class FilmController {
 
     private final FilmService filmService;
-    public final RatingsService ratingsService;
 
-    public FilmController(FilmService filmService, RatingsService ratingsService) {
+    public FilmController(FilmService filmService) {
         this.filmService = filmService;
-        this.ratingsService = ratingsService;
     }
-
 
     @PostMapping("/films")
     @ResponseStatus(HttpStatus.CREATED)
@@ -71,19 +66,5 @@ public class FilmController {
     public Collection<Film> findPopularFilms(@RequestParam(defaultValue = "10") int count) {
         log.info("Получен запрос на получение первых " + count + " популярных фильмов.");
         return filmService.getPopularFilms(count);
-    }
-
-    @GetMapping("/mpa")
-    @ResponseStatus(HttpStatus.OK)
-    public Collection<Rating> findAllFilmRatings() {
-        log.info("Получен запрос на получение списка всех доступных рейтингов фильмов.");
-        return ratingsService.findAllFilmRatings();
-    }
-
-    @GetMapping("/mpa/{ratingId}")
-    @ResponseStatus(HttpStatus.OK)
-    public Rating findRatingById(@PathVariable int ratingId) {
-        log.info("Получен запрос на получение рейтина фильмов под номером" + ratingId + ".");
-        return ratingsService.findRatingById(ratingId);
     }
 }

@@ -119,14 +119,28 @@ public class FilmDbStorage implements FilmStorage {
         jdbcTemplate.update(sqlQuery, filmId, userId);
     }
 
+    @Override
     public List<Rating> findAllFilmRatings() {
         String sqlQuery = "SELECT * FROM RATINGS";
         return jdbcTemplate.query(sqlQuery, this::mapRowToRating);
     }
 
+    @Override
     public Rating findRatingById(int ratingId) {
         String sqlQuery = "SELECT * FROM RATINGS WHERE rating_id = ?";
         return jdbcTemplate.queryForObject(sqlQuery, this::mapRowToRating, ratingId);
+    }
+
+    @Override
+    public Collection<Genre> findAllGenres() {
+        String sqlQuery = "SELECT * FROM GENRES";
+        return jdbcTemplate.query(sqlQuery, this::mapRowToGenre);
+    }
+
+    @Override
+    public Genre findGenreById(int genreId) {
+        String sqlQuery = "SELECT * FROM GENRES WHERE genre_id = ?";
+        return jdbcTemplate.queryForObject(sqlQuery, this::mapRowToGenre, genreId);
     }
 
     private Film mapRowToFilm(ResultSet resultSet, int rowNum) throws SQLException {

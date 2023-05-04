@@ -7,6 +7,7 @@ import ru.yandex.practicum.filmorate.exceptions.FilmAlreadyExistsException;
 import ru.yandex.practicum.filmorate.exceptions.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Rating;
 
 import java.util.Collection;
@@ -90,6 +91,16 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public Rating findRatingById(int ratingId) {
+        return null;
+    }
+
+    @Override
+    public Collection<Genre> findAllGenres() {
+        return null;
+    }
+
+    @Override
+    public Genre findGenreById(int genreId) {
         return null;
     }
 
