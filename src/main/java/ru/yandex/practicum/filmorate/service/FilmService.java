@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.FilmNotFoundException;
@@ -49,6 +50,7 @@ public class FilmService {
             log.info("Указанный ID юзера меньше или равен нулю.");
             throw new ValidationException("ID юзера не может быть меньше или равно нулю.");
         } else if (userService.findUserById(userId) != null) {
+
             log.info("К фильму добавлен лайк.");
             filmStorage.addLike(filmId, userId);
         }
