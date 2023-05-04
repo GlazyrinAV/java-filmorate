@@ -37,7 +37,7 @@ public class UserDbStorage implements UserStorage {
 
         jdbcTemplate.update(connection -> {
             PreparedStatement stmt = connection.prepareStatement(sqlQuery, new String[]{"user_id"});
-            stmt.setString(1, user.getName());
+            stmt.setString(1, checkName(user));
             stmt.setString(2, user.getLogin());
             stmt.setString(3, user.getEmail());
             stmt.setDate(4, Date.valueOf(user.getBirthday()));
@@ -47,6 +47,14 @@ public class UserDbStorage implements UserStorage {
         Optional<Integer> user_id = Optional.of(Objects.requireNonNull(keyHolder.getKey()).intValue());
 
         return findUser(user_id.get());
+    }
+
+    private String checkName(User user) {
+        if (user.getName().isBlank()) {
+            return user.getLogin();
+        } else {
+            return user.getName();
+        }
     }
 
     @Override
