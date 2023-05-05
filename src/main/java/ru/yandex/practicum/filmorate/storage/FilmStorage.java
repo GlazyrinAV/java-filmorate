@@ -29,4 +29,6 @@ public interface FilmStorage {
     Collection<Genre> findAllGenres();
 
     Genre findGenreById(int genreId);
+
+    Collection<Integer> getLikes(int filmId);
 }

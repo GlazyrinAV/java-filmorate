@@ -4,11 +4,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
+import ru.yandex.practicum.filmorate.exceptions.NoResultDataAccessException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Rating;
@@ -98,7 +100,13 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     public Film findFilm(int filmId) {
         String sqlQuery = "SELECT * FROM films where film_id = ?";
-        Film film = jdbcTemplate.queryForObject(sqlQuery, this::mapRowToFilm, filmId);
+        Film film;
+        try {
+            film = jdbcTemplate.queryForObject(sqlQuery, this::mapRowToFilm, filmId);
+        } catch (EmptyResultDataAccessException exception) {
+            throw new NoResultDataAccessException("Получен пустой ответ на запрос.", 1);
+        }
+
         film.setGenres(getGenresToFilmFromDB(filmId));
         film.setMpa(getRatingToFilmFromDB(filmId));
         return film;
@@ -123,7 +131,7 @@ public class FilmDbStorage implements FilmStorage {
         try {
             jdbcTemplate.update(sqlQuery, filmId, userId);
         } catch (DataIntegrityViolationException exception) {
-            throw new DataIntegrityViolationException("В запросе неправильно указаны данные о фильме.");
+            throw new DataIntegrityViolationException("В запросе неправильно указаны данные для добавдения лайка.");
         }
     }
 
@@ -142,7 +150,11 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     public Rating findRatingById(int ratingId) {
         String sqlQuery = "SELECT * FROM RATINGS WHERE rating_id = ?";
-        return jdbcTemplate.queryForObject(sqlQuery, this::mapRowToRating, ratingId);
+        try {
+            return jdbcTemplate.queryForObject(sqlQuery, this::mapRowToRating, ratingId);
+        } catch (EmptyResultDataAccessException exception) {
+            throw new NoResultDataAccessException("Запрос на получение рейтинга вернул пустой результат.", 1);
+        }
     }
 
     @Override
@@ -154,7 +166,17 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     public Genre findGenreById(int genreId) {
         String sqlQuery = "SELECT * FROM GENRES WHERE genre_id = ?";
-        return jdbcTemplate.queryForObject(sqlQuery, this::mapRowToGenre, genreId);
+        try {
+            return jdbcTemplate.queryForObject(sqlQuery, this::mapRowToGenre, genreId);
+        } catch (EmptyResultDataAccessException exception) {
+            throw new NoResultDataAccessException("Запрос на получение жанра получен пустой ответ.", 1);
+        }
+    }
+
+    @Override
+    public Collection<Integer> getLikes(int filmId) {
+        String sqlQuery = "SELECT user_id FROM film_likes WHERE film_id = ?";
+        return jdbcTemplate.query(sqlQuery, this::maoRowToInteger, filmId);
     }
 
     private Film mapRowToFilm(ResultSet resultSet, int rowNum) throws SQLException {
@@ -226,5 +248,9 @@ public class FilmDbStorage implements FilmStorage {
                 .id(resultSet.getInt("rating_id"))
                 .name(resultSet.getString("rating_name"))
                 .build();
+    }
+
+    private Integer maoRowToInteger(ResultSet resultSet, int rowNum) throws SQLException {
+        return resultSet.getInt("user_id");
     }
 }

@@ -104,6 +104,11 @@ public class InMemoryFilmStorage implements FilmStorage {
         return null;
     }
 
+    @Override
+    public Collection<Integer> getLikes(int filmId) {
+        return null;
+    }
+
     public void resetFilmsForTests() {
         idFilmSequence = 1;
     }

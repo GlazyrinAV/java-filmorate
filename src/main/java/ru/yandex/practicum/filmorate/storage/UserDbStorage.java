@@ -3,10 +3,12 @@ package ru.yandex.practicum.filmorate.storage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
+import ru.yandex.practicum.filmorate.exceptions.NoResultDataAccessException;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.sql.Date;
@@ -83,7 +85,11 @@ public class UserDbStorage implements UserStorage {
     @Override
     public User findUser(int userId) {
         String sqlQuery = "SELECT * FROM users where user_id = ?";
-        return jdbcTemplate.queryForObject(sqlQuery, this::mapRowToUser, userId);
+        try {
+            return jdbcTemplate.queryForObject(sqlQuery, this::mapRowToUser, userId);
+        } catch (EmptyResultDataAccessException exception) {
+            throw new NoResultDataAccessException("Запрос на поиск пользователя получил пустой ответ.", 1);
+        }
     }
 
     @Override

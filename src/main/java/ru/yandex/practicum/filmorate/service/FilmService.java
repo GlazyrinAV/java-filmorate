@@ -83,4 +83,8 @@ public class FilmService {
             return filmStorage.findPopular(count);
         }
     }
+
+    public Collection<Integer> gelKikes(int filmId) {
+        return filmStorage.getLikes(filmId);
+    }
 }

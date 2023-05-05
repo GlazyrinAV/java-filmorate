@@ -1,8 +1,6 @@
 package ru.yandex.practicum.filmorate.exceptions;
 
 import lombok.Data;
-import org.springframework.dao.DataAccessException;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -12,9 +10,15 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class ErrorHandler {
 
-    @ExceptionHandler()
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ErrorResponse noResultDataAccessException(NoResultDataAccessException exception) {
+        return new ErrorResponse("no data returned", exception.getMessage());
+    }
+
+    @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse dataIntegrityViolationException(DataAccessException exception) {
+    public ErrorResponse dataIntegrityViolationException(DataIntegrityViolationException exception) {
         return new ErrorResponse("data access error", exception.getMessage());
     }
 
@@ -24,7 +28,7 @@ public class ErrorHandler {
         return new ErrorResponse("error", exception.getMessage());
     }
 
-    @ExceptionHandler({UserNotFoundException.class, FilmNotFoundException.class, EmptyResultDataAccessException.class})
+    @ExceptionHandler({UserNotFoundException.class, FilmNotFoundException.class})
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse userNotFoundException(RuntimeException exception) {
         return new ErrorResponse("error", exception.getMessage());
