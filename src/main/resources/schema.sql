@@ -29,7 +29,7 @@ create table IF NOT EXISTS FILMS
     DESCRIPTION  VARCHAR_IGNORECASE(200),
     RELEASE_DATE DATE,
     DURATION     INTEGER                 not null,
-    RATING_ID    INTEGER default 1,
+    RATING_ID    INTEGER,
     constraint FILMS_PK
         primary key (FILM_ID),
     constraint FILMS_FK

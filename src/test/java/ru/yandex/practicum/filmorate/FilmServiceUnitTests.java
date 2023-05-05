@@ -41,7 +41,7 @@
 //    @Autowired
 //    private UserService userService;
 //    @Autowired
-//    private InMemoryFilmStorage storage;
+//    private InMemoryFilmStorage filmStorage;
 //    @Autowired
 //    private InMemoryUserStorage userStorage;
 //
@@ -58,8 +58,8 @@
 //
 //    @BeforeEach
 //    public void start() {
-//        storage.findAllFilms().clear();
-//        storage.resetCounter();
+//        filmStorage.findAllFilms().clear();
+//        filmStorage.resetCounter();
 //        userStorage.findAllUsers().clear();
 //        userStorage.resetCounter();
 //    }
