@@ -73,6 +73,7 @@ public class UserDbStorage implements UserStorage {
                 user.getEmail(),
                 Date.valueOf(user.getBirthday()),
                 user.getId());
+
         return findUser(user.getId());
     }
 
@@ -96,17 +97,19 @@ public class UserDbStorage implements UserStorage {
     public void addFriend(int userId, int friendId) {
         String sqlQuery = "INSERT INTO list_of_friends (user_id, friend_id, friendship_status_id) " +
                 "VALUES (?, ?, ?)";
-        int friendshipStatus;
-        if (findFriendshipStatus(friendId, userId) == 1) {
-            friendshipStatus = 2;
+        int friendshipStatusForDb;
+
+        if (findDidFriendMadeFriendRequest(friendId, userId)) {
+            friendshipStatusForDb = 2;
         } else {
-            friendshipStatus = 1;
+            friendshipStatusForDb = 1;
         }
-        jdbcTemplate.update(sqlQuery, userId, friendId, friendshipStatus);
-        if (friendshipStatus == 2) {
+        jdbcTemplate.update(sqlQuery, userId, friendId, friendshipStatusForDb);
+
+        if (friendshipStatusForDb == 2) {
             String sqlQuery2 = "UPDATE list_of_friends SET " +
                     "friendship_status_id = ? WHERE user_id = ? AND friend_id = ?";
-            jdbcTemplate.update(sqlQuery2, friendId, userId, friendshipStatus);
+            jdbcTemplate.update(sqlQuery2, friendId, userId, friendshipStatusForDb);
         }
     }
 
@@ -144,13 +147,9 @@ public class UserDbStorage implements UserStorage {
                 .build();
     }
 
-    private int findFriendshipStatus(int userId, int friendId) {
+    private boolean findDidFriendMadeFriendRequest(int userId, int friendId) {
         String sqlQuery = "SELECT friendship_status_id FROM list_of_friends" +
                 " WHERE user_id = ? AND friend_id = ?";
-        if (!jdbcTemplate.queryForRowSet(sqlQuery, userId, friendId).next()) {
-            return 0;
-        } else {
-            return 1;
-        }
+        return jdbcTemplate.queryForRowSet(sqlQuery, userId, friendId).next();
     }
 }

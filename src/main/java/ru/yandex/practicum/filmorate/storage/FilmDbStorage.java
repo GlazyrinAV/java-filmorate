@@ -82,6 +82,7 @@ public class FilmDbStorage implements FilmStorage {
         } catch (DataIntegrityViolationException exception) {
             throw new DataIntegrityViolationException("В запросе неправильно указаны данные о фильме.");
         }
+
         addFilmGenresToDB(film, film.getId());
         return findFilm(film.getId());
     }
@@ -90,10 +91,12 @@ public class FilmDbStorage implements FilmStorage {
     public Collection<Film> findAllFilms() {
         String sqlQuery = "SELECT * FROM films";
         Collection<Film> films = jdbcTemplate.query(sqlQuery, this::mapRowToFilm);
+
         for (Film film : films) {
             film.setGenres(getGenresToFilmFromDB(film.getId()));
             film.setMpa(getRatingToFilmFromDB(film.getId()));
         }
+
         return films;
     }
 
@@ -118,10 +121,12 @@ public class FilmDbStorage implements FilmStorage {
                 "SELECT * FROM FILMS LEFT JOIN FILM_LIKES FL on FILMS.FILM_ID = FL.FILM_ID " +
                         "GROUP BY FILMS.FILM_ID ORDER BY COUNT(FL.USER_ID) DESC LIMIT ?";
         Collection<Film> films = jdbcTemplate.query(sqlQuery, this::mapRowToFilm, count);
+
         for (Film film : films) {
             film.setGenres(getGenresToFilmFromDB(film.getId()));
             film.setMpa(getRatingToFilmFromDB(film.getId()));
         }
+
         return films;
     }
 
