@@ -21,8 +21,6 @@ import java.util.Set;
 @Builder
 public class Film {
 
-    private final Set<Integer> liked = new HashSet<>();
-
     @NotBlank(message = "Неверно указано название фильма.")
     private final String name;
 

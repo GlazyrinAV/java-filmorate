@@ -32,7 +32,7 @@ public class UserDbStorage implements UserStorage {
     }
 
     @Override
-    public User addNewUser(User user) {
+    public User addNew(User user) {
         String sqlQuery = "INSERT INTO users (name, login, email, birthday) values (?, ?, ?, ?)";
 
         KeyHolder keyHolder = new GeneratedKeyHolder();
@@ -48,7 +48,7 @@ public class UserDbStorage implements UserStorage {
 
         Optional<Integer> userId = Optional.of(Objects.requireNonNull(keyHolder.getKey()).intValue());
 
-        return findUser(userId.get());
+        return findById(userId.get());
     }
 
     private String checkName(User user) {
@@ -60,7 +60,7 @@ public class UserDbStorage implements UserStorage {
     }
 
     @Override
-    public User updateUser(User user) {
+    public User update(User user) {
         String sqlQuery = "UPDATE users SET " +
                 "name = ?," +
                 "login = ?," +
@@ -74,17 +74,17 @@ public class UserDbStorage implements UserStorage {
                 Date.valueOf(user.getBirthday()),
                 user.getId());
 
-        return findUser(user.getId());
+        return findById(user.getId());
     }
 
     @Override
-    public Collection<User> findAllUsers() {
+    public Collection<User> findAll() {
         String sqlQuery = "SELECT * FROM users";
         return jdbcTemplate.query(sqlQuery, this::mapRowToUser);
     }
 
     @Override
-    public User findUser(int userId) {
+    public User findById(int userId) {
         String sqlQuery = "SELECT * FROM users where user_id = ?";
         try {
             return jdbcTemplate.queryForObject(sqlQuery, this::mapRowToUser, userId);
@@ -128,6 +128,12 @@ public class UserDbStorage implements UserStorage {
                 " AS F1 ON F1.FRIEND_ID = F2.FRIEND_ID" +
                 " )) AND USER_ID NOT IN (?)";
         return jdbcTemplate.query(sqlQuery, this::mapRowToUser, user1Id, user2Id);
+    }
+
+    @Override
+    public boolean isExists(int userId) {
+        String sqlQuery = "SELECT EXISTS ( SELECT * FROM PUBLIC.users WHERE user_id = ?)";
+        return Boolean.TRUE.equals(jdbcTemplate.queryForObject(sqlQuery, Boolean.TYPE, userId));
     }
 
     @Override

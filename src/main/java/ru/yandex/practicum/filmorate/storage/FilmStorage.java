@@ -8,13 +8,13 @@ import java.util.Collection;
 
 public interface FilmStorage {
 
-    Film addNewFilm(Film film);
+    Film addNew(Film film);
 
-    Film updateFilm(Film film);
+    Film update(Film film);
 
-    Collection<Film> findAllFilms();
+    Collection<Film> findAll();
 
-    Film findFilm(int filmId);
+    Film findById(int filmId);
 
     Collection<Film> findPopular(int count);
 
@@ -22,7 +22,7 @@ public interface FilmStorage {
 
     void removeLike(int filmId, int userId);
 
-    Collection<Rating> findAllFilmRatings();
+    Collection<Rating> findAllRatings();
 
     Rating findRatingById(int ratingId);
 
@@ -31,4 +31,6 @@ public interface FilmStorage {
     Genre findGenreById(int genreId);
 
     Collection<Integer> getLikes(int filmId);
+
+    Boolean isExists(int filmId);
 }

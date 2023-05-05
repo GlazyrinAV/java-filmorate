@@ -22,7 +22,7 @@ public class InMemoryUserStorage implements UserStorage {
     private final Map<Integer, Set<Integer>> friends = new ConcurrentHashMap<>();
 
     @Override
-    public User addNewUser(User user) {
+    public User addNew(User user) {
         if (!users.containsValue(user)) {
             if (user.getName().isBlank()) {
                 user.setName(user.getLogin());
@@ -38,7 +38,7 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public User updateUser(User user) {
+    public User update(User user) {
         if (!users.containsKey(user.getId())) {
             log.info("Пользователь c ID " + user.getId() + " не найден.");
             throw new UserNotFoundException("Пользователь c ID " + user.getId() + " не найден.");
@@ -50,12 +50,12 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public Collection<User> findAllUsers() {
+    public Collection<User> findAll() {
         return users.values();
     }
 
     @Override
-    public User findUser(int userId) {
+    public User findById(int userId) {
         if (userId <= 0) {
             log.info("Указанный ID меньше или равен нулю.");
             throw new ValidationException("ID не может быть меньше или равно нулю.");
@@ -99,6 +99,11 @@ public class InMemoryUserStorage implements UserStorage {
         return users.values().stream()
                 .filter(user -> friendsOfUser1.contains(user.getId()))
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public boolean isExists(int userId) {
+        return users.get(userId) != null;
     }
 
     public void resetUsersForTest() {

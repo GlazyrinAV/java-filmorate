@@ -11,7 +11,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.test.context.jdbc.Sql;
+import ru.yandex.practicum.filmorate.exceptions.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.NoResultDataAccessException;
+import ru.yandex.practicum.filmorate.exceptions.UserNotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
@@ -76,17 +78,17 @@ public class FilmServiceUnitTests {
 
     @Test
     public void getFilmsEmpty() {
-        Assertions.assertTrue(filmService.findAllFilms().isEmpty(), "Ошибка при получении пустого хранилища фильмов.");
+        Assertions.assertTrue(filmService.findAll().isEmpty(), "Ошибка при получении пустого хранилища фильмов.");
     }
 
     @Test
     public void getFilmsNormal() {
         Film film = new Film("Name", "Description", LocalDate.of(1990, Month.APRIL, 13), Duration.ofMinutes(100), null, List.of(new Genre(1, null)), new Rating(1, null));
         Set<ConstraintViolation<Film>> violations = validator.validate(film);
-        filmService.addNewFilm(film);
-        Assertions.assertEquals("[Film(liked=[], name=Name, description=Description, releaseDate=1990-04-13, " +
+        filmService.addNew(film);
+        Assertions.assertEquals("[Film(name=Name, description=Description, releaseDate=1990-04-13, " +
                         "duration=PT1H40M, id=1, genres=[Genre(id=1, name=Комедия)], " +
-                        "mpa=Rating(id=1, name=G))]", filmService.findAllFilms().toString(),
+                        "mpa=Rating(id=1, name=G))]", filmService.findAll().toString(),
                 "Ошибка при получении из хранилища существующего фильма.");
     }
 
@@ -94,10 +96,10 @@ public class FilmServiceUnitTests {
     public void findFilmNormal() {
         Film film = new Film("Name", "Description", LocalDate.of(1990, Month.APRIL, 13), Duration.ofMinutes(100), null, List.of(new Genre(1, null)), new Rating(1, null));
         Set<ConstraintViolation<Film>> violations = validator.validate(film);
-        filmService.addNewFilm(film);
-        Assertions.assertEquals("Film(liked=[], name=Name, description=Description, releaseDate=1990-04-13, " +
+        filmService.addNew(film);
+        Assertions.assertEquals("Film(name=Name, description=Description, releaseDate=1990-04-13, " +
                         "duration=PT1H40M, id=1, genres=[Genre(id=1, name=Комедия)], " +
-                        "mpa=Rating(id=1, name=G))", filmService.findFilm(1).toString(),
+                        "mpa=Rating(id=1, name=G))", filmService.findById(1).toString(),
                 "Ошибка при получении из хранилища существующего фильма.");
     }
 
@@ -105,8 +107,8 @@ public class FilmServiceUnitTests {
     public void getFilmWithWrongId() {
         Film film = new Film("Name", "Description", LocalDate.of(1990, Month.APRIL, 13), Duration.ofMinutes(100), null, List.of(new Genre(1, null)), new Rating(1, null));
         Set<ConstraintViolation<Film>> violations = validator.validate(film);
-        filmService.addNewFilm(film);
-        NoResultDataAccessException exception = Assertions.assertThrows(NoResultDataAccessException.class, () -> filmService.findFilm(99));
+        filmService.addNew(film);
+        NoResultDataAccessException exception = Assertions.assertThrows(NoResultDataAccessException.class, () -> filmService.findById(99));
         Assertions.assertEquals("Получен пустой ответ на запрос.", exception.getMessage(),
                 "Ошибка при получении из хранилища фильма с неправильным ID.");
     }
@@ -115,15 +117,15 @@ public class FilmServiceUnitTests {
     public void addNewFilmNormal() {
         Film film = new Film("Name", "Description", LocalDate.of(1990, Month.APRIL, 13), Duration.ofMinutes(100), 1, List.of(new Genre(1, "Комедия")), new Rating(1, "G"));
         Set<ConstraintViolation<Film>> violations = validator.validate(film);
-        Assertions.assertEquals(filmService.addNewFilm(film), film, "Ошибка при добавлении в хранилище нормального фильма.");
+        Assertions.assertEquals(filmService.addNew(film), film, "Ошибка при добавлении в хранилище нормального фильма.");
     }
 
     @Test
     public void addLikeNormal() {
         Film film = new Film("Name", "Description", LocalDate.of(1990, Month.APRIL, 13), Duration.ofMinutes(100), null, List.of(new Genre(1, "Комедия")), new Rating(1, "G"));
-        filmService.addNewFilm(film);
+        filmService.addNew(film);
         User user = new User("abc@acb.ru", "login", "name", LocalDate.of(1986, Month.APRIL, 13), 1);
-        userService.addNewUser(user);
+        userService.addNew(user);
         filmService.addLike(1, 1);
         Assertions.assertEquals(filmService.gelKikes(1).toString(), "[1]", "Ошибка при нормальном добавлении лайка.");
     }
@@ -131,9 +133,9 @@ public class FilmServiceUnitTests {
     @Test
     public void addLikeWithWrongFilmDataId0() {
         Film film = new Film("Name", "Description", LocalDate.of(1990, Month.APRIL, 13), Duration.ofMinutes(100), null, List.of(new Genre(1, null)), new Rating(1, null));
-        filmService.addNewFilm(film);
+        filmService.addNew(film);
         User user = new User("abc@acb.ru", "login", "name", LocalDate.of(1986, Month.APRIL, 13), 1);
-        userService.addNewUser(user);
+        userService.addNew(user);
         ValidationException exception = Assertions.assertThrows(ValidationException.class, () -> filmService.addLike(0, 1));
         Assertions.assertEquals(exception.getMessage(), "ID фильма не может быть меньше или равно нулю.",
                 "Ошибка при добавлении лайка к фильму с ID0.");
@@ -142,9 +144,9 @@ public class FilmServiceUnitTests {
     @Test
     public void addLikeWithWrongFilmDataNegativeId() {
         Film film = new Film("Name", "Description", LocalDate.of(1990, Month.APRIL, 13), Duration.ofMinutes(100), null, List.of(new Genre(1, null)), new Rating(1, null));
-        filmService.addNewFilm(film);
+        filmService.addNew(film);
         User user = new User("abc@acb.ru", "login", "name", LocalDate.of(1986, Month.APRIL, 13), 1);
-        userService.addNewUser(user);
+        userService.addNew(user);
         ValidationException exception = Assertions.assertThrows(ValidationException.class, () -> filmService.addLike(-1, 1));
         Assertions.assertEquals(exception.getMessage(), "ID фильма не может быть меньше или равно нулю.",
                 "Ошибка при добавлении лайка к фильму с ID-1.");
@@ -153,20 +155,20 @@ public class FilmServiceUnitTests {
     @Test
     public void addLikeWithWrongFilmDataNoSuchFilm() {
         Film film = new Film("Name", "Description", LocalDate.of(1990, Month.APRIL, 13), Duration.ofMinutes(100), null, List.of(new Genre(1, null)), new Rating(1, null));
-        filmService.addNewFilm(film);
+        filmService.addNew(film);
         User user = new User("abc@acb.ru", "login", "name", LocalDate.of(1986, Month.APRIL, 13), 1);
-        userService.addNewUser(user);
-        NoResultDataAccessException exception = Assertions.assertThrows(NoResultDataAccessException.class, () -> filmService.addLike(99, 1));
-        Assertions.assertEquals(exception.getMessage(), "Получен пустой ответ на запрос.",
+        userService.addNew(user);
+        FilmNotFoundException exception = Assertions.assertThrows(FilmNotFoundException.class, () -> filmService.addLike(99, 1));
+        Assertions.assertEquals(exception.getMessage(), "Фильм c ID 99 не найден.",
                 "Ошибка при добавлении лайка к фильму с ID99.");
     }
 
     @Test
     public void addLikeWithWrongUserDataId0() {
         Film film = new Film("Name", "Description", LocalDate.of(1990, Month.APRIL, 13), Duration.ofMinutes(100), null, List.of(new Genre(1, null)), new Rating(1, null));
-        filmService.addNewFilm(film);
+        filmService.addNew(film);
         User user = new User("abc@acb.ru", "login", "name", LocalDate.of(1986, Month.APRIL, 13), 1);
-        userService.addNewUser(user);
+        userService.addNew(user);
         ValidationException exception = Assertions.assertThrows(ValidationException.class, () -> filmService.addLike(1, 0));
         Assertions.assertEquals(exception.getMessage(), "ID юзера не может быть меньше или равно нулю.",
                 "Ошибка при добавлении лайка к фильму с юзером ID0.");
@@ -175,9 +177,9 @@ public class FilmServiceUnitTests {
     @Test
     public void addLikeWithWrongUserDataNegativeId() {
         Film film = new Film("Name", "Description", LocalDate.of(1990, Month.APRIL, 13), Duration.ofMinutes(100), null, List.of(new Genre(1, null)), new Rating(1, null));
-        filmService.addNewFilm(film);
+        filmService.addNew(film);
         User user = new User("abc@acb.ru", "login", "name", LocalDate.of(1986, Month.APRIL, 13), 1);
-        userService.addNewUser(user);
+        userService.addNew(user);
         ValidationException exception = Assertions.assertThrows(ValidationException.class, () -> filmService.addLike(1, -1));
         Assertions.assertEquals(exception.getMessage(), "ID юзера не может быть меньше или равно нулю.",
                 "Ошибка при добавлении лайка к фильму с юзером ID-1.");
@@ -186,20 +188,20 @@ public class FilmServiceUnitTests {
     @Test
     public void addLikeWithWrongUserDataNoSuchFilm() {
         Film film = new Film("Name", "Description", LocalDate.of(1990, Month.APRIL, 13), Duration.ofMinutes(100), null, List.of(new Genre(1, null)), new Rating(1, null));
-        filmService.addNewFilm(film);
+        filmService.addNew(film);
         User user = new User("abc@acb.ru", "login", "name", LocalDate.of(1986, Month.APRIL, 13), 1);
-        userService.addNewUser(user);
-        NoResultDataAccessException exception = Assertions.assertThrows(NoResultDataAccessException.class, () -> filmService.addLike(1, 99));
-        Assertions.assertEquals(exception.getMessage(), "Запрос на поиск пользователя получил пустой ответ.",
+        userService.addNew(user);
+        UserNotFoundException exception = Assertions.assertThrows(UserNotFoundException.class, () -> filmService.addLike(1, 99));
+        Assertions.assertEquals(exception.getMessage(), "Юзер c ID 99 не найден.",
                 "Ошибка при добавлении лайка к фильму с юзером ID99.");
     }
 
     @Test
     public void removeLikeNormal() {
         Film film = new Film("Name", "Description", LocalDate.of(1990, Month.APRIL, 13), Duration.ofMinutes(100), null, List.of(new Genre(1, null)), new Rating(1, null));
-        filmService.addNewFilm(film);
+        filmService.addNew(film);
         User user = new User("abc@acb.ru", "login", "name", LocalDate.of(1986, Month.APRIL, 13), 1);
-        userService.addNewUser(user);
+        userService.addNew(user);
         filmService.addLike(1, 1);
         filmService.removeLike(1, 1);
         Assertions.assertTrue(filmService.gelKikes(1).isEmpty(), "Ошибка при нормальном удалении лайка.");
@@ -208,9 +210,9 @@ public class FilmServiceUnitTests {
     @Test
     public void removeLikeErrorWithWrongFilmDataId0() {
         Film film = new Film("Name", "Description", LocalDate.of(1990, Month.APRIL, 13), Duration.ofMinutes(100), null, List.of(new Genre(1, null)), new Rating(1, null));
-        filmService.addNewFilm(film);
+        filmService.addNew(film);
         User user = new User("abc@acb.ru", "login", "name", LocalDate.of(1986, Month.APRIL, 13), 1);
-        userService.addNewUser(user);
+        userService.addNew(user);
         filmService.addLike(1, 1);
         ValidationException exception = Assertions.assertThrows(ValidationException.class, () -> filmService.removeLike(0, 1));
         Assertions.assertEquals(exception.getMessage(), "ID фильма не может быть меньше или равно нулю.",
@@ -220,9 +222,9 @@ public class FilmServiceUnitTests {
     @Test
     public void removeLikeErrorWithWrongFilmDataIdNegative() {
         Film film = new Film("Name", "Description", LocalDate.of(1990, Month.APRIL, 13), Duration.ofMinutes(100), null, List.of(new Genre(1, null)), new Rating(1, null));
-        filmService.addNewFilm(film);
+        filmService.addNew(film);
         User user = new User("abc@acb.ru", "login", "name", LocalDate.of(1986, Month.APRIL, 13), 1);
-        userService.addNewUser(user);
+        userService.addNew(user);
         filmService.addLike(1, 1);
         ValidationException exception = Assertions.assertThrows(ValidationException.class, () -> filmService.removeLike(-1, 1));
         Assertions.assertEquals(exception.getMessage(), "ID фильма не может быть меньше или равно нулю.",
@@ -232,21 +234,21 @@ public class FilmServiceUnitTests {
     @Test
     public void removeLikeErrorWithWrongFilmDataWrongId() {
         Film film = new Film("Name", "Description", LocalDate.of(1990, Month.APRIL, 13), Duration.ofMinutes(100), null, List.of(new Genre(1, null)), new Rating(1, null));
-        filmService.addNewFilm(film);
+        filmService.addNew(film);
         User user = new User("abc@acb.ru", "login", "name", LocalDate.of(1986, Month.APRIL, 13), 1);
-        userService.addNewUser(user);
+        userService.addNew(user);
         filmService.addLike(1, 1);
-        NoResultDataAccessException exception = Assertions.assertThrows(NoResultDataAccessException.class, () -> filmService.removeLike(99, 1));
-        Assertions.assertEquals(exception.getMessage(), "Получен пустой ответ на запрос.",
+        FilmNotFoundException exception = Assertions.assertThrows(FilmNotFoundException.class, () -> filmService.removeLike(99, 1));
+        Assertions.assertEquals(exception.getMessage(), "Фильм c ID 99 не найден.",
                 "Ошибка при удалении лайка к фильму с ID99.");
     }
 
     @Test
     public void removeLikeErrorWithWrongUserDataId0() {
         Film film = new Film("Name", "Description", LocalDate.of(1990, Month.APRIL, 13), Duration.ofMinutes(100), null, List.of(new Genre(1, null)), new Rating(1, null));
-        filmService.addNewFilm(film);
+        filmService.addNew(film);
         User user = new User("abc@acb.ru", "login", "name", LocalDate.of(1986, Month.APRIL, 13), 1);
-        userService.addNewUser(user);
+        userService.addNew(user);
         filmService.addLike(1, 1);
         ValidationException exception = Assertions.assertThrows(ValidationException.class, () -> filmService.removeLike(1, 0));
         Assertions.assertEquals(exception.getMessage(), "ID юзера не может быть меньше или равно нулю.",
@@ -256,9 +258,9 @@ public class FilmServiceUnitTests {
     @Test
     public void removeLikeErrorWithWrongUserDataIdNegative() {
         Film film = new Film("Name", "Description", LocalDate.of(1990, Month.APRIL, 13), Duration.ofMinutes(100), null, List.of(new Genre(1, null)), new Rating(1, null));
-        filmService.addNewFilm(film);
+        filmService.addNew(film);
         User user = new User("abc@acb.ru", "login", "name", LocalDate.of(1986, Month.APRIL, 13), 1);
-        userService.addNewUser(user);
+        userService.addNew(user);
         filmService.addLike(1, 1);
         ValidationException exception = Assertions.assertThrows(ValidationException.class, () -> filmService.removeLike(1, -1));
         Assertions.assertEquals(exception.getMessage(), "ID юзера не может быть меньше или равно нулю.",
@@ -268,51 +270,51 @@ public class FilmServiceUnitTests {
     @Test
     public void removeLikeErrorWithWrongUserDataWrongId() {
         Film film = new Film("Name", "Description", LocalDate.of(1990, Month.APRIL, 13), Duration.ofMinutes(100), null, List.of(new Genre(1, null)), new Rating(1, null));
-        filmService.addNewFilm(film);
+        filmService.addNew(film);
         User user = new User("abc@acb.ru", "login", "name", LocalDate.of(1986, Month.APRIL, 13), null);
-        userService.addNewUser(user);
+        userService.addNew(user);
         filmService.addLike(1, 1);
-        NoResultDataAccessException exception = Assertions.assertThrows(NoResultDataAccessException.class, () -> filmService.removeLike(1, 99));
-        Assertions.assertEquals(exception.getMessage(), "Запрос на поиск пользователя получил пустой ответ.",
+        UserNotFoundException exception = Assertions.assertThrows(UserNotFoundException.class, () -> filmService.removeLike(1, 99));
+        Assertions.assertEquals(exception.getMessage(), "Юзер c ID 99 не найден.",
                 "Ошибка при удалении лайка к фильму с юзером ID99.");
     }
 
     @Test
     public void findPopularNormalWithCount() {
         Film film = new Film("Name", "Description", LocalDate.of(1990, Month.APRIL, 13), Duration.ofMinutes(100), 1, List.of(new Genre(1, "Комедия")), new Rating(1, "G"));
-        filmService.addNewFilm(film);
+        filmService.addNew(film);
         Film film2 = new Film("Name2", "Description2", LocalDate.of(1990, Month.APRIL, 13), Duration.ofMinutes(100), null, List.of(new Genre(1, null)), new Rating(1, null));
-        filmService.addNewFilm(film2);
+        filmService.addNew(film2);
         User user = new User("abc@acb.ru", "login", "name", LocalDate.of(1986, Month.APRIL, 13), 1);
-        userService.addNewUser(user);
+        userService.addNew(user);
         filmService.addLike(1, 1);
-        Assertions.assertEquals(filmService.getPopularFilms(1), new ArrayList<>(List.of(film)),
+        Assertions.assertEquals(filmService.getPopular(1), new ArrayList<>(List.of(film)),
                 "Ошибка при получении списка из 1 популярных фильмов.");
     }
 
     @Test
     public void findPopularNormalWithNoCount() {
         Film film = new Film("Name", "Description", LocalDate.of(1990, Month.APRIL, 13), Duration.ofMinutes(100), 1, List.of(new Genre(1, "Комедия")), new Rating(1, "G"));
-        filmService.addNewFilm(film);
+        filmService.addNew(film);
         Film film2 = new Film("Name2", "Description2", LocalDate.of(1990, Month.APRIL, 13), Duration.ofMinutes(100), null, List.of(new Genre(1, "Комедия")), new Rating(1, "G"));
-        filmService.addNewFilm(film2);
+        filmService.addNew(film2);
         User user = new User("abc@acb.ru", "login", "name", LocalDate.of(1986, Month.APRIL, 13), null);
-        userService.addNewUser(user);
+        userService.addNew(user);
         filmService.addLike(1, 1);
-        Assertions.assertEquals(filmService.getPopularFilms(10), new ArrayList<>(List.of(film, film2)),
+        Assertions.assertEquals(filmService.getPopular(10), new ArrayList<>(List.of(film, film2)),
                 "Ошибка при нормальном получении списка из 10 пополурных фильмов.");
     }
 
     @Test
     public void findPopularErrorCount0() {
         Film film = new Film("Name", "Description", LocalDate.of(1990, Month.APRIL, 13), Duration.ofMinutes(100), null, List.of(new Genre(1, null)), new Rating(1, null));
-        filmService.addNewFilm(film);
+        filmService.addNew(film);
         Film film2 = new Film("Name2", "Description2", LocalDate.of(1990, Month.APRIL, 13), Duration.ofMinutes(100), null, List.of(new Genre(1, null)), new Rating(1, null));
-        filmService.addNewFilm(film2);
+        filmService.addNew(film2);
         User user = new User("abc@acb.ru", "login", "name", LocalDate.of(1986, Month.APRIL, 13), 1);
-        userService.addNewUser(user);
+        userService.addNew(user);
         filmService.addLike(1, 1);
-        ValidationException exception = Assertions.assertThrows(ValidationException.class, () -> filmService.getPopularFilms(0));
+        ValidationException exception = Assertions.assertThrows(ValidationException.class, () -> filmService.getPopular(0));
         Assertions.assertEquals(exception.getMessage(), "Значение выводимых фильмов не может быть меньше или равно нулю.",
                 "Ошибка при получении ошибки получения популярных 0 фильмов");
     }
@@ -320,13 +322,13 @@ public class FilmServiceUnitTests {
     @Test
     public void findPopularErrorCountNegative() {
         Film film = new Film("Name", "Description", LocalDate.of(1990, Month.APRIL, 13), Duration.ofMinutes(100), null, List.of(new Genre(1, null)), new Rating(1, null));
-        filmService.addNewFilm(film);
+        filmService.addNew(film);
         Film film2 = new Film("Name2", "Description2", LocalDate.of(1990, Month.APRIL, 13), Duration.ofMinutes(100), null, List.of(new Genre(1, null)), new Rating(1, null));
-        filmService.addNewFilm(film2);
+        filmService.addNew(film2);
         User user = new User("abc@acb.ru", "login", "name", LocalDate.of(1986, Month.APRIL, 13), 1);
-        userService.addNewUser(user);
+        userService.addNew(user);
         filmService.addLike(1, 1);
-        ValidationException exception = Assertions.assertThrows(ValidationException.class, () -> filmService.getPopularFilms(-1));
+        ValidationException exception = Assertions.assertThrows(ValidationException.class, () -> filmService.getPopular(-1));
         Assertions.assertEquals(exception.getMessage(), "Значение выводимых фильмов не может быть меньше или равно нулю.",
                 "Ошибка при получении ошибки получения популярных -1 фильмов");
     }

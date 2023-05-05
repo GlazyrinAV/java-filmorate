@@ -20,24 +20,24 @@ public class UserService {
         this.storage = storage;
     }
 
-    public User addNewUser(User user) {
-        return storage.addNewUser(user);
+    public User addNew(User user) {
+        return storage.addNew(user);
     }
 
-    public User updateUser(User user) {
-        return storage.updateUser(user);
+    public User update(User user) {
+        return storage.update(user);
     }
 
-    public Collection<User> findAllUsers() {
-        return storage.findAllUsers();
+    public Collection<User> findAll() {
+        return storage.findAll();
     }
 
-    public User findUserById(int  userId) {
+    public User findById(int  userId) {
         if (userId <= 0) {
             log.info("Указан ID меньше или равный нулю.");
             throw new ValidationException("ID не может быть меньше или равно нулю.");
         } else {
-            return storage.findUser(userId);
+            return storage.findById(userId);
         }
     }
 
@@ -45,10 +45,10 @@ public class UserService {
         if (userId <= 0 || friendId <= 0) {
             log.info("Указан ID меньше или равный нулю.");
             throw new ValidationException("ID не может быть меньше или равно нулю.");
-        } else if (storage.findUser(userId) == null) {
+        } else if (!isExists(userId)) {
             log.info("Пользователь c ID " + userId + " не найден.");
             throw new UserNotFoundException("Пользователь c ID " + userId + " не найден.");
-        } else if (storage.findUser(friendId) == null) {
+        } else if (!isExists(friendId)) {
             log.info("Пользователь c ID " + friendId + " не найден.");
             throw new UserNotFoundException("Пользователь c ID " + friendId + " не найден.");
         } else {
@@ -61,10 +61,10 @@ public class UserService {
         if (userId <= 0 || friendId <= 0) {
             log.info("Указан ID меньше или равный нулю.");
             throw new ValidationException("ID не может быть меньше или равно нулю.");
-        } else if (storage.findUser(userId) == null) {
+        } else if (!isExists(userId)) {
             log.info("Пользователь c ID " + userId + " не найден.");
             throw new UserNotFoundException("Пользователь c ID " + userId + " не найден.");
-        } else if (storage.findUser(friendId) == null) {
+        } else if (!isExists(friendId)) {
             log.info("Пользователь c ID " + friendId + " не найден.");
             throw new UserNotFoundException("Пользователь c ID " + friendId + " не найден.");
         } else {
@@ -77,7 +77,7 @@ public class UserService {
         if (userId <= 0) {
             log.info("Указан ID меньше или равный нулю.");
             throw new ValidationException("ID не может быть меньше или равно нулю.");
-        } else if (storage.findUser(userId) == null) {
+        } else if (!isExists(userId)) {
             log.info("Пользователь c ID " + userId + " не найден.");
             throw new UserNotFoundException("Пользователь c ID " + userId + " не найден.");
         } else {
@@ -89,14 +89,18 @@ public class UserService {
         if (userId <= 0 || otherUserId <= 0) {
             log.info("Указан ID меньше или равный нулю.");
             throw new ValidationException("ID не может быть меньше или равно нулю.");
-        } else if (storage.findUser(userId) == null) {
+        } else if (!isExists(userId)) {
             log.info("Пользователь c ID " + userId + " не найден.");
             throw new UserNotFoundException("Пользователь c ID " + userId + " не найден.");
-        } else if (storage.findUser(otherUserId) == null) {
+        } else if (!isExists(otherUserId)) {
             log.info("Пользователь c ID " + otherUserId + " не найден.");
-            throw new UserNotFoundException("Пользователь c ID " + userId + " не найден.");
+            throw new UserNotFoundException("Пользователь c ID " + otherUserId + " не найден.");
         } else {
             return storage.findCommonFriends(userId, otherUserId);
         }
+    }
+
+    protected Boolean isExists(int userID) {
+        return storage.isExists(userID);
     }
 }

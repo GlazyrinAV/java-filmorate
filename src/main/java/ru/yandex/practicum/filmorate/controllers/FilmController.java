@@ -23,28 +23,28 @@ public class FilmController {
     @ResponseStatus(HttpStatus.CREATED)
     public Film addNewFilm(@Valid @RequestBody Film film) {
         log.info("Получен запрос на создание фильма.");
-        return filmService.addNewFilm(film);
+        return filmService.addNew(film);
     }
 
     @PutMapping("/films")
     @ResponseStatus(HttpStatus.OK)
     public Film updateFilm(@Valid @RequestBody Film film) {
         log.info("Получен запрос на обновление фильма.");
-        return filmService.updateFilm(film);
+        return filmService.update(film);
     }
 
     @GetMapping("/films")
     @ResponseStatus(HttpStatus.OK)
     public Collection<Film> getAllFilms() {
         log.info("Получен запрос на получение списка фильмов.");
-        return filmService.findAllFilms();
+        return filmService.findAll();
     }
 
     @GetMapping("/films/{id}")
     @ResponseStatus(HttpStatus.OK)
     public Film findFilmById(@PathVariable int id) {
         log.info("Получен запрос на поиск фильма с ID" + id + ".");
-        return filmService.findFilm(id);
+        return filmService.findById(id);
     }
 
     @PutMapping("/films/{id}/like/{userId}")
@@ -65,6 +65,6 @@ public class FilmController {
     @ResponseStatus(HttpStatus.OK)
     public Collection<Film> findPopularFilms(@RequestParam(defaultValue = "10") int count) {
         log.info("Получен запрос на получение первых " + count + " популярных фильмов.");
-        return filmService.getPopularFilms(count);
+        return filmService.getPopular(count);
     }
 }

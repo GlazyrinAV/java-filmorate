@@ -35,7 +35,7 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Override
-    public Film addNewFilm(Film film) {
+    public Film addNew(Film film) {
         String sqlQuery = "INSERT INTO films (name, description, release_date, duration, rating_id) " +
                 "VALUES (?, ?, ?, ?, ?)";
 
@@ -59,11 +59,11 @@ public class FilmDbStorage implements FilmStorage {
         Optional<Integer> filmId = Optional.of(Objects.requireNonNull(keyHolder.getKey()).intValue());
         addFilmGenresToDB(film, filmId.get());
 
-        return findFilm(filmId.get());
+        return findById(filmId.get());
     }
 
     @Override
-    public Film updateFilm(Film film) {
+    public Film update(Film film) {
         String sqlQuery = "UPDATE films SET " +
                 "name = ?," +
                 "description = ?," +
@@ -84,11 +84,11 @@ public class FilmDbStorage implements FilmStorage {
         }
 
         addFilmGenresToDB(film, film.getId());
-        return findFilm(film.getId());
+        return findById(film.getId());
     }
 
     @Override
-    public Collection<Film> findAllFilms() {
+    public Collection<Film> findAll() {
         String sqlQuery = "SELECT * FROM films";
         Collection<Film> films = jdbcTemplate.query(sqlQuery, this::mapRowToFilm);
 
@@ -101,7 +101,7 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Override
-    public Film findFilm(int filmId) {
+    public Film findById(int filmId) {
         String sqlQuery = "SELECT * FROM films where film_id = ?";
         Film film;
         try {
@@ -147,7 +147,7 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Override
-    public List<Rating> findAllFilmRatings() {
+    public List<Rating> findAllRatings() {
         String sqlQuery = "SELECT * FROM RATINGS";
         return jdbcTemplate.query(sqlQuery, this::mapRowToRating);
     }
@@ -182,6 +182,12 @@ public class FilmDbStorage implements FilmStorage {
     public Collection<Integer> getLikes(int filmId) {
         String sqlQuery = "SELECT user_id FROM film_likes WHERE film_id = ?";
         return jdbcTemplate.query(sqlQuery, this::maoRowToInteger, filmId);
+    }
+
+    @Override
+    public Boolean isExists(int filmId) {
+        String sqlQuery = "SELECT EXISTS ( SELECT * FROM PUBLIC.films WHERE film_id =? )";
+        return Boolean.TRUE.equals(jdbcTemplate.queryForObject(sqlQuery, Boolean.TYPE, filmId));
     }
 
     private Film mapRowToFilm(ResultSet resultSet, int rowNum) throws SQLException {

@@ -19,7 +19,7 @@ public class RatingsService {
     }
 
     public Collection<Rating> findAllFilmRatings() {
-        return filmStorage.findAllFilmRatings();
+        return filmStorage.findAllRatings();
     }
 
     public Rating findRatingById(int ratingId) {
