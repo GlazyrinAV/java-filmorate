@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.storage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -38,15 +39,20 @@ public class FilmDbStorage implements FilmStorage {
 
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
-        jdbcTemplate.update(connection -> {
-            PreparedStatement stmt = connection.prepareStatement(sqlQuery, new String[]{"film_id"});
-            stmt.setString(1, film.getName());
-            stmt.setString(2, film.getDescription());
-            stmt.setDate(3, Date.valueOf(film.getReleaseDate()));
-            stmt.setLong(4, film.getDuration().toMillis());
-            stmt.setInt(5, film.getMpa().getId());
-            return stmt;
-        }, keyHolder);
+        try {
+            jdbcTemplate.update(connection -> {
+                PreparedStatement stmt = connection.prepareStatement(sqlQuery, new String[]{"film_id"});
+                stmt.setString(1, film.getName());
+                stmt.setString(2, film.getDescription());
+                stmt.setDate(3, Date.valueOf(film.getReleaseDate()));
+                stmt.setLong(4, film.getDuration().toMillis());
+                stmt.setInt(5, film.getMpa().getId());
+                return stmt;
+            }, keyHolder);
+
+        } catch (DataIntegrityViolationException e) {
+            throw new DataIntegrityViolationException("В запросе неправильно указаны данные о фильме.");
+        }
 
         Optional<Integer> filmId = Optional.of(Objects.requireNonNull(keyHolder.getKey()).intValue());
         addFilmGenresToDB(film, filmId.get());
@@ -63,13 +69,17 @@ public class FilmDbStorage implements FilmStorage {
                 "duration = ?," +
                 "rating_id = ?" +
                 "WHERE film_id = ?";
-        jdbcTemplate.update(sqlQuery,
-                film.getName(),
-                film.getDescription(),
-                Date.valueOf(film.getReleaseDate()),
-                film.getDuration().toMillis(),
-                film.getMpa().getId(),
-                film.getId());
+        try {
+            jdbcTemplate.update(sqlQuery,
+                    film.getName(),
+                    film.getDescription(),
+                    Date.valueOf(film.getReleaseDate()),
+                    film.getDuration().toMillis(),
+                    film.getMpa().getId(),
+                    film.getId());
+        } catch (DataIntegrityViolationException exception) {
+            throw new DataIntegrityViolationException("В запросе неправильно указаны данные о фильме.");
+        }
         addFilmGenresToDB(film, film.getId());
         return findFilm(film.getId());
     }
@@ -110,7 +120,11 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     public void addLike(int filmId, int userId) {
         String sqlQuery = "INSERT INTO film_likes (film_id, user_id) VALUES (?, ?)";
-        jdbcTemplate.update(sqlQuery, filmId, userId);
+        try {
+            jdbcTemplate.update(sqlQuery, filmId, userId);
+        } catch (DataIntegrityViolationException exception) {
+            throw new DataIntegrityViolationException("В запросе неправильно указаны данные о фильме.");
+        }
     }
 
     @Override
@@ -165,19 +179,23 @@ public class FilmDbStorage implements FilmStorage {
 
         String sqlQueryForGenres = "MERGE INTO film_genres (film_id, genre_id) VALUES (?, ?)";
         if (film.getGenres() != null) {
-            jdbcTemplate.batchUpdate(sqlQueryForGenres, new BatchPreparedStatementSetter() {
-                @Override
-                public void setValues(PreparedStatement ps, int i) throws SQLException {
-                    Genre genre = film.getGenres().get(i);
-                    ps.setInt(1, filmId);
-                    ps.setInt(2, genre.getId());
-                }
+            try {
+                jdbcTemplate.batchUpdate(sqlQueryForGenres, new BatchPreparedStatementSetter() {
+                    @Override
+                    public void setValues(PreparedStatement ps, int i) throws SQLException {
+                        Genre genre = film.getGenres().get(i);
+                        ps.setInt(1, filmId);
+                        ps.setInt(2, genre.getId());
+                    }
 
-                @Override
-                public int getBatchSize() {
-                    return film.getGenres().size();
-                }
-            });
+                    @Override
+                    public int getBatchSize() {
+                        return film.getGenres().size();
+                    }
+                });
+            } catch (DataIntegrityViolationException exception) {
+                throw new DataIntegrityViolationException("В запросе неправильно указаны данные о фильме.");
+            }
         }
     }
 

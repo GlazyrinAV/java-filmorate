@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.exceptions;
 
 import lombok.Data;
+import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -10,6 +11,12 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
 public class ErrorHandler {
+
+    @ExceptionHandler()
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse dataIntegrityViolationException(DataAccessException exception) {
+        return new ErrorResponse("data access error", exception.getMessage());
+    }
 
     @ExceptionHandler({UserAlreadyExistsException.class, FilmAlreadyExistsException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)

@@ -8,10 +8,18 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(exclude = "id")
 @Builder
 public class Rating {
-    private final int id;
+    private final Integer id;
     private final String name;
 
-    public Rating(int id, String name) {
+    public Integer getId() {
+        if (id == null) {
+            return -1;
+        } else {
+            return id;
+        }
+    }
+
+    public Rating(Integer id, String name) {
         this.id = id;
         this.name = name;
     }
