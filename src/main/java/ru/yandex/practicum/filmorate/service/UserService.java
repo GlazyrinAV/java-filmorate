@@ -1,7 +1,6 @@
 package ru.yandex.practicum.filmorate.service;
 
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.UserNotFoundException;
@@ -34,7 +33,12 @@ public class UserService {
     }
 
     public User findUserById(int  userId) {
-        return storage.findUser(userId);
+        if (userId <= 0) {
+            log.info("Указан ID меньше или равный нулю.");
+            throw new ValidationException("ID не может быть меньше или равно нулю.");
+        } else {
+            return storage.findUser(userId);
+        }
     }
 
     public void addFriend(int userId, int friendId) {
