@@ -1,7 +1,7 @@
 package ru.yandex.practicum.filmorate.controllers;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.User;
@@ -14,49 +14,52 @@ import java.util.Collection;
 @Slf4j
 public class UserController {
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
+
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
 
     @PostMapping("/users")
     @ResponseStatus(HttpStatus.CREATED)
     public User addNewUser(@Valid @RequestBody User user) {
         log.info("Получен запрос на создание пользователя.");
-        return userService.addNewUser(user);
+        return userService.addNew(user);
     }
 
     @PutMapping("/users")
     @ResponseStatus(HttpStatus.OK)
     public User updateUser(@Valid @RequestBody User user) {
         log.info("Получен запрос на обновление пользователя.");
-        return userService.updateUser(user);
+        return userService.update(user);
     }
 
     @GetMapping("/users")
     @ResponseStatus(HttpStatus.OK)
     public Collection<User> getAllUsers() {
         log.info("Получен запрос на получение списка пользователей.");
-        return userService.findAllUsers();
+        return userService.findAll();
     }
 
     @GetMapping("/users/{id}")
     @ResponseStatus(HttpStatus.OK)
     public User findUserById(@PathVariable int id) {
         log.info("Получен запрос на поиск пользователя с ID" + id + ".");
-        return userService.findUserById(id);
+        return userService.findById(id);
     }
 
     @PutMapping("/users/{id}/friends/{friendId}")
     @ResponseStatus(HttpStatus.OK)
-    public User addNewFriend(@PathVariable int id, @PathVariable int friendId) {
+    public void addNewFriend(@PathVariable int id, @PathVariable int friendId) {
         log.info("Получен запрос на добавление друга юзеру ID" + id);
-        return userService.addFriend(id, friendId);
+        userService.addFriend(id, friendId);
     }
 
     @DeleteMapping("/users/{id}/friends/{friendId}")
     @ResponseStatus(HttpStatus.OK)
-    public User removeFriend(@PathVariable int id, @PathVariable int friendId) {
+    public void removeFriend(@PathVariable int id, @PathVariable int friendId) {
         log.info("Получен запрос на удаление друга у юзера ID" + id);
-        return userService.removeFriend(id, friendId);
+        userService.removeFriend(id, friendId);
     }
 
     @GetMapping("/users/{id}/friends")

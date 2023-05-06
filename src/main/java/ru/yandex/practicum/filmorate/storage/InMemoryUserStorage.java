@@ -1,28 +1,28 @@
 package ru.yandex.practicum.filmorate.storage;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exceptions.UserAlreadyExistsException;
 import ru.yandex.practicum.filmorate.exceptions.UserNotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 @Component
 @Slf4j
+@Qualifier("InMemoryUserStorage")
 public class InMemoryUserStorage implements UserStorage {
 
     private int idUserSequence = 1;
     private final Map<Integer, User> users = new ConcurrentHashMap<>();
+    private final Map<Integer, Set<Integer>> friends = new ConcurrentHashMap<>();
 
     @Override
-    public User addNewUser(User user) {
+    public User addNew(User user) {
         if (!users.containsValue(user)) {
             if (user.getName().isBlank()) {
                 user.setName(user.getLogin());
@@ -38,7 +38,7 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public User updateUser(User user) {
+    public User update(User user) {
         if (!users.containsKey(user.getId())) {
             log.info("Пользователь c ID " + user.getId() + " не найден.");
             throw new UserNotFoundException("Пользователь c ID " + user.getId() + " не найден.");
@@ -50,12 +50,12 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public Collection<User> findAllUsers() {
+    public Collection<User> findAll() {
         return users.values();
     }
 
     @Override
-    public User findUser(int userId) {
+    public User findById(int userId) {
         if (userId <= 0) {
             log.info("Указанный ID меньше или равен нулю.");
             throw new ValidationException("ID не может быть меньше или равно нулю.");
@@ -67,28 +67,43 @@ public class InMemoryUserStorage implements UserStorage {
         }
     }
 
-    @Override
-    public User addFriend(int userId, int friendId) {
-        users.get(userId).getFriends().add(friendId);
-        users.get(friendId).getFriends().add(userId);
-        return users.get(friendId);
+    private Set<Integer> putFriend(int userId, int friendId) {
+        friends.getOrDefault(userId, new HashSet<>()).add(friendId);
+        return friends.get(userId);
     }
 
     @Override
-    public User removeFriend(int userId, int friendId) {
-        users.get(userId).getFriends().remove(friendId);
-        users.get(friendId).getFriends().remove(userId);
-        return users.get(friendId);
+    public void addFriend(int userId, int friendId) {
+        friends.put(userId, putFriend(userId, friendId));
+        friends.put(friendId, putFriend(friendId, userId));
+    }
+
+    @Override
+    public void removeFriend(int userId, int friendId) {
+        friends.get(userId).remove(friendId);
+        friends.get(friendId).remove(userId);
+    }
+
+    @Override
+    public Collection<User> findFriends(int userId) {
+        return users.values().stream()
+                .filter(user -> friends.get(userId).contains(userId))
+                .collect(Collectors.toList());
     }
 
     @Override
     public Collection<User> findCommonFriends(int user1Id, int user2Id) {
-        List<Integer> friendsOfUser1 = new ArrayList<>(users.get(user1Id).getFriends());
-        List<Integer> friendsOfUser2 = new ArrayList<>(users.get(user2Id).getFriends());
+        List<Integer> friendsOfUser1 = new ArrayList<>(friends.get(user1Id));
+        List<Integer> friendsOfUser2 = new ArrayList<>(friends.get(user2Id));
         friendsOfUser1.retainAll(friendsOfUser2);
         return users.values().stream()
                 .filter(user -> friendsOfUser1.contains(user.getId()))
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public boolean isExists(int userId) {
+        return users.get(userId) != null;
     }
 
     public void resetUsersForTest() {
@@ -97,5 +112,9 @@ public class InMemoryUserStorage implements UserStorage {
 
     private int setNewId() {
         return idUserSequence++;
+    }
+
+    public void resetCounter() {
+        idUserSequence = 1;
     }
 }

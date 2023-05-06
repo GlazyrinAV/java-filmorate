@@ -1,26 +1,34 @@
 package ru.yandex.practicum.filmorate.storage;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exceptions.FilmAlreadyExistsException;
 import ru.yandex.practicum.filmorate.exceptions.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.model.Rating;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 @Component
 @Slf4j
+@Qualifier("InMemoryFilmStorage")
 public class InMemoryFilmStorage implements FilmStorage {
 
     private int idFilmSequence = 1;
     private final Map<Integer, Film> films = new ConcurrentHashMap<>();
 
+    private final Map<Integer, Set<Integer>> likes = new HashMap<>();
+
     @Override
-    public Film addNewFilm(Film film) {
+    public Film addNew(Film film) {
         if (!films.containsValue(film)) {
             film.setId(setNewId());
             films.put(film.getId(), film);
@@ -33,7 +41,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public Film updateFilm(Film film) {
+    public Film update(Film film) {
         if (films.containsKey(film.getId())) {
             films.replace(film.getId(), film);
             log.info("Данные о фильме c ID " + film.getId() + " обновлены.");
@@ -45,12 +53,12 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public Collection<Film> findAllFilms() {
+    public Collection<Film> findAll() {
         return films.values();
     }
 
     @Override
-    public Film findFilm(int filmId) {
+    public Film findById(int filmId) {
         if (filmId <= 0) {
             log.info("Указанный ID меньше или равен нулю.");
             throw new ValidationException("ID не может быть меньше или равно нулю.");
@@ -72,12 +80,47 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public void addLike(int filmId, int userId) {
-        films.get(filmId).getLiked().add(userId);
+        likes.put(filmId, putUserToLikes(filmId, userId));
     }
 
     @Override
     public void removeLike(int filmId, int userId) {
-        films.get(filmId).getLiked().remove(userId);
+        likes.get(filmId).remove(userId);
+    }
+
+    @Override
+    public Collection<Rating> findAllRatings() {
+        return null;
+    }
+
+    @Override
+    public Rating findRatingById(int ratingId) {
+        return null;
+    }
+
+    @Override
+    public Collection<Genre> findAllGenres() {
+        return null;
+    }
+
+    @Override
+    public Genre findGenreById(int genreId) {
+        return null;
+    }
+
+    @Override
+    public Collection<Integer> getLikes(int filmId) {
+        return null;
+    }
+
+    @Override
+    public Boolean isExists(int filmId) {
+        return films.get(filmId) != null;
+    }
+
+    private Set<Integer> putUserToLikes(int filmId, int userId) {
+        likes.get(filmId).add(userId);
+        return likes.get(filmId);
     }
 
     public void resetFilmsForTests() {
@@ -89,6 +132,10 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     private int compare(Film p0, Film p1) {
-        return p1.getLiked().size() - (p0.getLiked().size());
+        return likes.get(p1.getId()).size() - (likes.get(p0.getId()).size());
+    }
+
+    public void resetCounter() {
+        idFilmSequence = 1;
     }
 }

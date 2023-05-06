@@ -1,7 +1,7 @@
 package ru.yandex.practicum.filmorate.model;
 
-
 import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import ru.yandex.practicum.filmorate.customConstraints.DurationConstraint;
@@ -11,14 +11,12 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import java.time.Duration;
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 
 @Data
-@EqualsAndHashCode(of = "id")
+@EqualsAndHashCode(exclude = "id")
+@Builder
 public class Film {
-
-    private final Set<Integer> liked = new HashSet<>();
 
     @NotBlank(message = "Неверно указано название фильма.")
     private final String name;
@@ -33,20 +31,19 @@ public class Film {
     @DurationConstraint
     private final Duration duration;
 
-    private int id;
-//
-//    public Film(String name, String description, LocalDate releaseDate, Duration duration) {
-//        this.name = name;
-//        this.description = description;
-//        this.releaseDate = releaseDate;
-//        this.duration = duration;
-//    }
+    private Integer id;
 
-    public Film(String name, String description, LocalDate releaseDate, Duration duration, int id) {
+    private List<Genre> genres;
+
+    private Rating mpa;
+
+    public Film(String name, String description, LocalDate releaseDate, Duration duration, Integer id, List<Genre> genres, Rating mpa) {
         this.name = name;
         this.description = description;
         this.releaseDate = releaseDate;
         this.duration = duration;
         this.id = id;
+        this.genres = genres;
+        this.mpa = mpa;
     }
 }

@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.exceptions;
 
+import lombok.Data;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -8,6 +9,18 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
 public class ErrorHandler {
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ErrorResponse noResultDataAccessException(NoResultDataAccessException exception) {
+        return new ErrorResponse("no data returned", exception.getMessage());
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse dataIntegrityViolationException(DataIntegrityViolationException exception) {
+        return new ErrorResponse("data access error", exception.getMessage());
+    }
 
     @ExceptionHandler({UserAlreadyExistsException.class, FilmAlreadyExistsException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
@@ -45,23 +58,10 @@ public class ErrorHandler {
         return new ErrorResponse("error", "Получен неподходящий аргумент или аргумент неправильного типа");
     }
 
+    @Data
     public static class ErrorResponse {
 
-        String error;
-
-        String description;
-
-        public ErrorResponse(String error, String description) {
-            this.error = error;
-            this.description = description;
-        }
-
-        public String getError() {
-            return error;
-        }
-
-        public String getDescription() {
-            return description;
-        }
+        private final String error;
+        private final String description;
     }
 }
