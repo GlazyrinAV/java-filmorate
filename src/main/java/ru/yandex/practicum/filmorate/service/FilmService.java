@@ -4,11 +4,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exceptions.FilmNotFoundException;
-import ru.yandex.practicum.filmorate.exceptions.UserNotFoundException;
-import ru.yandex.practicum.filmorate.exceptions.ValidationException;
+import ru.yandex.practicum.filmorate.exceptions.exceptions.FilmNotFoundException;
+import ru.yandex.practicum.filmorate.exceptions.exceptions.UserNotFoundException;
+import ru.yandex.practicum.filmorate.exceptions.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.storage.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.dao.FilmStorage;
 
 import java.util.Collection;
 
@@ -39,7 +39,7 @@ public class FilmService {
         return filmStorage.findById(filmId);
     }
 
-    public void addLike(int filmId, int userId) {
+    public void makeLike(int filmId, int userId) {
         if (filmId <= 0) {
             log.info("Указанный ID фильма меньше или равен нулю.");
             throw new ValidationException("ID фильма не может быть меньше или равно нулю.");
@@ -54,7 +54,7 @@ public class FilmService {
             throw new UserNotFoundException("Юзер c ID " + userId + " не найден.");
         } else {
             log.info("К фильму добавлен лайк.");
-            filmStorage.addLike(filmId, userId);
+            filmStorage.makeLike(filmId, userId);
         }
     }
 
@@ -77,7 +77,7 @@ public class FilmService {
         }
     }
 
-    public Collection<Film> getPopular(int count) {
+    public Collection<Film> findPopular(int count) {
         if (count <= 0) {
             throw new ValidationException("Значение выводимых фильмов не может быть меньше или равно нулю.");
         } else {
@@ -85,8 +85,8 @@ public class FilmService {
         }
     }
 
-    public Collection<Integer> gelKikes(int filmId) {
-        return filmStorage.getLikes(filmId);
+    public Collection<Integer> findLikes(int filmId) {
+        return filmStorage.findLikes(filmId);
     }
 
     private boolean isExists(int filmId) {

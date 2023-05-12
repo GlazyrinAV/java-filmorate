@@ -1,10 +1,10 @@
 package ru.yandex.practicum.filmorate.service;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.storage.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.dao.GenresStorage;
 
 import java.util.Collection;
 
@@ -12,18 +12,18 @@ import java.util.Collection;
 @Slf4j
 public class GenresService {
 
-    private final FilmStorage filmStorage;
+    private final GenresStorage genresStorage;
 
-    public GenresService(@Qualifier("FilmDbStorage") FilmStorage filmStorage) {
-        this.filmStorage = filmStorage;
+    @Autowired
+    public GenresService(GenresStorage genresStorage) {
+        this.genresStorage = genresStorage;
     }
 
     public Collection<Genre> findAllGenres() {
-        return filmStorage.findAllGenres();
+        return genresStorage.findAll();
     }
 
     public Genre findGenreById(int genreId) {
-        return filmStorage.findGenreById(genreId);
+        return genresStorage.findById(genreId);
     }
-
 }

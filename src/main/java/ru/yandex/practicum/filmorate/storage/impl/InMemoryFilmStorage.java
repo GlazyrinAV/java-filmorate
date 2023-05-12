@@ -1,14 +1,13 @@
-package ru.yandex.practicum.filmorate.storage;
+package ru.yandex.practicum.filmorate.storage.impl;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.filmorate.exceptions.FilmAlreadyExistsException;
-import ru.yandex.practicum.filmorate.exceptions.FilmNotFoundException;
-import ru.yandex.practicum.filmorate.exceptions.ValidationException;
+import ru.yandex.practicum.filmorate.exceptions.exceptions.FilmAlreadyExistsException;
+import ru.yandex.practicum.filmorate.exceptions.exceptions.FilmNotFoundException;
+import ru.yandex.practicum.filmorate.exceptions.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.model.Rating;
+import ru.yandex.practicum.filmorate.storage.dao.FilmStorage;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -79,7 +78,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public void addLike(int filmId, int userId) {
+    public void makeLike(int filmId, int userId) {
         likes.put(filmId, putUserToLikes(filmId, userId));
     }
 
@@ -89,28 +88,8 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public Collection<Rating> findAllRatings() {
-        return null;
-    }
-
-    @Override
-    public Rating findRatingById(int ratingId) {
-        return null;
-    }
-
-    @Override
-    public Collection<Genre> findAllGenres() {
-        return null;
-    }
-
-    @Override
-    public Genre findGenreById(int genreId) {
-        return null;
-    }
-
-    @Override
-    public Collection<Integer> getLikes(int filmId) {
-        return null;
+    public Collection<Integer> findLikes(int filmId) {
+        return likes.get(filmId);
     }
 
     @Override

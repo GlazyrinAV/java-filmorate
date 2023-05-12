@@ -11,17 +11,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.jdbc.Sql;
-import ru.yandex.practicum.filmorate.exceptions.NoResultDataAccessException;
-import ru.yandex.practicum.filmorate.exceptions.UserNotFoundException;
-import ru.yandex.practicum.filmorate.exceptions.ValidationException;
+import ru.yandex.practicum.filmorate.exceptions.exceptions.NoResultDataAccessException;
+import ru.yandex.practicum.filmorate.exceptions.exceptions.UserNotFoundException;
+import ru.yandex.practicum.filmorate.exceptions.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
-import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
+import ru.yandex.practicum.filmorate.storage.impl.InMemoryUserStorage;
 
 import javax.validation.ConstraintViolation;
-import javax.validation.Validation;
 import javax.validation.Validator;
-import javax.validation.ValidatorFactory;
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.ArrayList;
@@ -35,13 +33,11 @@ import java.util.stream.Stream;
 @Sql(value = {"/data.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 public class UserServiceUnitTests {
 
-    private static final ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-    private static final Validator validator = factory.getValidator();
+    private  final Validator validator;
 
-    @Autowired
-    private UserService userService;
-    @Autowired
-    private InMemoryUserStorage userStorage;
+    private final UserService userService;
+
+    private final InMemoryUserStorage userStorage;
 
     static Stream<User> userWithWrongParameters() {
         return Stream.of(

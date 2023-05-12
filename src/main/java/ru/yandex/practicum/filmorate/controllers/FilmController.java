@@ -10,6 +10,7 @@ import javax.validation.Valid;
 import java.util.Collection;
 
 @RestController
+@RequestMapping("/films")
 @Slf4j
 public class FilmController {
 
@@ -19,52 +20,52 @@ public class FilmController {
         this.filmService = filmService;
     }
 
-    @PostMapping("/films")
+    @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Film addNewFilm(@Valid @RequestBody Film film) {
+    public Film addNew(@Valid @RequestBody Film film) {
         log.info("Получен запрос на создание фильма.");
         return filmService.addNew(film);
     }
 
-    @PutMapping("/films")
+    @PutMapping
     @ResponseStatus(HttpStatus.OK)
-    public Film updateFilm(@Valid @RequestBody Film film) {
+    public Film update(@Valid @RequestBody Film film) {
         log.info("Получен запрос на обновление фильма.");
         return filmService.update(film);
     }
 
-    @GetMapping("/films")
+    @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public Collection<Film> getAllFilms() {
+    public Collection<Film> getAll() {
         log.info("Получен запрос на получение списка фильмов.");
         return filmService.findAll();
     }
 
-    @GetMapping("/films/{id}")
+    @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public Film findFilmById(@PathVariable int id) {
+    public Film findById(@PathVariable int id) {
         log.info("Получен запрос на поиск фильма с ID" + id + ".");
         return filmService.findById(id);
     }
 
-    @PutMapping("/films/{id}/like/{userId}")
+    @PutMapping("/{id}/like/{userId}")
     @ResponseStatus(HttpStatus.OK)
-    public void addNewLike(@PathVariable int id, @PathVariable int userId) {
+    public void makeNewLike(@PathVariable int id, @PathVariable int userId) {
         log.info("Получен запрос на добавление лайка к фильму ");
-        filmService.addLike(id, userId);
+        filmService.makeLike(id, userId);
     }
 
-    @DeleteMapping("/films/{id}/like/{userId}")
+    @DeleteMapping("/{id}/like/{userId}")
     @ResponseStatus(HttpStatus.OK)
     public void removeLike(@PathVariable int id, @PathVariable int userId) {
         log.info("Получен запрос на удаление лайка к фильму ");
         filmService.removeLike(id, userId);
     }
 
-    @GetMapping("/films/popular")
+    @GetMapping("/popular")
     @ResponseStatus(HttpStatus.OK)
     public Collection<Film> findPopularFilms(@RequestParam(defaultValue = "10") int count) {
         log.info("Получен запрос на получение первых " + count + " популярных фильмов.");
-        return filmService.getPopular(count);
+        return filmService.findPopular(count);
     }
 }

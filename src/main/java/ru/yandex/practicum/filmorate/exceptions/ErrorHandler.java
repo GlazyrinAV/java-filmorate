@@ -6,6 +6,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import ru.yandex.practicum.filmorate.exceptions.exceptions.*;
 
 @RestControllerAdvice
 public class ErrorHandler {
@@ -55,12 +56,11 @@ public class ErrorHandler {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public  ErrorResponse methodArgumentNotValidException(MethodArgumentNotValidException exception) {
-        return new ErrorResponse("error", "Получен неподходящий аргумент или аргумент неправильного типа");
+        return new ErrorResponse("error", exception.getFieldErrors().toString());
     }
 
     @Data
     public static class ErrorResponse {
-
         private final String error;
         private final String description;
     }

@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.exceptions;
+package ru.yandex.practicum.filmorate.exceptions.exceptions;
 
 import org.springframework.web.bind.annotation.ResponseStatus;
 

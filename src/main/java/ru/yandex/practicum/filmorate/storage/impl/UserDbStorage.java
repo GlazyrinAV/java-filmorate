@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.storage;
+package ru.yandex.practicum.filmorate.storage.impl;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,8 +8,9 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
-import ru.yandex.practicum.filmorate.exceptions.NoResultDataAccessException;
+import ru.yandex.practicum.filmorate.exceptions.exceptions.NoResultDataAccessException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.dao.UserStorage;
 
 import java.sql.Date;
 import java.sql.PreparedStatement;
@@ -51,14 +52,6 @@ public class UserDbStorage implements UserStorage {
         return findById(userId.get());
     }
 
-    private String checkName(User user) {
-        if (user.getName().isBlank()) {
-            return user.getLogin();
-        } else {
-            return user.getName();
-        }
-    }
-
     @Override
     public User update(User user) {
         String sqlQuery = "UPDATE users SET " +
@@ -94,22 +87,17 @@ public class UserDbStorage implements UserStorage {
     }
 
     @Override
-    public void addFriend(int userId, int friendId) {
-        String sqlQuery = "INSERT INTO list_of_friends (user_id, friend_id, friendship_status_id) " +
+    public void makeFriend(int userId, int friendId) {
+        String sqlQueryForMakingFriend = "INSERT INTO list_of_friends (user_id, friend_id, friendship_status_id) " +
                 "VALUES (?, ?, ?)";
-        int friendshipStatusForDb;
+        String sqlQueryForCheckingFriendshipStatus = "UPDATE list_of_friends SET " +
+                "friendship_status_id = ? WHERE user_id = ? AND friend_id = ?";
 
         if (findDidFriendMadeFriendRequest(friendId, userId)) {
-            friendshipStatusForDb = 2;
+            jdbcTemplate.update(sqlQueryForMakingFriend, userId, friendId, 2);
+            jdbcTemplate.update(sqlQueryForCheckingFriendshipStatus, friendId, userId, 2);
         } else {
-            friendshipStatusForDb = 1;
-        }
-        jdbcTemplate.update(sqlQuery, userId, friendId, friendshipStatusForDb);
-
-        if (friendshipStatusForDb == 2) {
-            String sqlQuery2 = "UPDATE list_of_friends SET " +
-                    "friendship_status_id = ? WHERE user_id = ? AND friend_id = ?";
-            jdbcTemplate.update(sqlQuery2, friendId, userId, friendshipStatusForDb);
+            jdbcTemplate.update(sqlQueryForMakingFriend, userId, friendId, 1);
         }
     }
 
@@ -122,11 +110,10 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public Collection<User> findCommonFriends(int user1Id, int user2Id) {
-        String sqlQuery = "SELECT * FROM USERS WHERE " +
-                "(USER_ID IN (SELECT F2.FRIEND_ID FROM LIST_OF_FRIENDS AS F2 " +
-                "JOIN (SELECT FRIEND_ID FROM LIST_OF_FRIENDS WHERE USER_ID = ?)" +
-                " AS F1 ON F1.FRIEND_ID = F2.FRIEND_ID" +
-                " )) AND USER_ID NOT IN (?)";
+        String sqlQuery = "select * from USERS where USER_ID in " +
+                "(select FRIEND_ID from LIST_OF_FRIENDS where " +
+                "(USER_ID = ? and FRIEND_ID in " +
+                "(select FRIEND_ID from LIST_OF_FRIENDS where LIST_OF_FRIENDS.USER_ID = ?)))";
         return jdbcTemplate.query(sqlQuery, this::mapRowToUser, user1Id, user2Id);
     }
 
@@ -141,6 +128,14 @@ public class UserDbStorage implements UserStorage {
         String sqlQuery = "SELECT * FROM users WHERE user_id IN (" +
                 "SELECT friend_id FROM list_of_friends WHERE user_id = ?)";
         return jdbcTemplate.query(sqlQuery, this::mapRowToUser, userId);
+    }
+
+    private String checkName(User user) {
+        if (user.getName().isBlank()) {
+            return user.getLogin();
+        } else {
+            return user.getName();
+        }
     }
 
     private User mapRowToUser(ResultSet resultSet, int rowNum) throws SQLException {

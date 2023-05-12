@@ -1,12 +1,13 @@
-package ru.yandex.practicum.filmorate.storage;
+package ru.yandex.practicum.filmorate.storage.impl;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.filmorate.exceptions.UserAlreadyExistsException;
-import ru.yandex.practicum.filmorate.exceptions.UserNotFoundException;
-import ru.yandex.practicum.filmorate.exceptions.ValidationException;
+import ru.yandex.practicum.filmorate.exceptions.exceptions.UserAlreadyExistsException;
+import ru.yandex.practicum.filmorate.exceptions.exceptions.UserNotFoundException;
+import ru.yandex.practicum.filmorate.exceptions.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.dao.UserStorage;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -73,7 +74,7 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public void addFriend(int userId, int friendId) {
+    public void makeFriend(int userId, int friendId) {
         friends.put(userId, putFriend(userId, friendId));
         friends.put(friendId, putFriend(friendId, userId));
     }
