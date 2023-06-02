@@ -17,7 +17,7 @@ public class RatingDbStorage implements RatingStorage {
 
     private final JdbcTemplate jdbcTemplate;
 
-    private List<Rating> ratingsInMemory;
+    private final List<Rating> ratingsInMemory;
 
     @Autowired
     public RatingDbStorage(JdbcTemplate jdbcTemplate) {

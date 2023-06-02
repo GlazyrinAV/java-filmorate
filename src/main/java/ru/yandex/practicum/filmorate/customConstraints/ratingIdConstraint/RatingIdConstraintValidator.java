@@ -9,9 +9,9 @@ import javax.validation.ConstraintValidatorContext;
 
 public class RatingIdConstraintValidator implements ConstraintValidator<RatingIdConstraint, Rating> {
 
-    @Autowired
-    public final JdbcTemplate jdbcTemplate;
+    private final JdbcTemplate jdbcTemplate;
 
+    @Autowired
     public RatingIdConstraintValidator(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }

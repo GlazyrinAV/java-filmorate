@@ -10,7 +10,7 @@ import java.util.List;
 
 public class GenreIdConstraintValidator implements ConstraintValidator<GenreIdConstraint, List<Genre>> {
 
-    public final JdbcTemplate jdbcTemplate;
+    private final JdbcTemplate jdbcTemplate;
 
     @Autowired
     public GenreIdConstraintValidator(JdbcTemplate jdbcTemplate) {

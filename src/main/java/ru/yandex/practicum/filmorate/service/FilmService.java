@@ -16,12 +16,14 @@ import java.util.Collection;
 @Slf4j
 public class FilmService {
 
-    @Autowired
-    @Qualifier("FilmDbStorage")
-    private FilmStorage filmStorage;
+    private final FilmStorage filmStorage;
+    private final UserService userService;
 
     @Autowired
-    private UserService userService;
+    public FilmService(@Qualifier("FilmDbStorage") FilmStorage filmStorage, UserService userService) {
+        this.filmStorage = filmStorage;
+        this.userService = userService;
+    }
 
     public Film addNew(Film film) {
         return filmStorage.addNew(film);

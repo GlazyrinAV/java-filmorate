@@ -8,8 +8,6 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.annotation.Bean;
 import org.springframework.test.context.jdbc.Sql;
 import ru.yandex.practicum.filmorate.exceptions.exceptions.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.exceptions.NoResultDataAccessException;
@@ -330,13 +328,5 @@ public class FilmServiceUnitTests {
         ValidationException exception = Assertions.assertThrows(ValidationException.class, () -> filmService.findPopular(-1));
         Assertions.assertEquals(exception.getMessage(), "Значение выводимых фильмов не может быть меньше или равно нулю.",
                 "Ошибка при получении ошибки получения популярных -1 фильмов");
-    }
-
-    @TestConfiguration
-    static class EmployeeServiceImplTestContextConfiguration {
-        @Bean
-        public FilmService filmServiceInt() {
-            return new FilmService();
-        }
     }
 }

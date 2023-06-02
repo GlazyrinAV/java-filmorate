@@ -23,7 +23,7 @@ public class GenresDbStorage implements GenresStorage {
 
     private final JdbcTemplate jdbcTemplate;
 
-    private List<Genre> genresInMemory;
+    private final List<Genre> genresInMemory;
 
     @Autowired
     public GenresDbStorage(JdbcTemplate jdbcTemplate) {
