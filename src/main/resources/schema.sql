@@ -83,3 +83,31 @@ create table IF NOT EXISTS LIST_OF_FRIENDS
         foreign key (FRIENDSHIP_STATUS_ID) references FRIENDSHIP_STATUS
 );
 
+create table IF NOT EXISTS REVIEWS
+(
+    REVIEW_ID   INTEGER auto_increment
+        unique,
+    CONTENT     CHARACTER VARYING not null,
+    USER_ID     INTEGER           not null,
+    FILM_ID     INTEGER           not null,
+    IS_POSITIVE BOOLEAN           not null,
+    constraint "REVIEWS_pk"
+        primary key (REVIEW_ID),
+    constraint REVIEWS_FILMS_FILM_ID_FK
+        foreign key (FILM_ID) references PUBLIC.FILMS,
+    constraint REVIEWS_USERS_USER_ID_FK
+        foreign key (USER_ID) references PUBLIC.USERS (USER_ID)
+);
+
+create table IF NOT EXISTS REVIEWS_LIKES
+(
+    USER_ID   INTEGER not null,
+    REVIEW_ID INTEGER not null,
+    USEFUL    INTEGER not null,
+    constraint REVIEWS_LIKES_PK
+        primary key (USER_ID, REVIEW_ID),
+    constraint "REVIEWS_LIKES_REVIEWS_REVIEW_ID_fk"
+        foreign key (REVIEW_ID) references PUBLIC.REVIEWS
+            on update cascade on delete cascade
+);
+
