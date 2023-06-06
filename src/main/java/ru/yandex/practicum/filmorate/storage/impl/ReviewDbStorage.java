@@ -119,10 +119,9 @@ public class ReviewDbStorage implements ReviewStorage {
         return Boolean.TRUE.equals(jdbcTemplate.queryForObject(sqlQuery, Boolean.TYPE, reviewId));
     }
 
-    private int findUseful (int reviewId) {
+    private int findUseful(int reviewId) {
         String sqlQuery = "SELECT SUM(USEFUL) FROM REVIEWS_LIKES WHERE review_id = ?";
-        Optional<Integer> useful = Optional.ofNullable(jdbcTemplate.
-                queryForObject(sqlQuery, Integer.class, reviewId));
+        Optional<Integer> useful = Optional.ofNullable(jdbcTemplate.queryForObject(sqlQuery, Integer.class, reviewId));
         return useful.orElse(0);
     }
 
