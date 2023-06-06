@@ -53,7 +53,8 @@ public class ReviewController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public Collection<Review> findByFilmId(@RequestParam Optional<Integer> filmId, @RequestParam(defaultValue = "10") int count) {
+    public Collection<Review> findByFilmId(@RequestParam Optional<Integer> filmId,
+                                           @RequestParam(defaultValue = "10") int count) {
         log.info("Получен запрос на поиск отзыва на фильм.");
         if (filmId.isEmpty()) {
             return reviewService.findAll(count);

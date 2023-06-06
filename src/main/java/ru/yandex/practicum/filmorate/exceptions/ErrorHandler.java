@@ -31,7 +31,7 @@ public class ErrorHandler {
 
     @ExceptionHandler({UserNotFoundException.class, FilmNotFoundException.class, ReviewNotFoundException.class})
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorResponse EntityNotFoundException(RuntimeException exception) {
+    public ErrorResponse entityNotFoundException(RuntimeException exception) {
         return new ErrorResponse("error", exception.getMessage());
     }
 
