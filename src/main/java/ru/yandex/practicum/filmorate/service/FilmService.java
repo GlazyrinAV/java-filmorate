@@ -111,7 +111,7 @@ public class FilmService {
             throw new DirectorNotFoundException("Режиссер c ID " + directorId + " не найден.");
         } else {
             log.info("Недопустимый параметр запроса.");
-            throw new ValidationException ("Недопустимый параметр запроса.");
+            throw new ValidationException("Недопустимый параметр запроса.");
         }
     }
 
