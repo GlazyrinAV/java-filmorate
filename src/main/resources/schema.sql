@@ -90,7 +90,6 @@ create table IF NOT EXISTS REVIEWS
     CONTENT     CHARACTER VARYING not null,
     USER_ID     INTEGER           not null,
     FILM_ID     INTEGER           not null,
-    USEFUL      INTEGER default 0 not null,
     IS_POSITIVE BOOLEAN           not null,
     constraint "REVIEWS_pk"
         primary key (REVIEW_ID),
@@ -100,5 +99,11 @@ create table IF NOT EXISTS REVIEWS
         foreign key (USER_ID) references PUBLIC.USERS (USER_ID)
 );
 
-
-
+create table IF NOT EXISTS PUBLIC.REVIEWS_LIKES
+(
+    USER_ID   INTEGER not null,
+    REVIEW_ID INTEGER not null,
+    USEFUL    INTEGER not null,
+    constraint REVIEWS_LIKES_PK
+        primary key (USER_ID, REVIEW_ID)
+);

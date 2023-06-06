@@ -46,14 +46,14 @@ public class ReviewController {
 
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public void findById(@PathVariable int id) {
+    public Review findById(@PathVariable int id) {
         log.info("Получен запрос на поиск отзыва.");
-        reviewService.findById(id);
+        return reviewService.findById(id);
     }
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public Collection<Review> findReviews(@RequestParam Optional<Integer> filmId, @RequestParam(defaultValue = "10") int count) {
+    public Collection<Review> findByFilmId(@RequestParam Optional<Integer> filmId, @RequestParam(defaultValue = "10") int count) {
         log.info("Получен запрос на поиск отзыва на фильм.");
         if (filmId.isEmpty()) {
             return reviewService.findAll(count);
@@ -77,10 +77,8 @@ public class ReviewController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void removeLike(@PathVariable int id, @PathVariable int userId, @PathVariable String like) {
         log.info("Получен запрос на удадение лайка отзыву.");
-        if (like.equals("like")) {
-            reviewService.removeLike(userId, id, true);
-        } else if (like.equals("dislike")) {
-            reviewService.removeLike(userId, id, false);
+        if (like.equals("like") || like.equals("dislike") ) {
+            reviewService.removeLike(userId, id);
         }
     }
 }

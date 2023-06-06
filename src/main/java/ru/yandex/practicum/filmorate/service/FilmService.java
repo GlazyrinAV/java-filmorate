@@ -71,7 +71,7 @@ public class FilmService {
             log.info("Указанный ID юзера меньше или равен нулю.");
             throw new ValidationException("ID юзера не может быть меньше или равно нулю.");
         } else if (!userService.isExists(userId)) {
-            log.info("Фильм c ID " + filmId + " не найден.");
+            log.info("Юзер c ID " + userId + " не найден.");
             throw new UserNotFoundException("Юзер c ID " + userId + " не найден.");
         } else {
             log.info("У фильма удален лайк.");

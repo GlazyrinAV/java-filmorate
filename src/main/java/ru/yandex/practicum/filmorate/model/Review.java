@@ -4,10 +4,9 @@ import com.fasterxml.jackson.annotation.JsonRawValue;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.NonNull;
-import org.springframework.format.annotation.NumberFormat;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 @Data
 @Builder
@@ -17,19 +16,17 @@ public class Review {
     @NotBlank
     private final String content;
 
-    @NonNull
-    @NumberFormat
-    private final int userId;
+    @NotNull
+    private final Integer userId;
 
-    @NonNull
-    @NumberFormat
-    private final int filmId;
+    @NotNull
+    private final Integer filmId;
 
-    @NonNull
+    @NotNull
     @JsonRawValue
-    private final boolean isPositive;
+    private final Boolean isPositive;
 
-    private final int useful;
+    private Integer useful = 0;
 
-    private int reviewId;
+    private Integer reviewId;
 }
