@@ -77,7 +77,7 @@ public class ReviewController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void removeLike(@PathVariable int id, @PathVariable int userId, @PathVariable String like) {
         log.info("Получен запрос на удадение лайка отзыву.");
-        if (like.equals("like") || like.equals("dislike") ) {
+        if (like.equals("like") || like.equals("dislike")) {
             reviewService.removeLike(userId, id);
         }
     }
