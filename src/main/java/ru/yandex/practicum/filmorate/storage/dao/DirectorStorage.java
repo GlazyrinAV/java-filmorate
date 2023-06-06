@@ -8,12 +8,20 @@ import java.util.List;
 
 public interface DirectorStorage {
     Director saveNew(Director director);
-    Director update (Director director);
+
+    Director update(Director director);
+
     Collection<Director> findAll();
+
     Director findById(int id);
+
     void removeById(int id);
+
     List<Director> placeDirectorsToFilmFromDB(int filmId);
+
     void addFilmDirectorsToDB(Film film, int filmId);
+
     void clearFilmDirectors(int filmId);
+
     Boolean isExists(int directorId);
 }
