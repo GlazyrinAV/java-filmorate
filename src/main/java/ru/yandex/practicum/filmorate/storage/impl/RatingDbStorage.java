@@ -17,12 +17,9 @@ public class RatingDbStorage implements RatingStorage {
 
     private final JdbcTemplate jdbcTemplate;
 
-    private final List<Rating> ratingsInMemory;
-
     @Autowired
     public RatingDbStorage(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
-        ratingsInMemory = findAll();
     }
 
     @Override
@@ -33,15 +30,11 @@ public class RatingDbStorage implements RatingStorage {
 
     @Override
     public Rating findById(int ratingId) {
-        if (ratingId >= ratingsInMemory.size() || ratingsInMemory.get(ratingId-1) == null) {
-            String sqlQuery = "SELECT * FROM RATINGS WHERE rating_id = ?";
-            try {
-                return jdbcTemplate.queryForObject(sqlQuery, this::mapRowToRating, ratingId);
-            } catch (EmptyResultDataAccessException exception) {
-                throw new NoResultDataAccessException("Запрос на получение рейтинга вернул пустой результат.", 1);
-            }
-        } else {
-         return ratingsInMemory.get(ratingId-1);
+        String sqlQuery = "SELECT * FROM RATINGS WHERE rating_id = ?";
+        try {
+            return jdbcTemplate.queryForObject(sqlQuery, this::mapRowToRating, ratingId);
+        } catch (EmptyResultDataAccessException exception) {
+            throw new NoResultDataAccessException("Запрос на получение рейтинга вернул пустой результат.", 1);
         }
     }
 

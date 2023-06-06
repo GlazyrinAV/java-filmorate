@@ -23,12 +23,9 @@ public class GenresDbStorage implements GenresStorage {
 
     private final JdbcTemplate jdbcTemplate;
 
-    private final List<Genre> genresInMemory;
-
     @Autowired
     public GenresDbStorage(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
-        genresInMemory = new ArrayList<>(findAll());
     }
 
     @Override
@@ -81,15 +78,11 @@ public class GenresDbStorage implements GenresStorage {
 
     @Override
     public Genre findById(int genreId) {
-        if (genreId >= genresInMemory.size() || genresInMemory.get(genreId - 1) == null) {
-            String sqlQuery = "SELECT * FROM GENRES WHERE genre_id = ?";
-            try {
-                return jdbcTemplate.queryForObject(sqlQuery, this::mapRowToGenre, genreId);
-            } catch (EmptyResultDataAccessException exception) {
-                throw new NoResultDataAccessException("Запрос на получение жанра получен пустой ответ.", 1);
-            }
-        } else {
-            return genresInMemory.get(genreId - 1);
+        String sqlQuery = "SELECT * FROM GENRES WHERE genre_id = ?";
+        try {
+            return jdbcTemplate.queryForObject(sqlQuery, this::mapRowToGenre, genreId);
+        } catch (EmptyResultDataAccessException exception) {
+            throw new NoResultDataAccessException("Запрос на получение жанра получен пустой ответ.", 1);
         }
     }
 
