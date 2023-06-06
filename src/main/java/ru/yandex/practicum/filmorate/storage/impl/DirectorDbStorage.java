@@ -2,21 +2,22 @@ package ru.yandex.practicum.filmorate.storage.impl;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exceptions.exceptions.NoResultDataAccessException;
 import ru.yandex.practicum.filmorate.model.Director;
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.dao.DirectorStorage;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Collection;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 @Repository
 @Slf4j
@@ -78,6 +79,42 @@ public class DirectorDbStorage implements DirectorStorage {
     public void removeById(int id) {
         String sqlQuery = "DELETE FROM DIRECTORS WHERE director_id = ?";
         jdbcTemplate.update(sqlQuery, id);
+    }
+
+    @Override
+    public List<Director> placeDirectorsToFilmFromDB(int filmId) {
+        String sqlQuery = "SELECT FD.DIRECTOR_ID, D2.DIRECTOR_NAME " +
+                "FROM FILM_DIRECTOR AS FD JOIN DIRECTORS D2 on D2.DIRECTOR_ID = FD.DIRECTOR_ID WHERE FILM_ID = ?";
+        if (!jdbcTemplate.query(sqlQuery, this::mapRowToDirector, filmId).isEmpty()) {
+            return jdbcTemplate.query(sqlQuery, this::mapRowToDirector, filmId);
+        } else {
+            return new ArrayList<>();
+        }
+    }
+
+    @Override
+    public void addFilmDirectorsToDB(Film film, int filmId) {
+        String sqlQueryForGenres = "MERGE INTO FILM_DIRECTOR (film_id, DIRECTOR_ID) VALUES (?, ?)";
+
+        if (film.getDirectors() != null) {
+            try {
+                jdbcTemplate.batchUpdate(sqlQueryForGenres, new BatchPreparedStatementSetter() {
+                    @Override
+                    public void setValues(PreparedStatement ps, int i) throws SQLException {
+                        Director director = film.getDirectors().get(i);
+                        ps.setInt(1, filmId);
+                        ps.setInt(2, director.getId());
+                    }
+
+                    @Override
+                    public int getBatchSize() {
+                        return film.getDirectors().size();
+                    }
+                });
+            } catch (DataIntegrityViolationException exception) {
+                throw new DataIntegrityViolationException("В запросе неправильно указаны данные о фильме.");
+            }
+        }
     }
 
     private Director mapRowToDirector(ResultSet resultSet, int rowNum) throws SQLException {

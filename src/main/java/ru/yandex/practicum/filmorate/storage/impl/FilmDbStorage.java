@@ -21,6 +21,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.Duration;
 import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -146,6 +147,13 @@ public class FilmDbStorage implements FilmStorage {
     public Boolean isExists(int filmId) {
         String sqlQuery = "SELECT EXISTS ( SELECT * FROM PUBLIC.films WHERE film_id =? )";
         return Boolean.TRUE.equals(jdbcTemplate.queryForObject(sqlQuery, Boolean.TYPE, filmId));
+    }
+
+    @Override
+    public Collection<Film> findByDirectorId(int directorId, String sortBy) {
+        String sqlQuery = "SELECT * FROM FILMS WHERE FILM_ID IN (SELECT FILM_ID FROM FILM_DIRECTOR WHERE DIRECTOR_ID = ?)";
+        List<Film> films = jdbcTemplate.query(sqlQuery, this::mapRowToFilm, directorId);
+        return null;
     }
 
     private Film mapRowToFilm(ResultSet resultSet, int rowNum) throws SQLException {

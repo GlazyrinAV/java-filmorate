@@ -91,6 +91,10 @@ public class FilmService {
         return filmStorage.findLikes(filmId);
     }
 
+    public Collection<Film> findByDirectorId(int directorId, String sortBy) {
+        return filmStorage.findByDirectorId(directorId, sortBy);
+    }
+
     private boolean isExists(int filmId) {
         return filmStorage.isExists(filmId);
     }

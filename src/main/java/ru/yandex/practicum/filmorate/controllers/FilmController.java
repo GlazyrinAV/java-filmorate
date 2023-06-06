@@ -7,6 +7,7 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
 import javax.validation.Valid;
+import javax.xml.bind.ValidationException;
 import java.util.Collection;
 
 @RestController
@@ -67,5 +68,16 @@ public class FilmController {
     public Collection<Film> findPopularFilms(@RequestParam(defaultValue = "10") int count) {
         log.info("Получен запрос на получение первых " + count + " популярных фильмов.");
         return filmService.findPopular(count);
+    }
+
+    @GetMapping("/director/{directorId}")
+    @ResponseStatus(HttpStatus.OK)
+    public Collection<Film> findByDirectorId(@PathVariable int  directorId, @RequestParam String sortBy)
+            throws ValidationException {
+        if (sortBy.equals("year") || sortBy.equals("likes")) {
+            return filmService.findByDirectorId(directorId, sortBy);
+        } else {
+            throw new ValidationException("Ошибка запроса");
+        }
     }
 }
