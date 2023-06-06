@@ -4,10 +4,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.exceptions.exceptions.DirectorNotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.exceptions.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.exceptions.UserNotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.storage.dao.DirectorStorage;
 import ru.yandex.practicum.filmorate.storage.dao.FilmStorage;
 
 import java.util.Collection;
@@ -17,27 +19,33 @@ import java.util.Collection;
 public class FilmService {
 
     private final FilmStorage filmStorage;
+    private final DirectorStorage directorStorage;
     private final UserService userService;
 
     @Autowired
-    public FilmService(@Qualifier("FilmDbStorage") FilmStorage filmStorage, UserService userService) {
+    public FilmService(@Qualifier("FilmDbStorage") FilmStorage filmStorage, DirectorStorage directorStorage, UserService userService) {
         this.filmStorage = filmStorage;
+        this.directorStorage = directorStorage;
         this.userService = userService;
     }
 
     public Film addNew(Film film) {
+        log.info("Фильм добавлен.");
         return filmStorage.addNew(film);
     }
 
     public Film update(Film film) {
+        log.info("Фильм обновлен.");
         return filmStorage.update(film);
     }
 
     public Collection<Film> findAll()  {
+        log.info("Фильмы найдены.");
         return filmStorage.findAll();
     }
 
     public Film findById(int filmId) {
+        log.info("Фильм найден.");
         return filmStorage.findById(filmId);
     }
 
@@ -81,18 +89,30 @@ public class FilmService {
 
     public Collection<Film> findPopular(int count) {
         if (count <= 0) {
+            log.info("Count меньше или равен нулю.");
             throw new ValidationException("Значение выводимых фильмов не может быть меньше или равно нулю.");
         } else {
+            log.info("Популярные фильмы найдены.");
             return filmStorage.findPopular(count);
         }
     }
 
     public Collection<Integer> findLikes(int filmId) {
+        log.info("Лайки к фильму найдены.");
         return filmStorage.findLikes(filmId);
     }
 
     public Collection<Film> findByDirectorId(int directorId, String sortBy) {
-        return filmStorage.findByDirectorId(directorId, sortBy);
+        if (directorStorage.isExists(directorId) && (sortBy.equals("year") || sortBy.equals("likes"))) {
+            log.info("Фильмы по указанному режиссеру найдены.");
+            return filmStorage.findByDirectorId(directorId, sortBy);
+        } else if (!directorStorage.isExists(directorId) && (sortBy.equals("year") || sortBy.equals("likes"))) {
+            log.info("Режиссер c ID " + directorId + " не найден.");
+            throw new DirectorNotFoundException("Режиссер c ID " + directorId + " не найден.");
+        } else {
+            log.info("Недопустимый параметр запроса.");
+            throw new ValidationException ("Недопустимый параметр запроса.");
+        }
     }
 
     private boolean isExists(int filmId) {

@@ -97,6 +97,11 @@ public class InMemoryFilmStorage implements FilmStorage {
         return films.get(filmId) != null;
     }
 
+    @Override
+    public Collection<Film> findByDirectorId(int directorId, String sortBy) {
+        return null;
+    }
+
     private Set<Integer> putUserToLikes(int filmId, int userId) {
         likes.get(filmId).add(userId);
         return likes.get(filmId);

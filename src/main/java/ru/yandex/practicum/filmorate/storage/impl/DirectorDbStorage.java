@@ -117,6 +117,18 @@ public class DirectorDbStorage implements DirectorStorage {
         }
     }
 
+    @Override
+    public void clearFilmDirectors(int filmId) {
+        String sqlQuery = "DELETE FROM FILM_DIRECTOR WHERE film_id = ?";
+        jdbcTemplate.update(sqlQuery, filmId);
+    }
+
+    @Override
+    public Boolean isExists(int directorId) {
+        String sqlQuery = "SELECT EXISTS ( SELECT * FROM DIRECTORS WHERE DIRECTOR_ID =? )";
+        return Boolean.TRUE.equals(jdbcTemplate.queryForObject(sqlQuery, Boolean.TYPE, directorId));
+    }
+
     private Director mapRowToDirector(ResultSet resultSet, int rowNum) throws SQLException {
         return Director.builder()
                 .id(resultSet.getInt("director_id"))

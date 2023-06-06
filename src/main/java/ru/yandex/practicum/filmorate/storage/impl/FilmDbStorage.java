@@ -11,6 +11,7 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exceptions.exceptions.NoResultDataAccessException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.storage.dao.DirectorStorage;
 import ru.yandex.practicum.filmorate.storage.dao.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.dao.GenresStorage;
 import ru.yandex.practicum.filmorate.storage.dao.RatingStorage;
@@ -21,7 +22,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.Duration;
 import java.util.Collection;
-import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -36,11 +36,14 @@ public class FilmDbStorage implements FilmStorage {
 
     private final RatingStorage ratingStorage;
 
+    private final DirectorStorage directorStorage;
+
     @Autowired
-    public FilmDbStorage(JdbcTemplate jdbcTemplate, GenresStorage genresStorage, RatingStorage ratingStorage) {
+    public FilmDbStorage(JdbcTemplate jdbcTemplate, GenresStorage genresStorage, RatingStorage ratingStorage, DirectorStorage directorStorage) {
         this.jdbcTemplate = jdbcTemplate;
         this.genresStorage = genresStorage;
         this.ratingStorage = ratingStorage;
+        this.directorStorage = directorStorage;
     }
 
     @Override
@@ -66,6 +69,7 @@ public class FilmDbStorage implements FilmStorage {
         Optional<Integer> filmId = Optional.of(Objects.requireNonNull(keyHolder.getKey()).intValue());
 
         genresStorage.addFilmGenresToDB(film, filmId.get());
+        directorStorage.addFilmDirectorsToDB(film, filmId.get());
 
         return findById(filmId.get());
     }
@@ -93,6 +97,8 @@ public class FilmDbStorage implements FilmStorage {
 
         genresStorage.clearFilmGenres(film.getId());
         genresStorage.addFilmGenresToDB(film, film.getId());
+        directorStorage.clearFilmDirectors(film.getId());
+        directorStorage.addFilmDirectorsToDB(film, film.getId());
 
         return findById(film.getId());
     }
@@ -151,9 +157,16 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public Collection<Film> findByDirectorId(int directorId, String sortBy) {
-        String sqlQuery = "SELECT * FROM FILMS WHERE FILM_ID IN (SELECT FILM_ID FROM FILM_DIRECTOR WHERE DIRECTOR_ID = ?)";
-        List<Film> films = jdbcTemplate.query(sqlQuery, this::mapRowToFilm, directorId);
-        return null;
+        if (sortBy.equals("year")) {
+            String sqlQuery = "SELECT * FROM FILMS WHERE FILM_ID IN (SELECT FILM_ID FROM FILM_DIRECTOR WHERE DIRECTOR_ID = ?) " +
+                    "ORDER BY EXTRACT(YEAR FROM RELEASE_DATE)";
+            return jdbcTemplate.query(sqlQuery, this::mapRowToFilm, directorId);
+        } else {
+            String sqlQuery = "SELECT FILMS.*, SUM(FL.USER_ID) AS LIKES FROM FILMS LEFT JOIN FILM_LIKES FL on FILMS.FILM_ID = FL.FILM_ID " +
+                    "WHERE FILMS.FILM_ID IN (SELECT FILM_ID FROM FILM_DIRECTOR WHERE DIRECTOR_ID = ?)\n" +
+                    "group by FILMS.FILM_ID ORDER BY LIKES DESC";
+            return jdbcTemplate.query(sqlQuery, this::mapRowToFilm, directorId);
+        }
     }
 
     private Film mapRowToFilm(ResultSet resultSet, int rowNum) throws SQLException {
@@ -165,6 +178,7 @@ public class FilmDbStorage implements FilmStorage {
                 .duration(Duration.ofMillis(resultSet.getLong("duration")))
                 .mpa(ratingStorage.placeRatingToFilmFromDB(resultSet.getInt("film_id")))
                 .genres(genresStorage.placeGenresToFilmFromDB(resultSet.getInt("film_id")))
+                .directors((directorStorage.placeDirectorsToFilmFromDB(resultSet.getInt("film_id"))))
                 .build();
     }
 
