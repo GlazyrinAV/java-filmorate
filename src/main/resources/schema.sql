@@ -40,7 +40,8 @@ create table IF NOT EXISTS FILMS
     constraint FILMS_PK
         primary key (FILM_ID),
     constraint FILMS_FK
-        foreign key (RATING_ID) references RATINGS
+        foreign key (RATING_ID) references RATINGS,
+    constraint CHECK_FILM UNIQUE (NAME, RELEASE_DATE)
 );
 
 create table IF NOT EXISTS USERS
@@ -49,7 +50,8 @@ create table IF NOT EXISTS USERS
         unique,
     NAME     VARCHAR_IGNORECASE(256),
     LOGIN    VARCHAR_IGNORECASE(256) not null,
-    EMAIL    VARCHAR_IGNORECASE(256) not null,
+    EMAIL    VARCHAR_IGNORECASE(256) not null
+        unique,
     BIRTHDAY DATE                    not null,
     constraint USERS_PK
         primary key (USER_ID)
@@ -77,7 +79,7 @@ create table IF NOT EXISTS FILM_LIKES
         foreign key (FILM_ID) references FILMS
 );
 
-create table IF NOT EXISTS LIST_OF_FRIENDS
+create table if not exists LIST_OF_FRIENDS
 (
     FRIEND_ID            INTEGER not null,
     USER_ID              INTEGER not null,
@@ -85,9 +87,13 @@ create table IF NOT EXISTS LIST_OF_FRIENDS
     constraint LIST_OF_FRIENDS_PK
         primary key (USER_ID, FRIEND_ID),
     constraint LIST_OF_FRIENDS_FK
-        foreign key (USER_ID) references USERS,
+        foreign key (USER_ID) references PUBLIC.USERS,
     constraint LIST_OF_FRIENDS_FK_2
-        foreign key (FRIENDSHIP_STATUS_ID) references FRIENDSHIP_STATUS
+        foreign key (FRIENDSHIP_STATUS_ID) references PUBLIC.FRIENDSHIP_STATUS,
+    constraint LIST_OF_FRIENDS_USERS_USER_ID_FK
+        foreign key (FRIEND_ID) references PUBLIC.USERS,
+    constraint CHECK_NAME
+        check ("USER_ID" <> "FRIEND_ID")
 );
 
 create table if not exists PUBLIC.FILM_DIRECTOR

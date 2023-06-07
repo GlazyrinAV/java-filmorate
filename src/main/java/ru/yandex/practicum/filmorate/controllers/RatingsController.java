@@ -22,14 +22,12 @@ public class RatingsController {
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public Collection<Rating> findAll() {
-        log.info("Получен запрос на получение списка всех доступных рейтингов фильмов.");
         return ratingsService.findAll();
     }
 
     @GetMapping("/{ratingId}")
     @ResponseStatus(HttpStatus.OK)
     public Rating findById(@PathVariable int ratingId) {
-        log.info("Получен запрос на получение рейтина фильмов под номером" + ratingId + ".");
         return ratingsService.findById(ratingId);
     }
 }

@@ -3,15 +3,12 @@ package ru.yandex.practicum.filmorate.storage.impl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exceptions.exceptions.NoResultDataAccessException;
-import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.storage.dao.GenresStorage;
 
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -29,27 +26,15 @@ public class GenresDbStorage implements GenresStorage {
     }
 
     @Override
-    public void addFilmGenresToDB(Film film, int filmId) {
+    public void addFilmGenresToDB(List<Genre> genres, int filmId) {
         String sqlQueryForGenres = "MERGE INTO film_genres (film_id, genre_id) VALUES (?, ?)";
-
-        if (film.getGenres() != null) {
-            try {
-                jdbcTemplate.batchUpdate(sqlQueryForGenres, new BatchPreparedStatementSetter() {
-                    @Override
-                    public void setValues(PreparedStatement ps, int i) throws SQLException {
-                        Genre genre = film.getGenres().get(i);
-                        ps.setInt(1, filmId);
-                        ps.setInt(2, genre.getId());
-                    }
-
-                    @Override
-                    public int getBatchSize() {
-                        return film.getGenres().size();
-                    }
-                });
-            } catch (DataIntegrityViolationException exception) {
-                throw new DataIntegrityViolationException("В запросе неправильно указаны данные о фильме.");
-            }
+        try {
+            jdbcTemplate.batchUpdate(sqlQueryForGenres, genres, genres.size(), (ps, genre) -> {
+                ps.setInt(1, filmId);
+                ps.setInt(2, genre.getId());
+            });
+        } catch (DataIntegrityViolationException exception) {
+            throw new DataIntegrityViolationException("В запросе неправильно указаны данные о фильме.");
         }
     }
 

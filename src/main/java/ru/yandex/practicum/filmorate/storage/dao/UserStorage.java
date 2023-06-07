@@ -6,9 +6,9 @@ import java.util.Collection;
 
 public interface UserStorage {
 
-    User addNew(User user);
+    Integer addNew(User user);
 
-    User update(User user);
+    Integer update(User user);
 
     Collection<User> findAll();
 
