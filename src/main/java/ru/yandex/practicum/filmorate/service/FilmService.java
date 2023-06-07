@@ -9,7 +9,6 @@ import ru.yandex.practicum.filmorate.exceptions.exceptions.FilmNotFoundException
 import ru.yandex.practicum.filmorate.exceptions.exceptions.UserNotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.storage.dao.DirectorStorage;
 import ru.yandex.practicum.filmorate.storage.dao.FilmStorage;
 
 import java.util.Collection;
@@ -19,13 +18,13 @@ import java.util.Collection;
 public class FilmService {
 
     private final FilmStorage filmStorage;
-    private final DirectorStorage directorStorage;
+    private final DirectorsService directorsService;
     private final UserService userService;
 
     @Autowired
-    public FilmService(@Qualifier("FilmDbStorage") FilmStorage filmStorage, DirectorStorage directorStorage, UserService userService) {
+    public FilmService(@Qualifier("FilmDbStorage") FilmStorage filmStorage, DirectorsService directorsService, UserService userService) {
         this.filmStorage = filmStorage;
-        this.directorStorage = directorStorage;
+        this.directorsService = directorsService;
         this.userService = userService;
     }
 
@@ -50,15 +49,9 @@ public class FilmService {
     }
 
     public void makeLike(int filmId, int userId) {
-        if (filmId <= 0) {
-            log.info("Указанный ID фильма меньше или равен нулю.");
-            throw new ValidationException("ID фильма не может быть меньше или равно нулю.");
-        } else if (!isExists(filmId)) {
+        if (!isExists(filmId)) {
             log.info("Фильм c ID " + filmId + " не найден.");
             throw new FilmNotFoundException("Фильм c ID " + filmId + " не найден.");
-        } else if (userId <= 0) {
-            log.info("Указанный ID юзера меньше или равен нулю.");
-            throw new ValidationException("ID юзера не может быть меньше или равно нулю.");
         } else if (!userService.isExists(userId)) {
             log.info("Фильм c ID " + filmId + " не найден.");
             throw new UserNotFoundException("Юзер c ID " + userId + " не найден.");
@@ -69,15 +62,9 @@ public class FilmService {
     }
 
     public void removeLike(int filmId, int userId) {
-        if (filmId <= 0) {
-            log.info("Указанный ID фильма меньше или равен нулю.");
-            throw new ValidationException("ID фильма не может быть меньше или равно нулю.");
-        } else if (!isExists(filmId)) {
+        if (!isExists(filmId)) {
             log.info("Фильм c ID " + filmId + " не найден.");
             throw new FilmNotFoundException("Фильм c ID " + filmId + " не найден.");
-        } else if (userId <= 0) {
-            log.info("Указанный ID юзера меньше или равен нулю.");
-            throw new ValidationException("ID юзера не может быть меньше или равно нулю.");
         } else if (!userService.isExists(userId)) {
             log.info("Фильм c ID " + filmId + " не найден.");
             throw new UserNotFoundException("Юзер c ID " + userId + " не найден.");
@@ -103,10 +90,10 @@ public class FilmService {
     }
 
     public Collection<Film> findByDirectorId(int directorId, String sortBy) {
-        if (directorStorage.isExists(directorId) && (sortBy.equals("year") || sortBy.equals("likes"))) {
+        if (directorsService.isExists(directorId) && (sortBy.equals("year") || sortBy.equals("likes"))) {
             log.info("Фильмы по указанному режиссеру найдены.");
             return filmStorage.findByDirectorId(directorId, sortBy);
-        } else if (!directorStorage.isExists(directorId) && (sortBy.equals("year") || sortBy.equals("likes"))) {
+        } else if (!directorsService.isExists(directorId) && (sortBy.equals("year") || sortBy.equals("likes"))) {
             log.info("Режиссер c ID " + directorId + " не найден.");
             throw new DirectorNotFoundException("Режиссер c ID " + directorId + " не найден.");
         } else {

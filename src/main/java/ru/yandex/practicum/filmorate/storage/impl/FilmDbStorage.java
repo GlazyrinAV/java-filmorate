@@ -69,7 +69,6 @@ public class FilmDbStorage implements FilmStorage {
         Optional<Integer> filmId = Optional.of(Objects.requireNonNull(keyHolder.getKey()).intValue());
 
         genresStorage.addFilmGenresToDB(film, filmId.get());
-        directorStorage.saveFilmDirectorsToDB(film, filmId.get());
 
         return findById(filmId.get());
     }
@@ -97,8 +96,6 @@ public class FilmDbStorage implements FilmStorage {
 
         genresStorage.clearFilmGenres(film.getId());
         genresStorage.addFilmGenresToDB(film, film.getId());
-        directorStorage.remobeByFilmId(film.getId());
-        directorStorage.saveFilmDirectorsToDB(film, film.getId());
 
         return findById(film.getId());
     }

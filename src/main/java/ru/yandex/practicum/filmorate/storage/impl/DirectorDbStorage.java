@@ -4,14 +4,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exceptions.exceptions.NoResultDataAccessException;
 import ru.yandex.practicum.filmorate.model.Director;
-import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.dao.DirectorStorage;
 
 import java.sql.PreparedStatement;
@@ -31,31 +29,31 @@ public class DirectorDbStorage implements DirectorStorage {
     }
 
     @Override
-    public Director saveNew(Director director) {
+    public Integer saveNew(Director director) {
         String sqlQuery = "INSERT INTO DIRECTORS (DIRECTOR_NAME) values (?)";
 
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
-            jdbcTemplate.update(connection -> {
-                PreparedStatement stmt = connection.prepareStatement(sqlQuery, new String[]{"director_id"});
-                stmt.setString(1, director.getName());
-                return stmt;
-            }, keyHolder);
+        jdbcTemplate.update(connection -> {
+            PreparedStatement stmt = connection.prepareStatement(sqlQuery, new String[]{"director_id"});
+            stmt.setString(1, director.getName());
+            return stmt;
+        }, keyHolder);
 
         Optional<Integer> directorId = Optional.of(Objects.requireNonNull(keyHolder.getKey()).intValue());
 
-        return findById(directorId.get());
+        return directorId.get();
     }
 
     @Override
-    public Director update(Director director) {
+    public Integer update(Director director) {
         String sqlQuery = "UPDATE DIRECTORS SET " +
                 "DIRECTOR_NAME = ?" +
                 "WHERE DIRECTOR_ID = ?";
-            jdbcTemplate.update(sqlQuery,
-                    director.getName(),
-                    director.getId());
-        return findById(director.getId());
+        jdbcTemplate.update(sqlQuery,
+                director.getName(),
+                director.getId());
+        return director.getId();
     }
 
     @Override
@@ -92,27 +90,15 @@ public class DirectorDbStorage implements DirectorStorage {
     }
 
     @Override
-    public void saveFilmDirectorsToDB(Film film, int filmId) {
+    public void saveFilmDirectorsToDB(List<Director> directors, int filmId) {
         String sqlQueryForGenres = "MERGE INTO FILM_DIRECTOR (film_id, DIRECTOR_ID) VALUES (?, ?)";
-
-        if (film.getDirectors() != null) {
-            try {
-                jdbcTemplate.batchUpdate(sqlQueryForGenres, new BatchPreparedStatementSetter() {
-                    @Override
-                    public void setValues(PreparedStatement ps, int i) throws SQLException {
-                        Director director = film.getDirectors().get(i);
-                        ps.setInt(1, filmId);
-                        ps.setInt(2, director.getId());
-                    }
-
-                    @Override
-                    public int getBatchSize() {
-                        return film.getDirectors().size();
-                    }
-                });
-            } catch (DataIntegrityViolationException exception) {
-                throw new DataIntegrityViolationException("В запросе неправильно указаны данные о фильме.");
-            }
+        try {
+            jdbcTemplate.batchUpdate(sqlQueryForGenres, directors, directors.size(), (ps, director) -> {
+                ps.setInt(1, filmId);
+                ps.setInt(2, director.getId());
+            });
+        } catch (DataIntegrityViolationException exception) {
+            throw new DataIntegrityViolationException("В запросе неправильно указаны данные о фильме.");
         }
     }
 

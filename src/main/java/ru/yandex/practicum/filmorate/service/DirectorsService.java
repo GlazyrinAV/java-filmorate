@@ -4,7 +4,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.exceptions.DirectorNotFoundException;
-import ru.yandex.practicum.filmorate.exceptions.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.storage.dao.DirectorStorage;
 
@@ -22,13 +21,15 @@ public class DirectorsService {
     }
 
     public Director saveNew(Director director) {
+        int id = directorStorage.saveNew(director);
         log.info("Режиссер добавлен.");
-        return directorStorage.saveNew(director);
+        return findById(id);
     }
 
     public Director update(Director director) {
+        int id = directorStorage.update(director);
         log.info("Режиссер обновлен.");
-        return directorStorage.update(director);
+        return findById(id);
     }
 
     public Collection<Director> findAll() {
@@ -37,10 +38,7 @@ public class DirectorsService {
     }
 
     public Director findById(int id) {
-        if (id <= 0) {
-            log.info("Указанный ID режиссера меньше или равен нулю.");
-            throw new ValidationException("ID режиссера не может быть меньше или равно нулю.");
-        } else if (!directorStorage.isExists(id)) {
+        if (!directorStorage.isExists(id)) {
             log.info("Режиссер c ID " + id + " не найден.");
             throw new DirectorNotFoundException("Режиссер c ID " + id + " не найден.");
         } else {
@@ -50,15 +48,16 @@ public class DirectorsService {
     }
 
     public void removeById(int id) {
-        if (id <= 0) {
-            log.info("Указанный ID режиссера меньше или равен нулю.");
-            throw new ValidationException("ID режиссера не может быть меньше или равно нулю.");
-        } else if (!directorStorage.isExists(id)) {
+        if (!directorStorage.isExists(id)) {
             log.info("Режиссер c ID " + id + " не найден.");
             throw new DirectorNotFoundException("Режиссер c ID " + id + " не найден.");
         } else {
             log.info("Режиссер удален.");
             directorStorage.removeById(id);
         }
+    }
+
+    public boolean isExists(int directorId) {
+        return directorStorage.isExists(directorId);
     }
 }

@@ -1,15 +1,14 @@
 package ru.yandex.practicum.filmorate.storage.dao;
 
 import ru.yandex.practicum.filmorate.model.Director;
-import ru.yandex.practicum.filmorate.model.Film;
 
 import java.util.Collection;
 import java.util.List;
 
 public interface DirectorStorage {
-    Director saveNew(Director director);
+    Integer saveNew(Director director);
 
-    Director update(Director director);
+    Integer update(Director director);
 
     Collection<Director> findAll();
 
@@ -19,7 +18,7 @@ public interface DirectorStorage {
 
     List<Director> placeDirectorsToFilmFromDB(int filmId);
 
-    void saveFilmDirectorsToDB(Film film, int filmId);
+    void saveFilmDirectorsToDB(List<Director> directors, int filmId);
 
     void remobeByFilmId(int filmId);
 
