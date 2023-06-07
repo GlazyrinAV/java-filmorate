@@ -59,6 +59,18 @@ public class ErrorHandler {
         return new ErrorResponse("error", exception.getFieldErrors().toString());
     }
 
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse friendAlreadyExistException(FriendAlreadyExistException exception) {
+        return new ErrorResponse("error", exception.getMessage());
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse likeNotFoundException(LikeNotFoundException exception) {
+        return new ErrorResponse("error", exception.getMessage());
+    }
+
     @Data
     public static class ErrorResponse {
         private final String error;

@@ -33,14 +33,14 @@ public class UserDbStorage implements UserStorage {
     }
 
     @Override
-    public User addNew(User user) {
+    public Integer addNew(User user) {
         String sqlQuery = "INSERT INTO users (name, login, email, birthday) values (?, ?, ?, ?)";
 
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
         jdbcTemplate.update(connection -> {
             PreparedStatement stmt = connection.prepareStatement(sqlQuery, new String[]{"user_id"});
-            stmt.setString(1, checkName(user));
+            stmt.setString(1, user.getName());
             stmt.setString(2, user.getLogin());
             stmt.setString(3, user.getEmail());
             stmt.setDate(4, Date.valueOf(user.getBirthday()));
@@ -49,11 +49,11 @@ public class UserDbStorage implements UserStorage {
 
         Optional<Integer> userId = Optional.of(Objects.requireNonNull(keyHolder.getKey()).intValue());
 
-        return findById(userId.get());
+        return userId.get();
     }
 
     @Override
-    public User update(User user) {
+    public Integer update(User user) {
         String sqlQuery = "UPDATE users SET " +
                 "name = ?," +
                 "login = ?," +
@@ -67,7 +67,7 @@ public class UserDbStorage implements UserStorage {
                 Date.valueOf(user.getBirthday()),
                 user.getId());
 
-        return findById(user.getId());
+        return user.getId();
     }
 
     @Override
@@ -95,7 +95,7 @@ public class UserDbStorage implements UserStorage {
 
         if (findDidFriendMadeFriendRequest(friendId, userId)) {
             jdbcTemplate.update(sqlQueryForMakingFriend, userId, friendId, 2);
-            jdbcTemplate.update(sqlQueryForCheckingFriendshipStatus, friendId, userId, 2);
+            jdbcTemplate.update(sqlQueryForCheckingFriendshipStatus, 2, userId, friendId);
         } else {
             jdbcTemplate.update(sqlQueryForMakingFriend, userId, friendId, 1);
         }
@@ -128,14 +128,6 @@ public class UserDbStorage implements UserStorage {
         String sqlQuery = "SELECT * FROM users WHERE user_id IN (" +
                 "SELECT friend_id FROM list_of_friends WHERE user_id = ?)";
         return jdbcTemplate.query(sqlQuery, this::mapRowToUser, userId);
-    }
-
-    private String checkName(User user) {
-        if (user.getName().isBlank()) {
-            return user.getLogin();
-        } else {
-            return user.getName();
-        }
     }
 
     private User mapRowToUser(ResultSet resultSet, int rowNum) throws SQLException {
