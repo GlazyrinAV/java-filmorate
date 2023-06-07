@@ -19,9 +19,9 @@ public interface DirectorStorage {
 
     List<Director> placeDirectorsToFilmFromDB(int filmId);
 
-    void addFilmDirectorsToDB(Film film, int filmId);
+    void saveFilmDirectorsToDB(Film film, int filmId);
 
-    void clearFilmDirectors(int filmId);
+    void remobeByFilmId(int filmId);
 
     Boolean isExists(int directorId);
 }

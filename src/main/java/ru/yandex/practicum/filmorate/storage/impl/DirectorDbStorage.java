@@ -36,11 +36,11 @@ public class DirectorDbStorage implements DirectorStorage {
 
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
-        jdbcTemplate.update(connection -> {
-            PreparedStatement stmt = connection.prepareStatement(sqlQuery, new String[]{"director_id"});
-            stmt.setString(1, director.getName());
-            return stmt;
-        }, keyHolder);
+            jdbcTemplate.update(connection -> {
+                PreparedStatement stmt = connection.prepareStatement(sqlQuery, new String[]{"director_id"});
+                stmt.setString(1, director.getName());
+                return stmt;
+            }, keyHolder);
 
         Optional<Integer> directorId = Optional.of(Objects.requireNonNull(keyHolder.getKey()).intValue());
 
@@ -52,10 +52,9 @@ public class DirectorDbStorage implements DirectorStorage {
         String sqlQuery = "UPDATE DIRECTORS SET " +
                 "DIRECTOR_NAME = ?" +
                 "WHERE DIRECTOR_ID = ?";
-        jdbcTemplate.update(sqlQuery,
-                director.getName(),
-                director.getId());
-
+            jdbcTemplate.update(sqlQuery,
+                    director.getName(),
+                    director.getId());
         return findById(director.getId());
     }
 
@@ -93,7 +92,7 @@ public class DirectorDbStorage implements DirectorStorage {
     }
 
     @Override
-    public void addFilmDirectorsToDB(Film film, int filmId) {
+    public void saveFilmDirectorsToDB(Film film, int filmId) {
         String sqlQueryForGenres = "MERGE INTO FILM_DIRECTOR (film_id, DIRECTOR_ID) VALUES (?, ?)";
 
         if (film.getDirectors() != null) {
@@ -118,7 +117,7 @@ public class DirectorDbStorage implements DirectorStorage {
     }
 
     @Override
-    public void clearFilmDirectors(int filmId) {
+    public void remobeByFilmId(int filmId) {
         String sqlQuery = "DELETE FROM FILM_DIRECTOR WHERE film_id = ?";
         jdbcTemplate.update(sqlQuery, filmId);
     }
