@@ -22,14 +22,12 @@ public class GenresController {
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public Collection<Genre> findAll() {
-        log.info("Получен запрос на получение списка всех доступных жанров фильмов.");
         return genresService.findAllGenres();
     }
 
     @GetMapping("/{genreId}")
     @ResponseStatus(HttpStatus.OK)
     public Genre findById(@PathVariable int genreId) {
-        log.info("Получен запрос на получение жанра фильмов под номером" + genreId + ".");
         return genresService.findGenreById(genreId);
     }
 }

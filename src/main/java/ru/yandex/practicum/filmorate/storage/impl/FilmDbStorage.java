@@ -12,8 +12,6 @@ import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exceptions.exceptions.NoResultDataAccessException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.dao.FilmStorage;
-import ru.yandex.practicum.filmorate.storage.dao.GenresStorage;
-import ru.yandex.practicum.filmorate.storage.dao.RatingStorage;
 
 import java.sql.Date;
 import java.sql.PreparedStatement;
@@ -31,19 +29,13 @@ public class FilmDbStorage implements FilmStorage {
 
     private final JdbcTemplate jdbcTemplate;
 
-    private final GenresStorage genresStorage;
-
-    private final RatingStorage ratingStorage;
-
     @Autowired
-    public FilmDbStorage(JdbcTemplate jdbcTemplate, GenresStorage genresStorage, RatingStorage ratingStorage) {
+    public FilmDbStorage(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
-        this.genresStorage = genresStorage;
-        this.ratingStorage = ratingStorage;
     }
 
     @Override
-    public Film addNew(Film film) {
+    public Integer addNew(Film film) {
         String sqlQuery = "INSERT INTO films (name, description, release_date, duration, rating_id) " +
                 "VALUES (?, ?, ?, ?, ?)";
 
@@ -64,13 +56,11 @@ public class FilmDbStorage implements FilmStorage {
         }
         Optional<Integer> filmId = Optional.of(Objects.requireNonNull(keyHolder.getKey()).intValue());
 
-        genresStorage.addFilmGenresToDB(film, filmId.get());
-
-        return findById(filmId.get());
+        return filmId.get();
     }
 
     @Override
-    public Film update(Film film) {
+    public Integer update(Film film) {
         String sqlQuery = "UPDATE films SET " +
                 "name = ?," +
                 "description = ?," +
@@ -89,11 +79,7 @@ public class FilmDbStorage implements FilmStorage {
         } catch (DataIntegrityViolationException exception) {
             throw new DataIntegrityViolationException("В запросе неправильно указаны данные о фильме.");
         }
-
-        genresStorage.clearFilmGenres(film.getId());
-        genresStorage.addFilmGenresToDB(film, film.getId());
-
-        return findById(film.getId());
+        return film.getId();
     }
 
     @Override
@@ -139,7 +125,7 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     public Collection<Integer> findLikes(int filmId) {
         String sqlQuery = "SELECT user_id FROM film_likes WHERE film_id = ?";
-        return jdbcTemplate.query(sqlQuery, this::mapRowToInteger, filmId);
+        return jdbcTemplate.query(sqlQuery, this::mapRowToUserId, filmId);
     }
 
     @Override
@@ -155,12 +141,10 @@ public class FilmDbStorage implements FilmStorage {
                 .description(resultSet.getString("description"))
                 .releaseDate(resultSet.getDate("release_date").toLocalDate())
                 .duration(Duration.ofMillis(resultSet.getLong("duration")))
-                .mpa(ratingStorage.placeRatingToFilmFromDB(resultSet.getInt("film_id")))
-                .genres(genresStorage.placeGenresToFilmFromDB(resultSet.getInt("film_id")))
                 .build();
     }
 
-    private Integer mapRowToInteger(ResultSet resultSet, int rowNum) throws SQLException {
+    private Integer mapRowToUserId(ResultSet resultSet, int rowNum) throws SQLException {
         return resultSet.getInt("user_id");
     }
 }
