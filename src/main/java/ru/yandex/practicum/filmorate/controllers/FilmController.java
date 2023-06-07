@@ -68,4 +68,11 @@ public class FilmController {
         log.info("Получен запрос на получение первых " + count + " популярных фильмов.");
         return filmService.findPopular(count);
     }
+
+    @GetMapping("/common")
+    @ResponseStatus(HttpStatus.OK)
+    public Collection<Film> findCommonFilms(int userId, int friendId) {
+        log.info("Получен запрос на получение общих фильмов у юзера ID" + userId + " и юзера ID" + friendId);
+        return filmService.findCommonFilms(userId, friendId);
+    }
 }

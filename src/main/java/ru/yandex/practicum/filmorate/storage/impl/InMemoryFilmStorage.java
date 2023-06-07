@@ -117,4 +117,11 @@ public class InMemoryFilmStorage implements FilmStorage {
     public void resetCounter() {
         idFilmSequence = 1;
     }
+
+    @Override
+    public Collection<Film> findCommonFilms(int userId, int friendId) {
+
+        return null;
+    }
+
 }
