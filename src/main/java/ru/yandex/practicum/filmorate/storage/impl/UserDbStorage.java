@@ -95,7 +95,7 @@ public class UserDbStorage implements UserStorage {
 
         if (findDidFriendMadeFriendRequest(friendId, userId)) {
             jdbcTemplate.update(sqlQueryForMakingFriend, userId, friendId, 2);
-            jdbcTemplate.update(sqlQueryForCheckingFriendshipStatus, 2, userId, friendId);
+            jdbcTemplate.update(sqlQueryForCheckingFriendshipStatus, 2, friendId, userId);
         } else {
             jdbcTemplate.update(sqlQueryForMakingFriend, userId, friendId, 1);
         }
