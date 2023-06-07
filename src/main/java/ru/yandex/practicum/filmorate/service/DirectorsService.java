@@ -8,6 +8,7 @@ import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.storage.dao.DirectorStorage;
 
 import java.util.Collection;
+import java.util.List;
 
 @Service
 @Slf4j
@@ -64,5 +65,17 @@ public class DirectorsService {
 
     public boolean isExists(int directorId) {
         return directorStorage.isExists(directorId);
+    }
+
+    public List<Director> placeDirectorsToFilmFromDB(int filmId) {
+        return directorStorage.placeDirectorsToFilmFromDB(filmId);
+    }
+
+    public void saveFilmDirectorsToDB(List<Director> directors, int filmId) {
+        directorStorage.saveFilmDirectorsToDB(directors, filmId);
+    }
+
+    public void removeByFilmId(int filmId) {
+        directorStorage.removeByFilmId(filmId);
     }
 }

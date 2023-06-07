@@ -4,11 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exceptions.exceptions.DirectorNotFoundException;
-import ru.yandex.practicum.filmorate.exceptions.exceptions.FilmNotFoundException;
-import ru.yandex.practicum.filmorate.exceptions.exceptions.LikeNotFoundException;
-import ru.yandex.practicum.filmorate.exceptions.exceptions.UserNotFoundException;
-import ru.yandex.practicum.filmorate.exceptions.exceptions.ValidationException;
+import ru.yandex.practicum.filmorate.exceptions.exceptions.*;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.dao.FilmStorage;
 
@@ -21,14 +17,12 @@ public class FilmService {
     private final FilmStorage filmStorage;
     private final DirectorsService directorsService;
     private final UserService userService;
-
     private final GenresService genresService;
-
     private final RatingsService ratingsService;
 
     @Autowired
-    public FilmService(@Qualifier("FilmDbStorage") FilmStorage filmStorage, DirectorsService directorsService, UserService userService) {
-    public FilmService(@Qualifier("FilmDbStorage") FilmStorage filmStorage, UserService userService, GenresService genresService, RatingsService ratingsService) {
+    public FilmService(@Qualifier("FilmDbStorage") FilmStorage filmStorage, UserService userService,
+                       GenresService genresService, RatingsService ratingsService, DirectorsService directorsService) {
         this.filmStorage = filmStorage;
         this.directorsService = directorsService;
         this.userService = userService;
@@ -41,14 +35,21 @@ public class FilmService {
         if (isGenresExists(film)) {
             genresService.addFilmGenresToDB(film.getGenres(), filmId);
         }
+        if (isDirectorsExists(film)) {
+            directorsService.saveFilmDirectorsToDB(film.getDirectors(), filmId);
+        }
         return findById(filmId);
     }
 
     public Film update(Film film) {
         int filmId = filmStorage.update(film);
         genresService.clearFilmGenres(filmId);
+        directorsService.removeByFilmId(filmId);
         if (isGenresExists(film)) {
             genresService.addFilmGenresToDB(film.getGenres(), filmId);
+        }
+        if (isDirectorsExists(film)) {
+            directorsService.saveFilmDirectorsToDB(film.getDirectors(), filmId);
         }
         return findById(filmId);
     }
@@ -58,6 +59,7 @@ public class FilmService {
         for (Film film : films) {
             film.setGenres(genresService.placeGenresToFilmFromDB(film.getId()));
             film.setMpa(ratingsService.placeRatingToFilmFromDB(film.getId()));
+            film.setDirectors(directorsService.placeDirectorsToFilmFromDB(film.getId()));
         }
         return films;
     }
@@ -66,6 +68,7 @@ public class FilmService {
         Film film = filmStorage.findById(filmId);
         film.setGenres(genresService.placeGenresToFilmFromDB(filmId));
         film.setMpa(ratingsService.placeRatingToFilmFromDB(filmId));
+        film.setDirectors(directorsService.placeDirectorsToFilmFromDB(film.getId()));
         return film;
     }
 
@@ -107,6 +110,7 @@ public class FilmService {
             for (Film film : films) {
                 film.setGenres(genresService.placeGenresToFilmFromDB(film.getId()));
                 film.setMpa(ratingsService.placeRatingToFilmFromDB(film.getId()));
+                film.setDirectors(directorsService.placeDirectorsToFilmFromDB(film.getId()));
             }
             return films;
         }
@@ -120,7 +124,13 @@ public class FilmService {
     public Collection<Film> findByDirectorId(int directorId, String sortBy) {
         if (directorsService.isExists(directorId) && (sortBy.equals("year") || sortBy.equals("likes"))) {
             log.info("Фильмы по указанному режиссеру найдены.");
-            return filmStorage.findByDirectorId(directorId, sortBy);
+            Collection<Film> films = filmStorage.findByDirectorId(directorId, sortBy);
+            for (Film film : films) {
+                film.setGenres(genresService.placeGenresToFilmFromDB(film.getId()));
+                film.setMpa(ratingsService.placeRatingToFilmFromDB(film.getId()));
+                film.setDirectors(directorsService.placeDirectorsToFilmFromDB(film.getId()));
+            }
+            return films;
         } else if (!directorsService.isExists(directorId) && (sortBy.equals("year") || sortBy.equals("likes"))) {
             log.info("Режиссер c ID " + directorId + " не найден.");
             throw new DirectorNotFoundException("Режиссер c ID " + directorId + " не найден.");
@@ -136,5 +146,9 @@ public class FilmService {
 
     private boolean isGenresExists(Film film) {
         return film.getGenres() != null;
+    }
+
+    private boolean isDirectorsExists(Film film) {
+        return film.getDirectors() != null;
     }
 }

@@ -20,7 +20,7 @@ public interface DirectorStorage {
 
     void saveFilmDirectorsToDB(List<Director> directors, int filmId);
 
-    void remobeByFilmId(int filmId);
+    void removeByFilmId(int filmId);
 
     Boolean isExists(int directorId);
 }

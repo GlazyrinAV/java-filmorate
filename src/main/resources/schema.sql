@@ -100,8 +100,5 @@ create table if not exists PUBLIC.FILM_DIRECTOR
 (
     FILM_ID     INTEGER not null,
     DIRECTOR_ID INTEGER not null,
-    primary key (DIRECTOR_ID, FILM_ID),
-    constraint "FILM_DIRECTOR_FILMS_FILM_ID_fk"
-        foreign key (FILM_ID) references PUBLIC.FILMS
-            on update cascade on delete cascade
+    primary key (DIRECTOR_ID, FILM_ID)
 );

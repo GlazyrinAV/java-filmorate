@@ -103,7 +103,7 @@ public class DirectorDbStorage implements DirectorStorage {
     }
 
     @Override
-    public void remobeByFilmId(int filmId) {
+    public void removeByFilmId(int filmId) {
         String sqlQuery = "DELETE FROM FILM_DIRECTOR WHERE film_id = ?";
         jdbcTemplate.update(sqlQuery, filmId);
     }
