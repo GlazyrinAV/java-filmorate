@@ -147,4 +147,13 @@ public class FilmDbStorage implements FilmStorage {
     private Integer mapRowToUserId(ResultSet resultSet, int rowNum) throws SQLException {
         return resultSet.getInt("user_id");
     }
+
+    @Override
+    public Collection<Film> findCommonFilms(int userId, int friendId) {
+        String sqlQuery = "SELECT FILMS.FILM_ID, FILMS.NAME, FILMS.DESCRIPTION, FILMS.DURATION, FILMS.RELEASE_DATE, COUNT(FL.USER_ID)  FROM FILMS LEFT JOIN FILM_LIKES FL on FILMS.FILM_ID = FL.FILM_ID WHERE Films.FILM_ID in (select FILM_ID from  FILM_LIKES  where USER_ID = ? AND FILM_ID in (select FILM_ID from FILM_LIKES where USER_ID = ?))" +
+                "GROUP BY FILMS.FILM_ID ORDER BY COUNT(FL.USER_ID)";
+
+        return jdbcTemplate.query(sqlQuery, this::mapRowToFilm, userId, friendId);
+    }
+
 }

@@ -115,7 +115,21 @@ public class FilmService {
         return filmStorage.isExists(filmId);
     }
 
-    private boolean isGenresExists(Film film) {
-        return film.getGenres() != null;
+    public Collection<Film> findCommonFilms(int userId, int friendId) {
+
+        if (userId <= 0 || friendId <= 0) {
+            log.info("Указан ID меньше или равный нулю.");
+            throw new ValidationException("ID не может быть меньше или равно нулю.");
+        } else if (!userService.isExists(userId)) {
+            log.info("Пользователь c ID " + userId + " не найден.");
+            throw new UserNotFoundException("Пользователь c ID " + userId + " не найден.");
+        } else if (!userService.isExists(friendId)) {
+            log.info("Пользователь c ID " + friendId + " не найден.");
+            throw new UserNotFoundException("Пользователь c ID " + friendId + " не найден.");
+        } else {
+            return filmStorage.findCommonFilms(userId, friendId);
+        }
+
     }
+
 }

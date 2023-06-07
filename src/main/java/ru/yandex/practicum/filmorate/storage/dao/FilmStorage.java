@@ -23,4 +23,7 @@ public interface FilmStorage {
     Collection<Integer> findLikes(int filmId);
 
     Boolean isExists(int filmId);
+
+    Collection<Film> findCommonFilms(int userId, int friendId);
+
 }
