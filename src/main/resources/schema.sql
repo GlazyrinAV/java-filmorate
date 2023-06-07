@@ -90,13 +90,12 @@ create table IF NOT EXISTS LIST_OF_FRIENDS
         foreign key (FRIENDSHIP_STATUS_ID) references FRIENDSHIP_STATUS
 );
 
-create table IF NOT EXISTS FILM_DIRECTOR
+create table if not exists PUBLIC.FILM_DIRECTOR
 (
     FILM_ID     INTEGER not null,
     DIRECTOR_ID INTEGER not null,
     primary key (DIRECTOR_ID, FILM_ID),
-    constraint FILM_DIRECTOR_DIRECTORS_DIRECTOR_ID_FK
-        foreign key (DIRECTOR_ID) references PUBLIC.DIRECTORS
+    constraint "FILM_DIRECTOR_FILMS_FILM_ID_fk"
+        foreign key (FILM_ID) references PUBLIC.FILMS
             on update cascade on delete cascade
 );
-
