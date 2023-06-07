@@ -26,7 +26,7 @@ public class ReviewDbStorage implements ReviewStorage {
     }
 
     @Override
-    public Review saveNew(Review review) {
+    public Integer saveNew(Review review) {
         String sqlQuery = "INSERT INTO REVIEWS (content, user_id, film_id, is_positive) " +
                 "VALUES (?, ?, ?, ?)";
 
@@ -48,11 +48,11 @@ public class ReviewDbStorage implements ReviewStorage {
         Optional<Integer> reviewId = Optional.of(Objects.requireNonNull(keyHolder.getKey()).intValue());
         saveOwnLikeOnOwnReview(review.getUserId(), reviewId.get());
 
-        return findById(reviewId.get());
+        return reviewId.get();
     }
 
     @Override
-    public Review update(Review review) {
+    public Integer update(Review review) {
 
         String sqlQuery = "UPDATE REVIEWS SET " +
                 "CONTENT = ?," +
@@ -68,7 +68,7 @@ public class ReviewDbStorage implements ReviewStorage {
             throw new DataIntegrityViolationException("В запросе неправильно указаны данные об отзыве.");
         }
 
-        return findById(review.getReviewId());
+        return review.getReviewId();
     }
 
     @Override
@@ -122,12 +122,6 @@ public class ReviewDbStorage implements ReviewStorage {
         return Boolean.TRUE.equals(jdbcTemplate.queryForObject(sqlQuery, Boolean.TYPE, reviewId));
     }
 
-    private int findUseful(int reviewId) {
-        String sqlQuery = "SELECT SUM(USEFUL) FROM REVIEWS_LIKES WHERE review_id = ?";
-        Optional<Integer> useful = Optional.ofNullable(jdbcTemplate.queryForObject(sqlQuery, Integer.class, reviewId));
-        return useful.orElse(0);
-    }
-
     private Review mapRowToReview(ResultSet resultSet, int rowNum) throws SQLException {
         return Review.builder()
                 .reviewId(resultSet.getInt("review_id"))
@@ -144,4 +138,10 @@ public class ReviewDbStorage implements ReviewStorage {
         jdbcTemplate.update(sqlQuery, userId, reviewId, 0);
     }
 
+
+    private int findUseful(int reviewId) {
+        String sqlQuery = "SELECT SUM(USEFUL) FROM REVIEWS_LIKES WHERE review_id = ?";
+        Optional<Integer> useful = Optional.ofNullable(jdbcTemplate.queryForObject(sqlQuery, Integer.class, reviewId));
+        return useful.orElse(0);
+    }
 }

@@ -91,7 +91,7 @@ public class FilmService {
         return filmStorage.findLikes(filmId);
     }
 
-    private boolean isExists(int filmId) {
+    public boolean isExists(int filmId) {
         return filmStorage.isExists(filmId);
     }
 }

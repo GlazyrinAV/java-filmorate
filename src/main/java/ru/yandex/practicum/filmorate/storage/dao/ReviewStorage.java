@@ -6,9 +6,9 @@ import java.util.Collection;
 
 public interface ReviewStorage {
 
-    Review saveNew(Review review);
+    Integer saveNew(Review review);
 
-    Review update(Review review);
+    Integer update(Review review);
 
     void delete(int reviewId);
 
