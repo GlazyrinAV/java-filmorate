@@ -99,11 +99,15 @@ create table IF NOT EXISTS REVIEWS
         foreign key (USER_ID) references PUBLIC.USERS (USER_ID)
 );
 
-create table IF NOT EXISTS PUBLIC.REVIEWS_LIKES
+create table IF NOT EXISTS REVIEWS_LIKES
 (
     USER_ID   INTEGER not null,
     REVIEW_ID INTEGER not null,
     USEFUL    INTEGER not null,
     constraint REVIEWS_LIKES_PK
-        primary key (USER_ID, REVIEW_ID)
+        primary key (USER_ID, REVIEW_ID),
+    constraint "REVIEWS_LIKES_REVIEWS_REVIEW_ID_fk"
+        foreign key (REVIEW_ID) references PUBLIC.REVIEWS
+            on update cascade on delete cascade
 );
+

@@ -12,7 +12,9 @@ import ru.yandex.practicum.filmorate.storage.dao.ReviewStorage;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.Collection;
+import java.util.Objects;
+import java.util.Optional;
 
 @Repository
 public class ReviewDbStorage implements ReviewStorage {
@@ -44,6 +46,7 @@ public class ReviewDbStorage implements ReviewStorage {
             throw new DataIntegrityViolationException("В запросе неправильно указаны данные по отзыву.");
         }
         Optional<Integer> reviewId = Optional.of(Objects.requireNonNull(keyHolder.getKey()).intValue());
+        saveOwnLikeOnOwnReview(review.getUserId(), reviewId.get());
 
         return findById(reviewId.get());
     }
@@ -82,10 +85,11 @@ public class ReviewDbStorage implements ReviewStorage {
 
     @Override
     public Collection<Review> findAll(int count) {
-        String sqlQuery = "SELECT * FROM REVIEWS LIMIT ?";
-        List<Review> set = jdbcTemplate.query(sqlQuery, this::mapRowToReview, count);
-        set.sort(Comparator.comparing(Review::getUseful).reversed().thenComparing(Review::getReviewId));
-        return set;
+        String sqlQuery = "SELECT R.*, SUM(RL.USEFUL) AS USEFUL FROM REVIEWS AS R " +
+                "left join REVIEWS_LIKES RL on R.REVIEW_ID = RL.REVIEW_ID GROUP BY R.REVIEW_ID ORDER BY USEFUL DESC, R.REVIEW_ID LIMIT ?";
+//        List<Review> set = jdbcTemplate.query(sqlQuery, this::mapRowToReview, count);
+//        set.sort(Comparator.comparing(Review::getUseful).reversed().thenComparing(Review::getReviewId));
+        return jdbcTemplate.query(sqlQuery, this::mapRowToReview, count);
     }
 
     @Override
@@ -135,4 +139,10 @@ public class ReviewDbStorage implements ReviewStorage {
                 .useful(findUseful(resultSet.getInt("review_id")))
                 .build();
     }
+
+    private void saveOwnLikeOnOwnReview(int userId, int reviewId) {
+        String sqlQuery = "INSERT INTO REVIEWS_LIKES (USER_ID, REVIEW_ID, USEFUL) VALUES ( ?, ?, ? )";
+        jdbcTemplate.update(sqlQuery, userId, reviewId, 0);
+    }
+
 }
