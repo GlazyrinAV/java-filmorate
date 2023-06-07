@@ -285,7 +285,7 @@ public class FilmServiceUnitTests {
         User user = new User("abc@acb.ru", "login", "name", LocalDate.of(1986, Month.APRIL, 13), 1);
         userService.addNew(user);
         filmService.makeLike(1, 1);
-        Assertions.assertEquals(filmService.findPopular(1), new ArrayList<>(List.of(film)),
+        Assertions.assertEquals(filmService.findPopular(1, null, null), new ArrayList<>(List.of(film)),
                 "Ошибка при получении списка из 1 популярных фильмов.");
     }
 
@@ -298,7 +298,7 @@ public class FilmServiceUnitTests {
         User user = new User("abc@acb.ru", "login", "name", LocalDate.of(1986, Month.APRIL, 13), null);
         userService.addNew(user);
         filmService.makeLike(1, 1);
-        Assertions.assertEquals(filmService.findPopular(10), new ArrayList<>(List.of(film, film2)),
+        Assertions.assertEquals(filmService.findPopular(10, null, null), new ArrayList<>(List.of(film, film2)),
                 "Ошибка при нормальном получении списка из 10 пополурных фильмов.");
     }
 
@@ -311,7 +311,7 @@ public class FilmServiceUnitTests {
         User user = new User("abc@acb.ru", "login", "name", LocalDate.of(1986, Month.APRIL, 13), 1);
         userService.addNew(user);
         filmService.makeLike(1, 1);
-        ValidationException exception = Assertions.assertThrows(ValidationException.class, () -> filmService.findPopular(0));
+        ValidationException exception = Assertions.assertThrows(ValidationException.class, () -> filmService.findPopular(0, null, null));
         Assertions.assertEquals(exception.getMessage(), "Значение выводимых фильмов не может быть меньше или равно нулю.",
                 "Ошибка при получении ошибки получения популярных 0 фильмов");
     }
@@ -325,7 +325,7 @@ public class FilmServiceUnitTests {
         User user = new User("abc@acb.ru", "login", "name", LocalDate.of(1986, Month.APRIL, 13), 1);
         userService.addNew(user);
         filmService.makeLike(1, 1);
-        ValidationException exception = Assertions.assertThrows(ValidationException.class, () -> filmService.findPopular(-1));
+        ValidationException exception = Assertions.assertThrows(ValidationException.class, () -> filmService.findPopular(-1, null, null));
         Assertions.assertEquals(exception.getMessage(), "Значение выводимых фильмов не может быть меньше или равно нулю.",
                 "Ошибка при получении ошибки получения популярных -1 фильмов");
     }

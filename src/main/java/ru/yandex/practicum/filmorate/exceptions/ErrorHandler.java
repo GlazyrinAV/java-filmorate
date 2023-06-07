@@ -47,11 +47,11 @@ public class ErrorHandler {
         return new ErrorResponse("error", "Получен неподходящий аргумент или аргумент неправильного типа");
     }
 
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ErrorResponse otherException(RuntimeException exception) {
-        return new ErrorResponse("error", "В работе сервера возникла ошибка.");
-    }
+//    @ExceptionHandler
+//    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+//    public ErrorResponse otherException(RuntimeException exception) {
+//        return new ErrorResponse("error", "В работе сервера возникла ошибка.");
+//    }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)

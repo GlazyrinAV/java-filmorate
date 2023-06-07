@@ -101,9 +101,51 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     public Collection<Film> findPopular(int count) {
         String sqlQuery =
-                "SELECT * FROM FILMS LEFT JOIN FILM_LIKES FL on FILMS.FILM_ID = FL.FILM_ID " +
-                        "GROUP BY FILMS.FILM_ID ORDER BY COUNT(FL.USER_ID) DESC LIMIT ?";
+                "SELECT F.FILM_ID, F.NAME, F.DESCRIPTION, F.RELEASE_DATE, F.DURATION " +
+                        "FROM FILMS AS F " +
+                        "LEFT JOIN FILM_LIKES AS FL ON F.FILM_ID = FL.FILM_ID " +
+                        "GROUP BY F.FILM_ID ORDER BY COUNT(FL.FILM_ID) DESC LIMIT ?";
         return jdbcTemplate.query(sqlQuery, this::mapRowToFilm, count);
+    }
+
+    @Override
+    public Collection<Film> findPopularByGenreAndYear(int count, int genreId, int year) {
+        String sql = "SELECT F.FILM_ID, F.NAME, F.DESCRIPTION, F.RELEASE_DATE, F.DURATION\n" +
+                "FROM FILMS AS F\n" +
+                "LEFT JOIN FILM_GENRES AS FG ON F.FILM_ID = FG.FILM_ID\n" +
+                "LEFT JOIN FILM_LIKES AS FL ON F.FILM_ID = FL.FILM_ID\n" +
+                "WHERE FG.GENRE_ID = ?\n" +
+                "AND EXTRACT(YEAR FROM CAST(F.RELEASE_DATE AS DATE)) = ?\n" +
+                "GROUP BY F.FILM_ID\n" +
+                "ORDER BY COUNT(FL.USER_ID) DESC\n" +
+                "LIMIT ?";
+        return jdbcTemplate.query(sql, this::mapRowToFilm, genreId, year, count);
+    }
+
+    @Override
+    public Collection<Film> findPopularByGenre(int count, int genreId) {
+        String sql = "SELECT F.FILM_ID, F.NAME, F.DESCRIPTION, F.RELEASE_DATE, F.DURATION\n" +
+                "FROM FILMS AS F\n" +
+                "LEFT JOIN FILM_GENRES AS FG ON F.FILM_ID = FG.FILM_ID\n" +
+                "LEFT JOIN FILM_LIKES AS FL ON F.FILM_ID = FL.FILM_ID\n" +
+                "WHERE FG.GENRE_ID = ?\n" +
+                "GROUP BY F.FILM_ID\n" +
+                "ORDER BY COUNT(FL.USER_ID) DESC\n" +
+                "LIMIT ?";
+        return jdbcTemplate.query(sql, this::mapRowToFilm, genreId, count);
+    }
+
+    @Override
+    public Collection<Film> findPopularByYear(int count, int year) {
+        String sql = "SELECT F.FILM_ID, F.NAME, F.DESCRIPTION, F.RELEASE_DATE, F.DURATION\n" +
+                "FROM FILMS AS F\n" +
+                "LEFT JOIN FILM_GENRES AS FG ON F.FILM_ID = FG.FILM_ID\n" +
+                "LEFT JOIN FILM_LIKES AS FL ON F.FILM_ID = FL.FILM_ID\n" +
+                "WHERE EXTRACT(YEAR FROM CAST(F.RELEASE_DATE AS DATE)) = ?\n" +
+                "GROUP BY F.FILM_ID\n" +
+                "ORDER BY COUNT(FL.USER_ID) DESC\n" +
+                "LIMIT ?";
+        return jdbcTemplate.query(sql, this::mapRowToFilm, year, count);
     }
 
     @Override
@@ -136,11 +178,11 @@ public class FilmDbStorage implements FilmStorage {
 
     private Film mapRowToFilm(ResultSet resultSet, int rowNum) throws SQLException {
         return Film.builder()
-                .id(resultSet.getInt("film_id"))
-                .name(resultSet.getString("name"))
-                .description(resultSet.getString("description"))
-                .releaseDate(resultSet.getDate("release_date").toLocalDate())
-                .duration(Duration.ofMillis(resultSet.getLong("duration")))
+                .id(resultSet.getInt("films.film_id"))
+                .name(resultSet.getString("films.name"))
+                .description(resultSet.getString("films.description"))
+                .releaseDate(resultSet.getDate("films.release_date").toLocalDate())
+                .duration(Duration.ofMillis(resultSet.getLong("films.duration")))
                 .build();
     }
 

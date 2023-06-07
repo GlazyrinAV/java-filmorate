@@ -12,6 +12,7 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.dao.FilmStorage;
 
 import java.util.Collection;
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -94,17 +95,24 @@ public class FilmService {
         }
     }
 
-    public Collection<Film> findPopular(int count) {
+    public Collection<Film> findPopular(int count, Optional<Integer> genreId, Optional<Integer> year) {
+        Collection<Film> films;
         if (count <= 0) {
             throw new ValidationException("Значение выводимых фильмов не может быть меньше или равно нулю.");
+        } else if (genreId.isPresent() & year.isPresent()) {
+            films = filmStorage.findPopularByGenreAndYear(count, genreId.get(), year.get());
+        } else if (genreId.isPresent()) {
+            films = filmStorage.findPopularByGenre(count, genreId.get());
+        } else if (year.isPresent()) {
+            films = filmStorage.findPopularByYear(count, year.get());
         } else {
-            Collection<Film> films = filmStorage.findPopular(count);
-            for (Film film : films) {
-                film.setGenres(genresService.placeGenresToFilmFromDB(film.getId()));
-                film.setMpa(ratingsService.placeRatingToFilmFromDB(film.getId()));
-            }
-            return films;
+            films = filmStorage.findPopular(count);
         }
+        for (Film film : films) {
+            film.setGenres(genresService.placeGenresToFilmFromDB(film.getId()));
+            film.setMpa(ratingsService.placeRatingToFilmFromDB(film.getId()));
+        }
+        return films;
     }
 
     public Collection<Integer> findLikes(int filmId) {
@@ -118,4 +126,5 @@ public class FilmService {
     private boolean isGenresExists(Film film) {
         return film.getGenres() != null;
     }
+
 }
