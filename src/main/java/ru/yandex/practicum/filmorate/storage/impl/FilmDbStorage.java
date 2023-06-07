@@ -12,6 +12,8 @@ import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exceptions.exceptions.NoResultDataAccessException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.dao.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.dao.GenresStorage;
+import ru.yandex.practicum.filmorate.storage.dao.RatingStorage;
 
 import java.sql.Date;
 import java.sql.PreparedStatement;
@@ -28,10 +30,16 @@ import java.util.Optional;
 public class FilmDbStorage implements FilmStorage {
 
     private final JdbcTemplate jdbcTemplate;
+    private final GenresStorage genresStorage;
+
+    private final RatingStorage ratingStorage;
+
 
     @Autowired
-    public FilmDbStorage(JdbcTemplate jdbcTemplate) {
+    public FilmDbStorage(JdbcTemplate jdbcTemplate, GenresStorage genresStorage, RatingStorage ratingStorage) {
         this.jdbcTemplate = jdbcTemplate;
+        this.genresStorage = genresStorage;
+        this.ratingStorage = ratingStorage;
     }
 
     @Override
@@ -141,6 +149,8 @@ public class FilmDbStorage implements FilmStorage {
                 .description(resultSet.getString("description"))
                 .releaseDate(resultSet.getDate("release_date").toLocalDate())
                 .duration(Duration.ofMillis(resultSet.getLong("duration")))
+                .mpa(ratingStorage.placeRatingToFilmFromDB(resultSet.getInt("film_id")))
+                .genres(genresStorage.placeGenresToFilmFromDB(resultSet.getInt("film_id")))
                 .build();
     }
 
