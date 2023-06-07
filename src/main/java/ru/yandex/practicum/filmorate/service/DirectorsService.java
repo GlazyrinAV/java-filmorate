@@ -27,9 +27,14 @@ public class DirectorsService {
     }
 
     public Director update(Director director) {
-        int id = directorStorage.update(director);
-        log.info("Режиссер обновлен.");
-        return findById(id);
+        if (!directorStorage.isExists(director.getId())) {
+            log.info("Режиссер не найден.");
+            throw new DirectorNotFoundException("Режиссер не найден.");
+        } else {
+            int id = directorStorage.update(director);
+            log.info("Режиссер обновлен.");
+            return findById(id);
+        }
     }
 
     public Collection<Director> findAll() {

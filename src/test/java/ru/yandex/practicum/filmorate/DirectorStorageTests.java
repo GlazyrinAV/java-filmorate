@@ -9,9 +9,9 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.test.context.jdbc.Sql;
-import ru.yandex.practicum.filmorate.exceptions.exceptions.NoResultDataAccessException;
+import ru.yandex.practicum.filmorate.exceptions.exceptions.DirectorNotFoundException;
 import ru.yandex.practicum.filmorate.model.Director;
-import ru.yandex.practicum.filmorate.storage.dao.DirectorStorage;
+import ru.yandex.practicum.filmorate.service.DirectorsService;
 
 @SpringBootTest
 @AutoConfigureTestDatabase
@@ -19,12 +19,13 @@ import ru.yandex.practicum.filmorate.storage.dao.DirectorStorage;
 @Sql(value = {"/data.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 public class DirectorStorageTests {
 
-    private final DirectorStorage directorStorage;
+    private final DirectorsService directorsService;
 
     @Test
     public void saveNewDirectorNormal() {
         Director director = new Director(1, "Director");
-        Assertions.assertEquals(directorStorage.saveNew(new Director(null, "Director")), director,
+        directorsService.saveNew(new Director(null, "Director"));
+        Assertions.assertEquals(directorsService.findById(1), director,
                 "Ошибка при нормальном добавлении нового режиссера.");
     }
 
@@ -32,7 +33,7 @@ public class DirectorStorageTests {
     public void saveNewDirectorWithNullName() {
         Director director = new Director(null, null);
         DataIntegrityViolationException exception = Assertions.assertThrows(DataIntegrityViolationException.class, () ->
-                directorStorage.saveNew(director));
+                directorsService.saveNew(director));
         Assertions.assertNotNull(exception.getMessage(),
                 "Ошибка при добавлении режиссера без имени.");
     }
@@ -40,21 +41,24 @@ public class DirectorStorageTests {
     @Test
     public void saveNewDirectorWithWrongId() {
         Director director = new Director(1, "Director");
-        Assertions.assertEquals(directorStorage.saveNew(new Director(99, "Director")), director,
+        directorsService.saveNew(new Director(99, "Director"));
+        Assertions.assertEquals(directorsService.findById(1), director,
                 "Ошибка при добавлении нового режиссера c указанием несуществующего ид.");
     }
 
     @Test
     public void saveNewDirectorWithNegativeId() {
         Director director = new Director(1, "Director");
-        Assertions.assertEquals(directorStorage.saveNew(new Director(-1, "Director")), director,
+        directorsService.saveNew(new Director(-1, "Director"));
+        Assertions.assertEquals(directorsService.findById(1), director,
                 "Ошибка при добавлении нового режиссера c указанием отрицательного ид.");
     }
 
     @Test
     public void saveNewDirectorWithZeroId() {
         Director director = new Director(1, "Director");
-        Assertions.assertEquals(directorStorage.saveNew(new Director(-1, "Director")), director,
+        directorsService.saveNew(new Director(0, "Director"));
+        Assertions.assertEquals(directorsService.findById(1), director,
                 "Ошибка при добавлении нового режиссера c указанием нулевого ид.");
     }
 
@@ -62,7 +66,8 @@ public class DirectorStorageTests {
     @Sql(value = {"/dataForDirectorTests.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     public void updateDirectorNormal() {
         Director director = new Director(1, "Director update");
-        Assertions.assertEquals(directorStorage.update(new Director(1, "Director update")), director,
+        directorsService.update(new Director(1, "Director update"));
+        Assertions.assertEquals(directorsService.findById(1), director,
                 "Ошибка при нормальном обновлении нового режиссера.");
     }
 
@@ -71,7 +76,7 @@ public class DirectorStorageTests {
     public void updateDirectorWithNullName() {
         Director director = new Director(1, null);
         DataIntegrityViolationException exception = Assertions.assertThrows(DataIntegrityViolationException.class, () ->
-                directorStorage.update(director));
+                directorsService.update(director));
         Assertions.assertNotNull(exception.getMessage(),
                 "Ошибка при обновлении режиссера без имени.");
     }
@@ -80,9 +85,9 @@ public class DirectorStorageTests {
     @Sql(value = {"/dataForDirectorTests.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     public void updateDirectorWithWrongId() {
         Director director = new Director(99, "Director update");
-        NoResultDataAccessException exception = Assertions.assertThrows(NoResultDataAccessException.class, () ->
-                directorStorage.update(director));
-        Assertions.assertEquals(exception.getMessage(), "Запрос на получение режиссера получен пустой ответ.",
+        DirectorNotFoundException exception = Assertions.assertThrows(DirectorNotFoundException.class, () ->
+                directorsService.update(director));
+        Assertions.assertEquals(exception.getMessage(), "Режиссер не найден.",
                 "Ошибка при обновлении режиссера c указанием несуществующего ид.");
     }
 
@@ -90,9 +95,9 @@ public class DirectorStorageTests {
     @Sql(value = {"/dataForDirectorTests.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     public void updateDirectorWithNegativeId() {
         Director director = new Director(-1, "Director update");
-        NoResultDataAccessException exception = Assertions.assertThrows(NoResultDataAccessException.class, () ->
-                directorStorage.update(director));
-        Assertions.assertEquals(exception.getMessage(), "Запрос на получение режиссера получен пустой ответ.",
+        DirectorNotFoundException exception = Assertions.assertThrows(DirectorNotFoundException.class, () ->
+                directorsService.update(director));
+        Assertions.assertEquals(exception.getMessage(), "Режиссер не найден.",
                 "Ошибка при обновлении режиссера c указанием отрицательного ид.");
 }
 
@@ -100,22 +105,22 @@ public class DirectorStorageTests {
     @Sql(value = {"/dataForDirectorTests.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     public void updateDirectorWithZeroId() {
         Director director = new Director(0, "Director update");
-        NoResultDataAccessException exception = Assertions.assertThrows(NoResultDataAccessException.class, () ->
-                directorStorage.update(director));
-        Assertions.assertEquals(exception.getMessage(), "Запрос на получение режиссера получен пустой ответ.",
+        DirectorNotFoundException exception = Assertions.assertThrows(DirectorNotFoundException.class, () ->
+                directorsService.update(director));
+        Assertions.assertEquals(exception.getMessage(), "Режиссер не найден.",
                 "Ошибка при обновлении режиссера c указанием нулевого ид.");
     }
 
     @Test
     public void findAllWithNoDirectors() {
-        Assertions.assertTrue(directorStorage.findAll().isEmpty(),
+        Assertions.assertTrue(directorsService.findAll().isEmpty(),
                 "Ошибка при получении всех режиссеров при пустой базе.");
     }
 
     @Test
     @Sql(value = {"/dataForDirectorTests.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     public void findAllWithDirectors()  {
-        Assertions.assertTrue(directorStorage.findAll().size() == 2,
+        Assertions.assertTrue(directorsService.findAll().size() == 2,
                 "Ошибка при получении всех режиссеров при заполненной базе.");
     }
 
