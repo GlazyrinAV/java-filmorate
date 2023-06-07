@@ -26,28 +26,24 @@ public class ReviewController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public Review saveNew(@Valid @RequestBody Review review) {
-        log.info("Получен запрос на создание отзыва.");
         return reviewService.saveNew(review);
     }
 
     @PutMapping
     @ResponseStatus(HttpStatus.OK)
     public Review update(@Valid @RequestBody Review review) {
-        log.info("Получен запрос на обновление отзыва.");
         return reviewService.update(review);
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable int id) {
-        log.info("Получен запрос на удаление отзыва.");
         reviewService.delete(id);
     }
 
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     public Review findById(@PathVariable int id) {
-        log.info("Получен запрос на поиск отзыва.");
         return reviewService.findById(id);
     }
 
@@ -55,7 +51,6 @@ public class ReviewController {
     @ResponseStatus(HttpStatus.OK)
     public Collection<Review> findByFilmId(@RequestParam Optional<Integer> filmId,
                                            @RequestParam(defaultValue = "10") int count) {
-        log.info("Получен запрос на поиск отзыва на фильм.");
         if (filmId.isEmpty()) {
             return reviewService.findAll(count);
         } else {
@@ -66,20 +61,18 @@ public class ReviewController {
     @PutMapping("/{id}/{like}/{userId}")
     @ResponseStatus(HttpStatus.OK)
     public void saveLike(@PathVariable int id, @PathVariable int userId, @PathVariable String like) {
-        log.info("Получен запрос на проставление лайка отзыву.");
-        if (like.equals("like")) {
-            reviewService.saveLike(userId, id, true);
-        } else if (like.equals("dislike")) {
-            reviewService.saveLike(userId, id, false);
-        }
+        reviewService.saveLike(userId, id, like);
     }
 
     @DeleteMapping("/{id}/{like}/{userId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void removeLike(@PathVariable int id, @PathVariable int userId, @PathVariable String like) {
-        log.info("Получен запрос на удадение лайка отзыву.");
-        if (like.equals("like") || like.equals("dislike")) {
-            reviewService.removeLike(userId, id);
-        }
+        reviewService.removeLike(userId, id, like);
+    }
+
+    @DeleteMapping("/{id}/dislike/{userId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void removeDislike(@PathVariable int id, @PathVariable int userId) {
+        reviewService.removeDislike(userId, id);
     }
 }

@@ -85,9 +85,8 @@ public class ReviewDbStorage implements ReviewStorage {
 
     @Override
     public Collection<Review> findAll(int count) {
-        String sqlQuery = "SELECT R.*, SUM(RL.USEFUL) AS USEFUL FROM REVIEWS AS R " +
-                "left join REVIEWS_LIKES RL on R.REVIEW_ID = RL.REVIEW_ID GROUP BY R.REVIEW_ID " +
-                "ORDER BY USEFUL DESC, R.REVIEW_ID LIMIT ?";
+        String sqlQuery = "SELECT R.* FROM REVIEWS AS R left join REVIEWS_LIKES RL on R.REVIEW_ID = RL.REVIEW_ID " +
+                "GROUP BY R.REVIEW_ID ORDER BY SUM(RL.USEFUL) DESC, R.REVIEW_ID LIMIT ?";
         return jdbcTemplate.query(sqlQuery, this::mapRowToReview, count);
     }
 
@@ -117,9 +116,22 @@ public class ReviewDbStorage implements ReviewStorage {
     }
 
     @Override
-    public Boolean isExists(int reviewId) {
-        String sqlQuery = "SELECT EXISTS ( SELECT * FROM REVIEWS WHERE REVIEW_ID =? )";
-        return Boolean.TRUE.equals(jdbcTemplate.queryForObject(sqlQuery, Boolean.TYPE, reviewId));
+    public Boolean isExists(Review review) {
+        String sqlQuery = "SELECT EXISTS ( SELECT * FROM REVIEWS WHERE USER_ID = ? AND FILM_ID = ? AND CONTENT = ? )";
+        return Boolean.TRUE.equals(jdbcTemplate.queryForObject(sqlQuery, Boolean.TYPE, review.getUserId(),
+                review.getFilmId(), review.getContent()));
+    }
+
+    @Override
+    public Boolean isLikeExists(int userId, int reviewId) {
+        String sqlQuery = "SELECT EXISTS ( SELECT * FROM REVIEWS_LIKES WHERE USER_ID = ? AND REVIEW_ID = ? )";
+        return Boolean.TRUE.equals(jdbcTemplate.queryForObject(sqlQuery, Boolean.TYPE, userId, reviewId));
+    }
+
+    @Override
+    public Boolean isDislikeExists(int userId, int reviewId) {
+        String sqlQuery = "SELECT EXISTS ( SELECT * FROM REVIEWS_LIKES WHERE USER_ID = ? AND REVIEW_ID = ? AND USEFUL = -1)";
+        return Boolean.TRUE.equals(jdbcTemplate.queryForObject(sqlQuery, Boolean.TYPE, userId, reviewId));
     }
 
     private Review mapRowToReview(ResultSet resultSet, int rowNum) throws SQLException {
@@ -137,7 +149,6 @@ public class ReviewDbStorage implements ReviewStorage {
         String sqlQuery = "INSERT INTO REVIEWS_LIKES (USER_ID, REVIEW_ID, USEFUL) VALUES ( ?, ?, ? )";
         jdbcTemplate.update(sqlQuery, userId, reviewId, 0);
     }
-
 
     private int findUseful(int reviewId) {
         String sqlQuery = "SELECT SUM(USEFUL) FROM REVIEWS_LIKES WHERE review_id = ?";

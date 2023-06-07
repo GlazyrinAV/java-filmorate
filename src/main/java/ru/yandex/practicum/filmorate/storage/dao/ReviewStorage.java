@@ -22,5 +22,9 @@ public interface ReviewStorage {
 
     void removeLike(int userId, int reviewId);
 
-    Boolean isExists(int reviewId);
+    Boolean isExists(Review review);
+
+    Boolean isLikeExists(int userId, int reviewId);
+
+    Boolean isDislikeExists(int userId, int reviewId);
 }

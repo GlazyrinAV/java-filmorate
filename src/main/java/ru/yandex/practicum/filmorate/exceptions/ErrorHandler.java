@@ -59,6 +59,12 @@ public class ErrorHandler {
         return new ErrorResponse("error", exception.getFieldErrors().toString());
     }
 
+    @ExceptionHandler({LikeAlreadyExistsException.class, ReviewAlreadyExistsException.class})
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse entityAlreadyExistsException(RuntimeException exception) {
+        return new ErrorResponse("error", exception.getMessage());
+    }
+
     @Data
     public static class ErrorResponse {
         private final String error;

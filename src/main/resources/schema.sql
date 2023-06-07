@@ -96,7 +96,8 @@ create table IF NOT EXISTS REVIEWS
     constraint REVIEWS_FILMS_FILM_ID_FK
         foreign key (FILM_ID) references PUBLIC.FILMS,
     constraint REVIEWS_USERS_USER_ID_FK
-        foreign key (USER_ID) references PUBLIC.USERS (USER_ID)
+        foreign key (USER_ID) references PUBLIC.USERS (USER_ID),
+    CONSTRAINT  REVIEWS_UNIQUE UNIQUE (USER_ID, FILM_ID, CONTENT)
 );
 
 create table IF NOT EXISTS REVIEWS_LIKES
