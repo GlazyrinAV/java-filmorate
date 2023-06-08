@@ -125,11 +125,6 @@ public class FilmDbStorage implements FilmStorage {
         return jdbcTemplate.query(sqlQuery, this::mapRowToUserId, filmId);
     }
 
-    @Override
-    public Boolean isExists(int filmId) {
-        String sqlQuery = "SELECT EXISTS ( SELECT * FROM PUBLIC.films WHERE film_id =? )";
-        return Boolean.TRUE.equals(jdbcTemplate.queryForObject(sqlQuery, Boolean.TYPE, filmId));
-    }
 
     @Override
     public void removeFilm(int filmId) {
