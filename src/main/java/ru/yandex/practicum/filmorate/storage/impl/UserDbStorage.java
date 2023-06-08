@@ -129,6 +129,7 @@ public class UserDbStorage implements UserStorage {
                 "SELECT friend_id FROM list_of_friends WHERE user_id = ?)";
         return jdbcTemplate.query(sqlQuery, this::mapRowToUser, userId);
     }
+
     @Override
     public void removeUser(int id) {
         String sqlQueryFriend = "DELETE FROM list_of_friends WHERE user_id = ? OR" +
