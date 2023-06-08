@@ -128,7 +128,14 @@ public class FilmService {
             log.info("Пользователь c ID " + friendId + " не найден.");
             throw new UserNotFoundException("Пользователь c ID " + friendId + " не найден.");
         } else {
-            return filmStorage.findCommonFilms(userId, friendId);
+
+            Collection<Film> films = filmStorage.findCommonFilms(userId, friendId);
+            for (Film film : films) {
+                film.setGenres(genresService.placeGenresToFilmFromDB(film.getId()));
+                film.setMpa(ratingsService.placeRatingToFilmFromDB(film.getId()));
+            }
+            return films;
+
         }
 
     }
