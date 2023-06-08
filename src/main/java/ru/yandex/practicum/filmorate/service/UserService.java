@@ -81,6 +81,14 @@ public class UserService {
         return storage.findCommonFriends(userId, otherUserId);
     }
 
+    public void removeUser(int userId) {
+        findById(userId);
+        log.info("Пользователь удален.");
+        storage.removeUser(userId);
+
+    }
+
+
     private void checkName(User user) {
         if (user.getName().isBlank()) {
             user.setName(user.getLogin());

@@ -106,4 +106,10 @@ public class FilmService {
             genresService.saveGenresToDBFromFilm(film.getGenres(), filmId);
         }
     }
+
+    public void removeFilm(int filmId) {
+        findById(filmId);
+        log.info("Фильм удален.");
+        filmStorage.removeFilm(filmId);
+    }
 }

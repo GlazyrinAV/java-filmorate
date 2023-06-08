@@ -124,6 +124,12 @@ public class UserDbStorage implements UserStorage {
         return jdbcTemplate.query(sqlQuery, this::mapRowToUser, userId);
     }
 
+    @Override
+    public void removeUser(int id) {
+        String sqlQuery = "DELETE FROM USERS WHERE USER_ID = ?";
+        jdbcTemplate.update(sqlQuery, id);
+    }
+
     private User mapRowToUser(ResultSet resultSet, int rowNum) throws SQLException {
         return User.builder()
                 .id(resultSet.getInt("user_id"))
