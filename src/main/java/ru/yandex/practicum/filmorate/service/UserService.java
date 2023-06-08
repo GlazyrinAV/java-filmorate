@@ -35,7 +35,7 @@ public class UserService {
         return storage.findAll();
     }
 
-    public User findById(int  userId) {
+    public User findById(int userId) {
         if (!isExists(userId)) {
             log.info("Пользователь c ID " + userId + " не найден.");
             throw new UserNotFoundException("Пользователь c ID " + userId + " не найден.");
@@ -55,8 +55,7 @@ public class UserService {
             log.info("Друг уже в друзьях.");
             throw new FriendAlreadyExistException("Пользователь с ID " + userId +
                     " уже добавил в друзья пользователя c ID " + friendId);
-        }
-        else {
+        } else {
             log.info("Друг добавлен.");
             storage.makeFriend(userId, friendId);
         }
@@ -97,6 +96,16 @@ public class UserService {
             throw new UserNotFoundException("Пользователь c ID " + otherUserId + " не найден.");
         } else {
             return storage.findCommonFriends(userId, otherUserId);
+        }
+    }
+
+    public void removeUser(int userId) {
+        if (!isExists(userId)) {
+            log.info("Пользователь c ID " + userId + " не найден.");
+            throw new UserNotFoundException("Пользователь c ID " + userId + " не найден.");
+        } else {
+            log.info("Пользователь удален.");
+            storage.removeUser(userId);
         }
     }
 

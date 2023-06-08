@@ -101,8 +101,11 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     public Collection<Film> findPopular(int count) {
         String sqlQuery =
-                "SELECT * FROM FILMS LEFT JOIN FILM_LIKES FL on FILMS.FILM_ID = FL.FILM_ID " +
-                        "GROUP BY FILMS.FILM_ID ORDER BY COUNT(FL.USER_ID) DESC LIMIT ?";
+                "SELECT f.*, COUNT(fl.USER_ID) as likesCount FROM FILMS f \n" +
+                        "LEFT JOIN FILM_LIKES fl ON f.FILM_ID = fl.FILM_ID \n" +
+                        "GROUP BY f.FILM_ID \n" +
+                        "ORDER BY likesCount DESC \n" +
+                        "LIMIT ?";
         return jdbcTemplate.query(sqlQuery, this::mapRowToFilm, count);
     }
 
@@ -132,6 +135,16 @@ public class FilmDbStorage implements FilmStorage {
     public Boolean isExists(int filmId) {
         String sqlQuery = "SELECT EXISTS ( SELECT * FROM PUBLIC.films WHERE film_id =? )";
         return Boolean.TRUE.equals(jdbcTemplate.queryForObject(sqlQuery, Boolean.TYPE, filmId));
+    }
+
+    @Override
+    public void removeFilm(int filmId) {
+        String sqlQueryGenre = "DELETE FROM film_genres WHERE film_id = ?";
+        jdbcTemplate.update(sqlQueryGenre, filmId);
+        String sqlQueryLike = "DELETE FROM FILM_LIKES WHERE film_id = ?";
+        jdbcTemplate.update(sqlQueryLike, filmId);
+        String sqlQuery = "DELETE FROM PUBLIC.films WHERE film_id = ?";
+        jdbcTemplate.update(sqlQuery, filmId);
     }
 
     private Film mapRowToFilm(ResultSet resultSet, int rowNum) throws SQLException {
