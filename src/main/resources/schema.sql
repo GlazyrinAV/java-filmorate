@@ -22,11 +22,12 @@ create table IF NOT EXISTS FRIENDSHIP_STATUS
         primary key (FRIENDSHIP_STATUS_ID)
 );
 
-create table IF NOT EXISTS DIRECTORS
+create table if not exists PUBLIC.DIRECTORS
 (
     DIRECTOR_ID   INTEGER auto_increment
         primary key,
     DIRECTOR_NAME CHARACTER VARYING not null
+        unique
 );
 
 create table IF NOT EXISTS FILMS

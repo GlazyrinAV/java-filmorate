@@ -67,12 +67,12 @@ public class DirectorsService {
         return directorStorage.isExists(directorId);
     }
 
-    public List<Director> placeDirectorsToFilmFromDB(int filmId) {
-        return directorStorage.placeDirectorsToFilmFromDB(filmId);
+    public List<Director> saveDirectorsToFilmFromDB(int filmId) {
+        return directorStorage.saveDirectorsToFilmFromDB(filmId);
     }
 
-    public void saveFilmDirectorsToDB(List<Director> directors, int filmId) {
-        directorStorage.saveFilmDirectorsToDB(directors, filmId);
+    public void saveDirectorsToDBFromFilm(List<Director> directors, int filmId) {
+        directorStorage.saveDirectorsToDBFromFilm(directors, filmId);
     }
 
     public void removeByFilmId(int filmId) {
