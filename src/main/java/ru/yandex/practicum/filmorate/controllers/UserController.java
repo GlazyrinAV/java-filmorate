@@ -22,8 +22,8 @@ public class UserController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public User addNew(@Valid @RequestBody User user) {
-        return userService.addNew(user);
+    public User saveNew(@Valid @RequestBody User user) {
+        return userService.saveNew(user);
     }
 
     @PutMapping
@@ -46,8 +46,8 @@ public class UserController {
 
     @PutMapping("/{id}/friends/{friendId}")
     @ResponseStatus(HttpStatus.OK)
-    public void makeNewFriend(@PathVariable int id, @PathVariable int friendId) {
-        userService.addFriend(id, friendId);
+    public void saveFriend(@PathVariable int id, @PathVariable int friendId) {
+        userService.saveFriend(id, friendId);
     }
 
     @DeleteMapping("/{id}/friends/{friendId}")

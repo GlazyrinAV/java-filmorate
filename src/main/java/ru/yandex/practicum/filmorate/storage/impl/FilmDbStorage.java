@@ -4,12 +4,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
-import ru.yandex.practicum.filmorate.exceptions.exceptions.NoResultDataAccessException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.dao.FilmStorage;
 
@@ -35,7 +33,7 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Override
-    public Integer addNew(Film film) {
+    public Integer saveNew(Film film) {
         String sqlQuery = "INSERT INTO films (name, description, release_date, duration, rating_id) " +
                 "VALUES (?, ?, ?, ?, ?)";
 
@@ -91,11 +89,7 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     public Film findById(int filmId) {
         String sqlQuery = "SELECT * FROM films where film_id = ?";
-        try {
-            return jdbcTemplate.queryForObject(sqlQuery, this::mapRowToFilm, filmId);
-        } catch (EmptyResultDataAccessException exception) {
-            throw new NoResultDataAccessException("Получен пустой ответ на запрос.", 1);
-        }
+        return jdbcTemplate.queryForObject(sqlQuery, this::mapRowToFilm, filmId);
     }
 
     @Override
@@ -126,12 +120,6 @@ public class FilmDbStorage implements FilmStorage {
     public Collection<Integer> findLikes(int filmId) {
         String sqlQuery = "SELECT user_id FROM film_likes WHERE film_id = ?";
         return jdbcTemplate.query(sqlQuery, this::mapRowToUserId, filmId);
-    }
-
-    @Override
-    public Boolean isExists(int filmId) {
-        String sqlQuery = "SELECT EXISTS ( SELECT * FROM PUBLIC.films WHERE film_id =? )";
-        return Boolean.TRUE.equals(jdbcTemplate.queryForObject(sqlQuery, Boolean.TYPE, filmId));
     }
 
     private Film mapRowToFilm(ResultSet resultSet, int rowNum) throws SQLException {
