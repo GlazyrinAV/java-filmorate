@@ -7,11 +7,11 @@ import java.util.List;
 
 public interface GenresStorage {
 
-    void addFilmGenresToDB(List<Genre> genres, int filmId);
+    void saveFilmGenresToDB(List<Genre> genres, int filmId);
 
-    void clearFilmGenres(int filmId);
+    void removeFilmGenres(int filmId);
 
-    List<Genre> placeGenresToFilmFromDB(int filmId);
+    List<Genre> saveGenresToFilmFromDB(int filmId);
 
     Collection<Genre> findAll();
 

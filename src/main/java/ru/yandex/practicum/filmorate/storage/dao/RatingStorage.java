@@ -10,5 +10,5 @@ public interface RatingStorage {
 
     Rating findById(int ratingId);
 
-    Rating placeRatingToFilmFromDB(int filmId);
+    Rating saveRatingToFilmFromDB(int filmId);
 }

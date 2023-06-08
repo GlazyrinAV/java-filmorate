@@ -55,10 +55,10 @@ public class ReviewService {
         }
     }
 
-    public void delete(int reviewId) {
+    public void remove(int reviewId) {
         if (isExistsByReviewId(reviewId)) {
             log.info("Отзыв удален.");
-            reviewStorage.delete(reviewId);
+            reviewStorage.remove(reviewId);
         } else if (!isExists(reviewStorage.findById(reviewId))) {
             log.info("Такой отзыв не существует.");
             throw new ReviewNotFoundException("Такой отзыв не существует.");

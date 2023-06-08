@@ -22,9 +22,9 @@ public class UserService {
         this.storage = storage;
     }
 
-    public User addNew(User user) {
+    public User saveNew(User user) {
         checkName(user);
-        return findById(storage.addNew(user));
+        return findById(storage.saveNew(user));
     }
 
     public User update(User user) {
@@ -44,7 +44,7 @@ public class UserService {
         }
     }
 
-    public void addFriend(int userId, int friendId) {
+    public void saveFriend(int userId, int friendId) {
         if (!isExists(userId)) {
             log.info("Пользователь c ID " + userId + " не найден.");
             throw new UserNotFoundException("Пользователь c ID " + userId + " не найден.");
@@ -58,7 +58,7 @@ public class UserService {
         }
         else {
             log.info("Друг добавлен.");
-            storage.makeFriend(userId, friendId);
+            storage.saveFriend(userId, friendId);
         }
     }
 

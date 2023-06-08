@@ -33,7 +33,7 @@ public class UserDbStorage implements UserStorage {
     }
 
     @Override
-    public Integer addNew(User user) {
+    public Integer saveNew(User user) {
         String sqlQuery = "INSERT INTO users (name, login, email, birthday) values (?, ?, ?, ?)";
 
         KeyHolder keyHolder = new GeneratedKeyHolder();
@@ -87,7 +87,7 @@ public class UserDbStorage implements UserStorage {
     }
 
     @Override
-    public void makeFriend(int userId, int friendId) {
+    public void saveFriend(int userId, int friendId) {
         String sqlQueryForMakingFriend = "INSERT INTO list_of_friends (user_id, friend_id, friendship_status_id) " +
                 "VALUES (?, ?, ?)";
         String sqlQueryForCheckingFriendshipStatus = "UPDATE list_of_friends SET " +

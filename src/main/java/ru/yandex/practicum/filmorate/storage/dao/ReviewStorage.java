@@ -10,7 +10,7 @@ public interface ReviewStorage {
 
     Integer update(Review review);
 
-    void delete(int reviewId);
+    void remove(int reviewId);
 
     Review findById(int reviewId);
 

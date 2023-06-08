@@ -29,7 +29,7 @@ public class GenresDbStorage implements GenresStorage {
     }
 
     @Override
-    public void addFilmGenresToDB(List<Genre> genres, int filmId) {
+    public void saveFilmGenresToDB(List<Genre> genres, int filmId) {
         String sqlQueryForGenres = "MERGE INTO film_genres (film_id, genre_id) VALUES (?, ?)";
         try {
             jdbcTemplate.batchUpdate(sqlQueryForGenres, genres, genres.size(), (ps, genre) -> {
@@ -42,13 +42,13 @@ public class GenresDbStorage implements GenresStorage {
     }
 
     @Override
-    public void clearFilmGenres(int filmId) {
+    public void removeFilmGenres(int filmId) {
         String sqlQuery = "DELETE FROM film_genres WHERE film_id = ?";
         jdbcTemplate.update(sqlQuery, filmId);
     }
 
     @Override
-    public List<Genre> placeGenresToFilmFromDB(int filmId) {
+    public List<Genre> saveGenresToFilmFromDB(int filmId) {
         String sqlQuery = "SELECT FG.GENRE_ID, G2.GENRE_NAME " +
                 "FROM FILM_GENRES AS FG JOIN GENRES G2 on G2.GENRE_ID = FG.GENRE_ID WHERE FILM_ID = ?";
         if (!jdbcTemplate.query(sqlQuery, this::mapRowToGenre, filmId).isEmpty()) {

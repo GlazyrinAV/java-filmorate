@@ -162,7 +162,7 @@ public class UserServiceUnitTests {
         userService.addNew(user);
         User user2 = new User("vcx@acb.ru", "afr", "hh", LocalDate.of(1986, Month.APRIL, 14), null);
         userService.addNew(user2);
-        userService.addFriend(1, 2);
+        userService.saveFriend(1, 2);
         Assertions.assertTrue(userService.findFriends(1).size() == 1 &&
                 userService.findFriends(2).isEmpty(),
                 "Ошибка при нормальном добавлении друга.");
@@ -174,8 +174,8 @@ public class UserServiceUnitTests {
         userService.addNew(user);
         User user2 = new User("vcx@acb.ru", "afr", "hh", LocalDate.of(1986, Month.APRIL, 14), null);
         userService.addNew(user2);
-        userService.addFriend(1, 2);
-        userService.addFriend(2, 1);
+        userService.saveFriend(1, 2);
+        userService.saveFriend(2, 1);
         Assertions.assertTrue(userService.findFriends(1).size() == 1 &&
                         userService.findFriends(2).size() == 1,
                 "Ошибка при нормальном добавлении друга.");
@@ -187,7 +187,7 @@ public class UserServiceUnitTests {
         userService.addNew(user);
         User user2 = new User("vcx@acb.ru", "afr", "hh", LocalDate.of(1986, Month.APRIL, 14), null);
         userService.addNew(user2);
-        UserNotFoundException exception = Assertions.assertThrows(UserNotFoundException.class, () -> userService.addFriend(0, 2));
+        UserNotFoundException exception = Assertions.assertThrows(UserNotFoundException.class, () -> userService.saveFriend(0, 2));
         Assertions.assertEquals(exception.getMessage(), "Пользователь c ID 0 не найден.",
                 "Ошибка в получении ошибки при добавлении друга юзеру с ID 0");
     }
@@ -198,7 +198,7 @@ public class UserServiceUnitTests {
         userService.addNew(user);
         User user2 = new User("vcx@acb.ru", "afr", "hh", LocalDate.of(1986, Month.APRIL, 14), null);
         userService.addNew(user2);
-        UserNotFoundException exception = Assertions.assertThrows(UserNotFoundException.class, () -> userService.addFriend(-1, 2));
+        UserNotFoundException exception = Assertions.assertThrows(UserNotFoundException.class, () -> userService.saveFriend(-1, 2));
         Assertions.assertEquals(exception.getMessage(), "Пользователь c ID -1 не найден.",
                 "Ошибка в получении ошибки при добавлении друга юзеру с ID -1");
     }
@@ -209,7 +209,7 @@ public class UserServiceUnitTests {
         userService.addNew(user);
         User user2 = new User("vcx@acb.ru", "afr", "hh", LocalDate.of(1986, Month.APRIL, 14), null);
         userService.addNew(user2);
-        UserNotFoundException exception = Assertions.assertThrows(UserNotFoundException.class, () -> userService.addFriend(99, 2));
+        UserNotFoundException exception = Assertions.assertThrows(UserNotFoundException.class, () -> userService.saveFriend(99, 2));
         Assertions.assertEquals(exception.getMessage(), "Пользователь c ID 99 не найден.",
                 "Ошибка в получении ошибки при добавлении друга юзеру с ID -1");
     }
@@ -220,7 +220,7 @@ public class UserServiceUnitTests {
         userService.addNew(user);
         User user2 = new User("vcx@acb.ru", "afr", "hh", LocalDate.of(1986, Month.APRIL, 14), null);
         userService.addNew(user2);
-        UserNotFoundException exception = Assertions.assertThrows(UserNotFoundException.class, () -> userService.addFriend(1, 0));
+        UserNotFoundException exception = Assertions.assertThrows(UserNotFoundException.class, () -> userService.saveFriend(1, 0));
         Assertions.assertEquals(exception.getMessage(), "Пользователь c ID 0 не найден.",
                 "Ошибка в получении ошибки при добавлении друга юзеру с ID 0");
     }
@@ -231,7 +231,7 @@ public class UserServiceUnitTests {
         userService.addNew(user);
         User user2 = new User("vcx@acb.ru", "afr", "hh", LocalDate.of(1986, Month.APRIL, 14), null);
         userService.addNew(user2);
-        UserNotFoundException exception = Assertions.assertThrows(UserNotFoundException.class, () -> userService.addFriend(1, -1));
+        UserNotFoundException exception = Assertions.assertThrows(UserNotFoundException.class, () -> userService.saveFriend(1, -1));
         Assertions.assertEquals(exception.getMessage(), "Пользователь c ID -1 не найден.",
                 "Ошибка в получении ошибки при добавлении друга юзеру с ID -1");
     }
@@ -242,7 +242,7 @@ public class UserServiceUnitTests {
         userService.addNew(user);
         User user2 = new User("vcx@acb.ru", "afr", "hh", LocalDate.of(1986, Month.APRIL, 14), null);
         userService.addNew(user2);
-        UserNotFoundException exception = Assertions.assertThrows(UserNotFoundException.class, () -> userService.addFriend(1, 99));
+        UserNotFoundException exception = Assertions.assertThrows(UserNotFoundException.class, () -> userService.saveFriend(1, 99));
         Assertions.assertEquals(exception.getMessage(), "Пользователь c ID 99 не найден.",
                 "Ошибка в получении ошибки при добавлении друга юзеру с ID 99");
     }
@@ -253,7 +253,7 @@ public class UserServiceUnitTests {
         userService.addNew(user);
         User user2 = new User("vcx@acb.ru", "afr", "hh", LocalDate.of(1986, Month.APRIL, 14), null);
         userService.addNew(user2);
-        userService.addFriend(1, 2);
+        userService.saveFriend(1, 2);
         userService.removeFriend(1, 2);
         Assertions.assertTrue(userService.findFriends(1).isEmpty() &&
                         userService.findFriends(2).isEmpty(),
@@ -332,7 +332,7 @@ public class UserServiceUnitTests {
         userService.addNew(user);
         User user2 = new User("vcx@acb.ru", "afr", "hh", LocalDate.of(1986, Month.APRIL, 14), null);
         userService.addNew(user2);
-        userService.addFriend(1, 2);
+        userService.saveFriend(1, 2);
         Assertions.assertTrue(userService.findFriends(1).equals(new ArrayList<>(List.of(user2))) &&
                         userService.findFriends(2).isEmpty(),
                 "Ошибка при нормально получении списка друзей.");
@@ -344,8 +344,8 @@ public class UserServiceUnitTests {
         userService.addNew(user);
         User user2 = new User("vcx@acb.ru", "afr", "hh", LocalDate.of(1986, Month.APRIL, 14), null);
         userService.addNew(user2);
-        userService.addFriend(1, 2);
-        userService.addFriend(2,1);
+        userService.saveFriend(1, 2);
+        userService.saveFriend(2,1);
         Assertions.assertTrue(userService.findFriends(1).equals(new ArrayList<>(List.of(user2))) &&
                         userService.findFriends(2).equals(new ArrayList<>(List.of(user))),
                 "Ошибка при нормально получении списка друзей.");
@@ -392,8 +392,8 @@ public class UserServiceUnitTests {
         userService.addNew(user2);
         User user3 = new User("jkf@acb.ru", "dsa", "bb", LocalDate.of(1986, Month.APRIL, 14), null);
         userService.addNew(user3);
-        userService.addFriend(1,3);
-        userService.addFriend(2,3);
+        userService.saveFriend(1,3);
+        userService.saveFriend(2,3);
         Assertions.assertEquals(userService.findCommonFriends(1, 2), new ArrayList<>(List.of(user3)), "Ошибка в нормальном получении общих друзей.");
     }
 
@@ -405,8 +405,8 @@ public class UserServiceUnitTests {
         userService.addNew(user2);
         User user3 = new User("jkf@acb.ru", "dsa", "bb", LocalDate.of(1986, Month.APRIL, 14), null);
         userService.addNew(user3);
-        userService.addFriend(1,3);
-        userService.addFriend(2,3);
+        userService.saveFriend(1,3);
+        userService.saveFriend(2,3);
         UserNotFoundException exception = Assertions.assertThrows(UserNotFoundException.class, () -> userService.findCommonFriends(0, 2));
         Assertions.assertEquals(exception.getMessage(), "Пользователь c ID 0 не найден.",
                 "Ошибка в получении ошибка при поиске общих друзей юзера с ID 0.");
@@ -420,8 +420,8 @@ public class UserServiceUnitTests {
         userService.addNew(user2);
         User user3 = new User("jkf@acb.ru", "dsa", "bb", LocalDate.of(1986, Month.APRIL, 14), null);
         userService.addNew(user3);
-        userService.addFriend(1,3);
-        userService.addFriend(2,3);
+        userService.saveFriend(1,3);
+        userService.saveFriend(2,3);
         UserNotFoundException exception = Assertions.assertThrows(UserNotFoundException.class, () -> userService.findCommonFriends(-1, 2));
         Assertions.assertEquals(exception.getMessage(), "Пользователь c ID -1 не найден.",
                 "Ошибка в получении ошибка при поиске общих друзей юзера с ID -1.");
@@ -435,8 +435,8 @@ public class UserServiceUnitTests {
         userService.addNew(user2);
         User user3 = new User("jkf@acb.ru", "dsa", "bb", LocalDate.of(1986, Month.APRIL, 14), null);
         userService.addNew(user3);
-        userService.addFriend(1,3);
-        userService.addFriend(2,3);
+        userService.saveFriend(1,3);
+        userService.saveFriend(2,3);
         UserNotFoundException exception = Assertions.assertThrows(UserNotFoundException.class, () -> userService.findCommonFriends(99, 2));
         Assertions.assertEquals(exception.getMessage(), "Пользователь c ID 99 не найден.",
                 "Ошибка в получении ошибка при поиске общих друзей юзера с ID 99.");
@@ -450,8 +450,8 @@ public class UserServiceUnitTests {
         userService.addNew(user2);
         User user3 = new User("jkf@acb.ru", "dsa", "bb", LocalDate.of(1986, Month.APRIL, 14), null);
         userService.addNew(user3);
-        userService.addFriend(1,3);
-        userService.addFriend(2,3);
+        userService.saveFriend(1,3);
+        userService.saveFriend(2,3);
         UserNotFoundException exception = Assertions.assertThrows(UserNotFoundException.class, () -> userService.findCommonFriends(1, 0));
         Assertions.assertEquals(exception.getMessage(), "Пользователь c ID 0 не найден.",
                 "Ошибка в получении ошибка при поиске общих друзей юзера с ID 0.");
@@ -465,8 +465,8 @@ public class UserServiceUnitTests {
         userService.addNew(user2);
         User user3 = new User("jkf@acb.ru", "dsa", "bb", LocalDate.of(1986, Month.APRIL, 14), null);
         userService.addNew(user3);
-        userService.addFriend(1,3);
-        userService.addFriend(2,3);
+        userService.saveFriend(1,3);
+        userService.saveFriend(2,3);
         UserNotFoundException exception = Assertions.assertThrows(UserNotFoundException.class, () -> userService.findCommonFriends(1, -1));
         Assertions.assertEquals(exception.getMessage(), "Пользователь c ID -1 не найден.",
                 "Ошибка в получении ошибка при поиске общих друзей юзера с ID -1.");
@@ -480,8 +480,8 @@ public class UserServiceUnitTests {
         userService.addNew(user2);
         User user3 = new User("jkf@acb.ru", "dsa", "bb", LocalDate.of(1986, Month.APRIL, 14), null);
         userService.addNew(user3);
-        userService.addFriend(1,3);
-        userService.addFriend(2,3);
+        userService.saveFriend(1,3);
+        userService.saveFriend(2,3);
         UserNotFoundException exception = Assertions.assertThrows(UserNotFoundException.class, () -> userService.findCommonFriends(1, 99));
         Assertions.assertEquals(exception.getMessage(), "Пользователь c ID 99 не найден.",
                 "Ошибка в получении ошибка при поиске общих друзей юзера с ID 99.");

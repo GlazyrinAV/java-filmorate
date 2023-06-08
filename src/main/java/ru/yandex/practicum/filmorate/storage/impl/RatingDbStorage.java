@@ -46,7 +46,7 @@ public class RatingDbStorage implements RatingStorage {
     }
 
     @Override
-    public Rating placeRatingToFilmFromDB(int filmId) {
+    public Rating saveRatingToFilmFromDB(int filmId) {
         String sqlQuery = "SELECT R.RATING_ID, R.RATING_NAME FROM RATINGS AS R " +
                 "JOIN FILMS F ON R.RATING_ID = F.RATING_ID WHERE F.FILM_ID = ?";
         return jdbcTemplate.queryForObject(sqlQuery, this::mapRowToRating, filmId);

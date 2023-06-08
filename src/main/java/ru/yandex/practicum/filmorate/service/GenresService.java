@@ -29,14 +29,14 @@ public class GenresService {
     }
 
     public void addFilmGenresToDB(List<Genre> genres, int filmId) {
-        genresStorage.addFilmGenresToDB(genres, filmId);
+        genresStorage.saveFilmGenresToDB(genres, filmId);
     }
 
-    public void clearFilmGenres(int filmId) {
-        genresStorage.clearFilmGenres(filmId);
+    public void removeFilmGenres(int filmId) {
+        genresStorage.removeFilmGenres(filmId);
     }
 
-    public List<Genre> placeGenresToFilmFromDB(int filmId) {
-        return genresStorage.placeGenresToFilmFromDB(filmId);
+    public List<Genre> saveGenresToFilmFromDB(int filmId) {
+        return genresStorage.saveGenresToFilmFromDB(filmId);
     }
 }

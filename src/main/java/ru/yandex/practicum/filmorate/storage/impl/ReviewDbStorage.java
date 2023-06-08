@@ -72,7 +72,7 @@ public class ReviewDbStorage implements ReviewStorage {
     }
 
     @Override
-    public void delete(int reviewId) {
+    public void remove(int reviewId) {
         String sqlQuery = "DELETE FROM REVIEWS WHERE review_id = ?";
         jdbcTemplate.update(sqlQuery, reviewId);
     }

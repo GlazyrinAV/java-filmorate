@@ -27,7 +27,7 @@ public class RatingsService {
         return ratingStorage.findById(ratingId);
     }
 
-    public Rating placeRatingToFilmFromDB(int filmId) {
-        return ratingStorage.placeRatingToFilmFromDB(filmId);
+    public Rating saveRatingToFilmFromDB(int filmId) {
+        return ratingStorage.saveRatingToFilmFromDB(filmId);
     };
 }

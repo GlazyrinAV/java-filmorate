@@ -32,8 +32,8 @@ public class FilmService {
         this.ratingsService = ratingsService;
     }
 
-    public Film addNew(Film film) {
-        int filmId = filmStorage.addNew(film);
+    public Film saveNew(Film film) {
+        int filmId = filmStorage.saveNew(film);
         if (isGenresExists(film)) {
             genresService.addFilmGenresToDB(film.getGenres(), filmId);
         }
@@ -42,7 +42,7 @@ public class FilmService {
 
     public Film update(Film film) {
         int filmId = filmStorage.update(film);
-        genresService.clearFilmGenres(filmId);
+        genresService.removeFilmGenres(filmId);
         if (isGenresExists(film)) {
             genresService.addFilmGenresToDB(film.getGenres(), filmId);
         }
@@ -52,16 +52,16 @@ public class FilmService {
     public Collection<Film> findAll() {
         Collection<Film> films = filmStorage.findAll();
         for (Film film : films) {
-            film.setGenres(genresService.placeGenresToFilmFromDB(film.getId()));
-            film.setMpa(ratingsService.placeRatingToFilmFromDB(film.getId()));
+            film.setGenres(genresService.saveGenresToFilmFromDB(film.getId()));
+            film.setMpa(ratingsService.saveRatingToFilmFromDB(film.getId()));
         }
         return films;
     }
 
     public Film findById(int filmId) {
         Film film = filmStorage.findById(filmId);
-        film.setGenres(genresService.placeGenresToFilmFromDB(filmId));
-        film.setMpa(ratingsService.placeRatingToFilmFromDB(filmId));
+        film.setGenres(genresService.saveGenresToFilmFromDB(filmId));
+        film.setMpa(ratingsService.saveRatingToFilmFromDB(filmId));
         return film;
     }
 
@@ -100,8 +100,8 @@ public class FilmService {
         } else {
             Collection<Film> films = filmStorage.findPopular(count);
             for (Film film : films) {
-                film.setGenres(genresService.placeGenresToFilmFromDB(film.getId()));
-                film.setMpa(ratingsService.placeRatingToFilmFromDB(film.getId()));
+                film.setGenres(genresService.saveGenresToFilmFromDB(film.getId()));
+                film.setMpa(ratingsService.saveRatingToFilmFromDB(film.getId()));
             }
             return films;
         }

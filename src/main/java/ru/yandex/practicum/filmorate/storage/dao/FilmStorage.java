@@ -6,7 +6,7 @@ import java.util.Collection;
 
 public interface FilmStorage {
 
-    Integer addNew(Film film);
+    Integer saveNew(Film film);
 
     Integer update(Film film);
 
