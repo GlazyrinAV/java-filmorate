@@ -29,5 +29,5 @@ public class RatingsService {
 
     public Rating saveRatingToFilmFromDB(int filmId) {
         return ratingStorage.saveRatingToFilmFromDB(filmId);
-    };
+    }
 }
