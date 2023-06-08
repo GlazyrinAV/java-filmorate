@@ -109,23 +109,16 @@ public class FilmService {
 
     public Collection<Film> findCommonFilms(int userId, int friendId) {
 
-        if (!userService.isExists(userId)) {
-            log.info("Пользователь c ID " + userId + " не найден.");
-            throw new UserNotFoundException("Пользователь c ID " + userId + " не найден.");
-        } else if (!userService.isExists(friendId)) {
-            log.info("Пользователь c ID " + friendId + " не найден.");
-            throw new UserNotFoundException("Пользователь c ID " + friendId + " не найден.");
-        } else {
+        userService.findById(userId);
+        userService.findById(friendId);
 
-            Collection<Film> films = filmStorage.findCommonFilms(userId, friendId);
-            for (Film film : films) {
-                film.setGenres(genresService.placeGenresToFilmFromDB(film.getId()));
-                film.setMpa(ratingsService.placeRatingToFilmFromDB(film.getId()));
-            }
-            return films;
-
+        Collection<Film> films = filmStorage.findCommonFilms(userId, friendId);
+        for (Film film : films) {
+            saveAdditionalInfoToFilm(film);
         }
+        return films;
 
     }
 
 }
+
