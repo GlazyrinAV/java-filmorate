@@ -33,7 +33,7 @@ public class RatingDbStorage implements RatingStorage {
 
     @Override
     public Rating findById(int ratingId) {
-        if (ratingId >= ratingsInMemory.size() || ratingsInMemory.get(ratingId-1) == null) {
+        if (ratingId >= ratingsInMemory.size() || ratingsInMemory.get(ratingId - 1) == null) {
             String sqlQuery = "SELECT * FROM RATINGS WHERE rating_id = ?";
             try {
                 return jdbcTemplate.queryForObject(sqlQuery, this::mapRowToRating, ratingId);
@@ -41,7 +41,7 @@ public class RatingDbStorage implements RatingStorage {
                 throw new NoResultDataAccessException("Запрос на получение рейтинга вернул пустой результат.", 1);
             }
         } else {
-         return ratingsInMemory.get(ratingId-1);
+         return ratingsInMemory.get(ratingId - 1);
         }
     }
 
