@@ -34,7 +34,7 @@ create table IF NOT EXISTS FILMS
         primary key (FILM_ID),
     constraint FILMS_FK
         foreign key (RATING_ID) references RATINGS,
-    constraint CHECK_FILM UNIQUE (NAME, RELEASE_DATE)
+    constraint CHECK_FILM UNIQUE (NAME, RELEASE_DATE, DESCRIPTION)
 );
 
 create table IF NOT EXISTS USERS
