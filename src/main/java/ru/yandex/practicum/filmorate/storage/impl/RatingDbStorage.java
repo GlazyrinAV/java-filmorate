@@ -15,12 +15,9 @@ public class RatingDbStorage implements RatingStorage {
 
     private final JdbcTemplate jdbcTemplate;
 
-    private final List<Rating> ratingsInMemory;
-
     @Autowired
     public RatingDbStorage(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
-        ratingsInMemory = findAll();
     }
 
     @Override
@@ -31,12 +28,8 @@ public class RatingDbStorage implements RatingStorage {
 
     @Override
     public Rating findById(int ratingId) {
-        if (ratingId >= ratingsInMemory.size() || ratingsInMemory.get(ratingId - 1) == null) {
             String sqlQuery = "SELECT * FROM RATINGS WHERE rating_id = ?";
             return jdbcTemplate.queryForObject(sqlQuery, this::mapRowToRating, ratingId);
-        } else {
-            return ratingsInMemory.get(ratingId - 1);
-        }
     }
 
     @Override

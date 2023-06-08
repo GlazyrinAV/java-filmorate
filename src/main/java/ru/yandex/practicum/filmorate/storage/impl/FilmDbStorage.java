@@ -97,8 +97,11 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     public Collection<Film> findPopular(int count) {
         String sqlQuery =
-                "SELECT * FROM FILMS LEFT JOIN FILM_LIKES FL on FILMS.FILM_ID = FL.FILM_ID " +
-                        "GROUP BY FILMS.FILM_ID ORDER BY COUNT(FL.USER_ID) DESC LIMIT ?";
+                "SELECT f.*, COUNT(fl.USER_ID) as likesCount FROM FILMS f \n" +
+                        "LEFT JOIN FILM_LIKES fl ON f.FILM_ID = fl.FILM_ID \n" +
+                        "GROUP BY f.FILM_ID \n" +
+                        "ORDER BY likesCount DESC \n" +
+                        "LIMIT ?";
         return jdbcTemplate.query(sqlQuery, this::mapRowToFilm, count);
     }
 
@@ -122,6 +125,27 @@ public class FilmDbStorage implements FilmStorage {
     public Collection<Integer> findLikes(int filmId) {
         String sqlQuery = "SELECT user_id FROM film_likes WHERE film_id = ?";
         return jdbcTemplate.query(sqlQuery, this::mapRowToUserId, filmId);
+    }
+
+
+    @Override
+    public void removeFilm(int filmId) {
+        String sqlQuery = "DELETE FROM FILMS WHERE film_id = ?";
+        jdbcTemplate.update(sqlQuery, filmId);
+    }
+
+    @Override
+    public Collection<Film> findByDirectorId(int directorId, String sortBy) {
+        if (sortBy.equals("year")) {
+            String sqlQuery = "SELECT * FROM FILMS WHERE FILM_ID IN (SELECT FILM_ID FROM FILM_DIRECTOR WHERE DIRECTOR_ID = ?) " +
+                    "ORDER BY EXTRACT(YEAR FROM RELEASE_DATE)";
+            return jdbcTemplate.query(sqlQuery, this::mapRowToFilm, directorId);
+        } else {
+            String sqlQuery = "SELECT FILMS.*, SUM(FL.USER_ID) AS LIKES FROM FILMS LEFT JOIN FILM_LIKES FL on FILMS.FILM_ID = FL.FILM_ID " +
+                    "WHERE FILMS.FILM_ID IN (SELECT FILM_ID FROM FILM_DIRECTOR WHERE DIRECTOR_ID = ?)\n" +
+                    "group by FILMS.FILM_ID ORDER BY LIKES DESC";
+            return jdbcTemplate.query(sqlQuery, this::mapRowToFilm, directorId);
+        }
     }
 
     private Film mapRowToFilm(ResultSet resultSet, int rowNum) throws SQLException {

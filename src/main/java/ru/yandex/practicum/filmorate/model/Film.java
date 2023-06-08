@@ -42,4 +42,6 @@ public class Film {
 
     @RatingIdConstraint
     private Rating mpa;
+
+    private List<Director> directors;
 }

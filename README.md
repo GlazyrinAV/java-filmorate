@@ -2,7 +2,7 @@ java-filmorate
 Template repository for Filmorate project.
 
 ### Описание Базы данных проекта
-![DBStucture.png](DBStucture.png)
+![Untitled.png](Untitled.png)
 
 ## Film
 Содержит информацию о фильме.
