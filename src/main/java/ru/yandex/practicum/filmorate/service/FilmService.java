@@ -118,7 +118,6 @@ public class FilmService {
     private boolean isGenresExists(Film film) {
         return film.getGenres() != null;
     }
-
     public void removeFilm(int filmId) {
         if (filmId <= 0) {
             log.info("Указанный ID фильма меньше или равен нулю.");
