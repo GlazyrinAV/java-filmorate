@@ -108,12 +108,7 @@ public class FilmService {
     }
 
     public void removeFilm(int filmId) {
-        Film film;
-        try {
-            film = filmStorage.findById(filmId);
-        } catch (EmptyResultDataAccessException exception) {
-            throw new FilmNotFoundException("Фильм c ID " + filmId + " не найден.");
-        }
+        findById(filmId);
         log.info("Фильм удален.");
         filmStorage.removeFilm(filmId);
     }
