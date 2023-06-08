@@ -17,13 +17,16 @@ import java.util.Collection;
 public class FilmService {
 
     private final FilmStorage filmStorage;
+    private final DirectorsService directorsService;
     private final UserService userService;
     private final GenresService genresService;
     private final RatingsService ratingsService;
 
     @Autowired
-    public FilmService(@Qualifier("FilmDbStorage") FilmStorage filmStorage, UserService userService, GenresService genresService, RatingsService ratingsService) {
+    public FilmService(@Qualifier("FilmDbStorage") FilmStorage filmStorage, UserService userService,
+                       GenresService genresService, RatingsService ratingsService, DirectorsService directorsService) {
         this.filmStorage = filmStorage;
+        this.directorsService = directorsService;
         this.userService = userService;
         this.genresService = genresService;
         this.ratingsService = ratingsService;
@@ -31,21 +34,22 @@ public class FilmService {
 
     public Film saveNew(Film film) {
         int filmId = filmStorage.saveNew(film);
-        saveAdditionalInfoFromFilm(film, filmId);
+        saveAdditionalInfoToDb(film, filmId);
         return findById(filmId);
     }
 
     public Film update(Film film) {
         int filmId = filmStorage.update(film);
         genresService.removeFilmGenres(filmId);
-        saveAdditionalInfoFromFilm(film, filmId);
+        directorsService.removeFromFilmByFilmId(filmId);
+        saveAdditionalInfoToDb(film, filmId);
         return findById(filmId);
     }
 
     public Collection<Film> findAll() {
         Collection<Film> films = filmStorage.findAll();
         for (Film film : films) {
-            saveAdditionalInfoToFilm(film);
+            saveAdditionalInfoFromDb(film);
         }
         return films;
     }
@@ -57,7 +61,7 @@ public class FilmService {
         } catch (EmptyResultDataAccessException exception) {
             throw new FilmNotFoundException("Фильм c ID " + filmId + " не найден.");
         }
-        saveAdditionalInfoToFilm(film);
+        saveAdditionalInfoFromDb(film);
         return film;
     }
 
@@ -81,7 +85,7 @@ public class FilmService {
         } else {
             Collection<Film> films = filmStorage.findPopular(count);
             for (Film film : films) {
-                saveAdditionalInfoToFilm(film);
+                saveAdditionalInfoFromDb(film);
             }
             log.info("Популярные фильмы найдены.");
             return films;
@@ -89,21 +93,47 @@ public class FilmService {
     }
 
     public Collection<Integer> findLikes(int filmId) {
+        log.info("Лайки к фильму найдены.");
         return filmStorage.findLikes(filmId);
+    }
+
+    public Collection<Film> findByDirectorId(int directorId, String sortBy) {
+        directorsService.findById(directorId);
+        if (!(sortBy.equals("year") || sortBy.equals("likes"))) {
+            throw new ValidationException("Недопустимый параметр запроса.");
+        }
+        Collection<Film> films = filmStorage.findByDirectorId(directorId, sortBy);
+        if (films.isEmpty()) {
+            log.info("Фильмы по указанному режиссеру не найдены.");
+        } else {
+            log.info("Фильмы по указанному режиссеру найдены.");
+            for (Film film : films) {
+                saveAdditionalInfoFromDb(film);
+            }
+        }
+        return films;
     }
 
     private boolean isGenresExists(Film film) {
         return film.getGenres() != null;
     }
 
-    private void saveAdditionalInfoToFilm(Film film) {
-        film.setGenres(genresService.saveGenresToFilmFromDB(film.getId()));
-        film.setMpa(ratingsService.saveRatingToFilmFromDB(film.getId()));
+    private boolean isDirectorsExists(Film film) {
+        return film.getDirectors() != null;
     }
 
-    private void saveAdditionalInfoFromFilm(Film film, int filmId) {
+    private void saveAdditionalInfoFromDb(Film film) {
+        film.setGenres(genresService.saveGenresToFilmFromDB(film.getId()));
+        film.setMpa(ratingsService.saveRatingToFilmFromDB(film.getId()));
+        film.setDirectors(directorsService.saveDirectorsToFilmFromDB(film.getId()));
+    }
+
+    private void saveAdditionalInfoToDb(Film film, int filmId) {
         if (isGenresExists(film)) {
             genresService.saveGenresToDBFromFilm(film.getGenres(), filmId);
+        }
+        if (isDirectorsExists(film)) {
+            directorsService.saveDirectorsToDBFromFilm(film.getDirectors(), filmId);
         }
     }
 

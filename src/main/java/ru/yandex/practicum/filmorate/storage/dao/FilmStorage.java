@@ -23,4 +23,6 @@ public interface FilmStorage {
     Collection<Integer> findLikes(int filmId);
 
     void removeFilm(int filmId);
+
+    Collection<Film> findByDirectorId(int directorId, String sortBy);
 }

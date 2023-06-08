@@ -132,6 +132,20 @@ public class FilmDbStorage implements FilmStorage {
         jdbcTemplate.update(sqlQuery, filmId);
     }
 
+    @Override
+    public Collection<Film> findByDirectorId(int directorId, String sortBy) {
+        if (sortBy.equals("year")) {
+            String sqlQuery = "SELECT * FROM FILMS WHERE FILM_ID IN (SELECT FILM_ID FROM FILM_DIRECTOR WHERE DIRECTOR_ID = ?) " +
+                    "ORDER BY EXTRACT(YEAR FROM RELEASE_DATE)";
+            return jdbcTemplate.query(sqlQuery, this::mapRowToFilm, directorId);
+        } else {
+            String sqlQuery = "SELECT FILMS.*, SUM(FL.USER_ID) AS LIKES FROM FILMS LEFT JOIN FILM_LIKES FL on FILMS.FILM_ID = FL.FILM_ID " +
+                    "WHERE FILMS.FILM_ID IN (SELECT FILM_ID FROM FILM_DIRECTOR WHERE DIRECTOR_ID = ?)\n" +
+                    "group by FILMS.FILM_ID ORDER BY LIKES DESC";
+            return jdbcTemplate.query(sqlQuery, this::mapRowToFilm, directorId);
+        }
+    }
+
     private Film mapRowToFilm(ResultSet resultSet, int rowNum) throws SQLException {
         return Film.builder()
                 .id(resultSet.getInt("film_id"))

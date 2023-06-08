@@ -22,6 +22,14 @@ create table IF NOT EXISTS FRIENDSHIP_STATUS
         primary key (FRIENDSHIP_STATUS_ID)
 );
 
+create table if not exists PUBLIC.DIRECTORS
+(
+    DIRECTOR_ID   INTEGER auto_increment
+        primary key,
+    DIRECTOR_NAME CHARACTER VARYING not null
+        unique
+);
+
 create table IF NOT EXISTS FILMS
 (
     FILM_ID      INTEGER auto_increment,
@@ -118,4 +126,16 @@ create table if not exists PUBLIC.REVIEWS_LIKES
             on update cascade on delete cascade,
     constraint CHECK_LIKES
         check ("USEFUL" IN (1, -1))
+);
+
+create table if not exists PUBLIC.FILM_DIRECTOR
+(
+    FILM_ID     INTEGER not null,
+    DIRECTOR_ID INTEGER not null,
+    primary key (DIRECTOR_ID, FILM_ID),
+    constraint "FILM_DIRECTOR_DIRECTORS_DIRECTOR_ID_fk"
+        foreign key (DIRECTOR_ID) references PUBLIC.DIRECTORS
+            on delete cascade,
+    constraint "FILM_DIRECTOR_FILMS_FILM_ID_fk"
+        foreign key (FILM_ID) references PUBLIC.FILMS
 );
