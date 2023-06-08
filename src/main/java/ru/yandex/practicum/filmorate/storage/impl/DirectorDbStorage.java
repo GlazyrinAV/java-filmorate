@@ -8,6 +8,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
+import ru.yandex.practicum.filmorate.exceptions.exceptions.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.exceptions.NoResultDataAccessException;
 import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.storage.dao.DirectorStorage;
@@ -105,7 +106,10 @@ public class DirectorDbStorage implements DirectorStorage {
     @Override
     public void removeByFilmId(int filmId) {
         String sqlQuery = "DELETE FROM FILM_DIRECTOR WHERE film_id = ?";
-        jdbcTemplate.update(sqlQuery, filmId);
+        int result = jdbcTemplate.update(sqlQuery, filmId);
+        if (result == 0) {
+            throw new FilmNotFoundException("Фильм c ID " + filmId + " не найден.");
+        }
     }
 
     @Override
