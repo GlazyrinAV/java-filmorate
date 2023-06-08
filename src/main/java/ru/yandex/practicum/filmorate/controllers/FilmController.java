@@ -24,8 +24,8 @@ public class FilmController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Film addNew(@Valid @RequestBody Film film) {
-        return filmService.addNew(film);
+    public Film saveNew(@Valid @RequestBody Film film) {
+        return filmService.saveNew(film);
     }
 
     @PutMapping
@@ -36,7 +36,7 @@ public class FilmController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public Collection<Film> getAll() {
+    public Collection<Film> findAll() {
         return filmService.findAll();
     }
 
@@ -65,5 +65,17 @@ public class FilmController {
                                              @RequestParam Optional<Integer> year
                                              ) {
             return filmService.findPopular(count, genreId, year);
+    }
+
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public void removeFilm(@PathVariable int id) {
+        filmService.removeFilm(id);
+    }
+
+    @GetMapping("/director/{directorId}")
+    @ResponseStatus(HttpStatus.OK)
+    public Collection<Film> findByDirectorId(@PathVariable int directorId, @RequestParam String sortBy) {
+        return filmService.findByDirectorId(directorId, sortBy);
     }
 }

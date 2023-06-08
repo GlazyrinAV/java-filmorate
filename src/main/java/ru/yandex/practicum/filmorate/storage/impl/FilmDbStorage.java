@@ -4,12 +4,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
-import ru.yandex.practicum.filmorate.exceptions.exceptions.NoResultDataAccessException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.dao.FilmStorage;
 
@@ -35,7 +33,7 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Override
-    public Integer addNew(Film film) {
+    public Integer saveNew(Film film) {
         String sqlQuery = "INSERT INTO films (name, description, release_date, duration, rating_id) " +
                 "VALUES (?, ?, ?, ?, ?)";
 
@@ -91,11 +89,7 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     public Film findById(int filmId) {
         String sqlQuery = "SELECT * FROM films where film_id = ?";
-        try {
-            return jdbcTemplate.queryForObject(sqlQuery, this::mapRowToFilm, filmId);
-        } catch (EmptyResultDataAccessException exception) {
-            throw new NoResultDataAccessException("Получен пустой ответ на запрос.", 1);
-        }
+        return jdbcTemplate.queryForObject(sqlQuery, this::mapRowToFilm, filmId);
     }
 
     @Override
@@ -171,18 +165,32 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Override
-    public Boolean isExists(int filmId) {
-        String sqlQuery = "SELECT EXISTS ( SELECT * FROM PUBLIC.films WHERE film_id =? )";
-        return Boolean.TRUE.equals(jdbcTemplate.queryForObject(sqlQuery, Boolean.TYPE, filmId));
+    public void removeFilm(int filmId) {
+        String sqlQuery = "DELETE FROM FILMS WHERE film_id = ?";
+        jdbcTemplate.update(sqlQuery, filmId);
+    }
+
+    @Override
+    public Collection<Film> findByDirectorId(int directorId, String sortBy) {
+        if (sortBy.equals("year")) {
+            String sqlQuery = "SELECT * FROM FILMS WHERE FILM_ID IN (SELECT FILM_ID FROM FILM_DIRECTOR WHERE DIRECTOR_ID = ?) " +
+                    "ORDER BY EXTRACT(YEAR FROM RELEASE_DATE)";
+            return jdbcTemplate.query(sqlQuery, this::mapRowToFilm, directorId);
+        } else {
+            String sqlQuery = "SELECT FILMS.*, SUM(FL.USER_ID) AS LIKES FROM FILMS LEFT JOIN FILM_LIKES FL on FILMS.FILM_ID = FL.FILM_ID " +
+                    "WHERE FILMS.FILM_ID IN (SELECT FILM_ID FROM FILM_DIRECTOR WHERE DIRECTOR_ID = ?)\n" +
+                    "group by FILMS.FILM_ID ORDER BY LIKES DESC";
+            return jdbcTemplate.query(sqlQuery, this::mapRowToFilm, directorId);
+        }
     }
 
     private Film mapRowToFilm(ResultSet resultSet, int rowNum) throws SQLException {
         return Film.builder()
-                .id(resultSet.getInt("films.film_id"))
-                .name(resultSet.getString("films.name"))
-                .description(resultSet.getString("films.description"))
-                .releaseDate(resultSet.getDate("films.release_date").toLocalDate())
-                .duration(Duration.ofMillis(resultSet.getLong("films.duration")))
+                .id(resultSet.getInt("film_id"))
+                .name(resultSet.getString("name"))
+                .description(resultSet.getString("description"))
+                .releaseDate(resultSet.getDate("release_date").toLocalDate())
+                .duration(Duration.ofMillis(resultSet.getLong("duration")))
                 .build();
     }
 

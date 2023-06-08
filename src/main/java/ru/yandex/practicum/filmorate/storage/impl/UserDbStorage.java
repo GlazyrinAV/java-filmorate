@@ -33,7 +33,7 @@ public class UserDbStorage implements UserStorage {
     }
 
     @Override
-    public Integer addNew(User user) {
+    public Integer saveNew(User user) {
         String sqlQuery = "INSERT INTO users (name, login, email, birthday) values (?, ?, ?, ?)";
 
         KeyHolder keyHolder = new GeneratedKeyHolder();
@@ -87,7 +87,7 @@ public class UserDbStorage implements UserStorage {
     }
 
     @Override
-    public void makeFriend(int userId, int friendId) {
+    public void saveFriend(int userId, int friendId) {
         String sqlQueryForMakingFriend = "INSERT INTO list_of_friends (user_id, friend_id, friendship_status_id) " +
                 "VALUES (?, ?, ?)";
         String sqlQueryForCheckingFriendshipStatus = "UPDATE list_of_friends SET " +
@@ -118,16 +118,16 @@ public class UserDbStorage implements UserStorage {
     }
 
     @Override
-    public boolean isExists(int userId) {
-        String sqlQuery = "SELECT EXISTS ( SELECT * FROM PUBLIC.users WHERE user_id = ?)";
-        return Boolean.TRUE.equals(jdbcTemplate.queryForObject(sqlQuery, Boolean.TYPE, userId));
-    }
-
-    @Override
     public Collection<User> findFriends(int userId) {
         String sqlQuery = "SELECT * FROM users WHERE user_id IN (" +
                 "SELECT friend_id FROM list_of_friends WHERE user_id = ?)";
         return jdbcTemplate.query(sqlQuery, this::mapRowToUser, userId);
+    }
+
+    @Override
+    public void removeUser(int id) {
+        String sqlQuery = "DELETE FROM USERS WHERE USER_ID = ?";
+        jdbcTemplate.update(sqlQuery, id);
     }
 
     private User mapRowToUser(ResultSet resultSet, int rowNum) throws SQLException {
