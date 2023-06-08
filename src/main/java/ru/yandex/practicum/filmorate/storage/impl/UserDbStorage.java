@@ -33,7 +33,7 @@ public class UserDbStorage implements UserStorage {
     }
 
     @Override
-    public Integer addNew(User user) {
+    public Integer saveNew(User user) {
         String sqlQuery = "INSERT INTO users (name, login, email, birthday) values (?, ?, ?, ?)";
 
         KeyHolder keyHolder = new GeneratedKeyHolder();
@@ -87,7 +87,7 @@ public class UserDbStorage implements UserStorage {
     }
 
     @Override
-    public void makeFriend(int userId, int friendId) {
+    public void saveFriend(int userId, int friendId) {
         String sqlQueryForMakingFriend = "INSERT INTO list_of_friends (user_id, friend_id, friendship_status_id) " +
                 "VALUES (?, ?, ?)";
         String sqlQueryForCheckingFriendshipStatus = "UPDATE list_of_friends SET " +
@@ -115,12 +115,6 @@ public class UserDbStorage implements UserStorage {
                 "(USER_ID = ? and FRIEND_ID in " +
                 "(select FRIEND_ID from LIST_OF_FRIENDS where LIST_OF_FRIENDS.USER_ID = ?)))";
         return jdbcTemplate.query(sqlQuery, this::mapRowToUser, user1Id, user2Id);
-    }
-
-    @Override
-    public boolean isExists(int userId) {
-        String sqlQuery = "SELECT EXISTS ( SELECT * FROM PUBLIC.users WHERE user_id = ?)";
-        return Boolean.TRUE.equals(jdbcTemplate.queryForObject(sqlQuery, Boolean.TYPE, userId));
     }
 
     @Override

@@ -42,7 +42,7 @@ create table IF NOT EXISTS FILMS
         primary key (FILM_ID),
     constraint FILMS_FK
         foreign key (RATING_ID) references RATINGS,
-    constraint CHECK_FILM UNIQUE (NAME, RELEASE_DATE)
+    constraint CHECK_FILM UNIQUE (NAME, RELEASE_DATE, DESCRIPTION)
 );
 
 create table IF NOT EXISTS USERS
@@ -95,6 +95,37 @@ create table if not exists LIST_OF_FRIENDS
         foreign key (FRIEND_ID) references PUBLIC.USERS,
     constraint CHECK_NAME
         check ("USER_ID" <> "FRIEND_ID")
+);
+
+create table IF NOT EXISTS REVIEWS
+(
+    REVIEW_ID   INTEGER auto_increment
+        unique,
+    CONTENT     CHARACTER VARYING not null,
+    USER_ID     INTEGER           not null,
+    FILM_ID     INTEGER           not null,
+    IS_POSITIVE BOOLEAN           not null,
+    constraint "REVIEWS_pk"
+        primary key (REVIEW_ID),
+    constraint REVIEWS_FILMS_FILM_ID_FK
+        foreign key (FILM_ID) references PUBLIC.FILMS,
+    constraint REVIEWS_USERS_USER_ID_FK
+        foreign key (USER_ID) references PUBLIC.USERS (USER_ID),
+    CONSTRAINT  REVIEWS_UNIQUE UNIQUE (USER_ID, FILM_ID, CONTENT)
+);
+
+create table if not exists PUBLIC.REVIEWS_LIKES
+(
+    USER_ID   INTEGER not null,
+    REVIEW_ID INTEGER not null,
+    USEFUL    INTEGER not null,
+    constraint REVIEWS_LIKES_PK
+        primary key (USER_ID, REVIEW_ID),
+    constraint "REVIEWS_LIKES_REVIEWS_REVIEW_ID_fk"
+        foreign key (REVIEW_ID) references PUBLIC.REVIEWS (REVIEW_ID)
+            on update cascade on delete cascade,
+    constraint CHECK_LIKES
+        check ("USEFUL" IN (1, -1))
 );
 
 create table if not exists PUBLIC.FILM_DIRECTOR

@@ -6,7 +6,7 @@ import java.util.Collection;
 
 public interface FilmStorage {
 
-    Integer addNew(Film film);
+    Integer saveNew(Film film);
 
     Integer update(Film film);
 
@@ -21,8 +21,4 @@ public interface FilmStorage {
     void removeLike(int filmId, int userId);
 
     Collection<Integer> findLikes(int filmId);
-
-    Boolean isExists(int filmId);
-
-    Collection<Film> findByDirectorId(int directorId, String sortBy);
 }
