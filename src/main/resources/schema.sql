@@ -34,8 +34,6 @@ create table IF NOT EXISTS FILMS
         primary key (FILM_ID),
     constraint FILMS_FK
         foreign key (RATING_ID) references RATINGS,
-    constraint FILM_GENRES_FK
-        foreign key (FILM_ID) references FILM_GENRES on delete cascade,
     constraint CHECK_FILM UNIQUE (NAME, RELEASE_DATE, DESCRIPTION)
 );
 
@@ -59,7 +57,10 @@ create table IF NOT EXISTS FILM_GENRES
     constraint FILM_GENRES_PK
         primary key (FILM_ID, GENRE_ID),
     constraint FILM_GENRES_FK
-        foreign key (GENRE_ID) references GENRES(GENRE_ID) on delete cascade
+        foreign key (GENRE_ID) references GENRES(GENRE_ID) on delete cascade,
+    CONSTRAINT FK_FILM_GENRES_FILM_ID
+        FOREIGN KEY (FILM_ID)
+        REFERENCES FILMS(FILM_ID) ON DELETE CASCADE
 );
 
 create table if not exists FILM_LIKES
