@@ -82,13 +82,15 @@ public class UserService {
     }
 
     public void removeUser(int userId) {
-        if (!isExists(userId)) {
-            log.info("Пользователь c ID " + userId + " не найден.");
+        User user;
+        try {
+            user = storage.findById(userId);
+        } catch (EmptyResultDataAccessException exception) {
             throw new UserNotFoundException("Пользователь c ID " + userId + " не найден.");
-        } else {
-            log.info("Пользователь удален.");
-            storage.removeUser(userId);
         }
+        log.info("Пользователь удален.");
+        storage.removeUser(userId);
+
     }
 
 

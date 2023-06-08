@@ -108,15 +108,13 @@ public class FilmService {
     }
 
     public void removeFilm(int filmId) {
-        if (filmId <= 0) {
-            log.info("Указанный ID фильма меньше или равен нулю.");
-            throw new ValidationException("ID фильма не может быть меньше или равно нулю.");
-        } else if (!isExists(filmId)) {
-            log.info("Фильм c ID " + filmId + " не найден.");
+        Film film;
+        try {
+            film = filmStorage.findById(filmId);
+        } catch (EmptyResultDataAccessException exception) {
             throw new FilmNotFoundException("Фильм c ID " + filmId + " не найден.");
-        } else {
-            log.info("Фильм удален.");
-            filmStorage.removeFilm(filmId);
         }
+        log.info("Фильм удален.");
+        filmStorage.removeFilm(filmId);
     }
 }
