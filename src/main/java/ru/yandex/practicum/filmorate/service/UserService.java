@@ -55,8 +55,7 @@ public class UserService {
             log.info("Друг уже в друзьях.");
             throw new FriendAlreadyExistException("Пользователь с ID " + userId +
                     " уже добавил в друзья пользователя c ID " + friendId);
-        }
-        else {
+        } else {
             log.info("Друг добавлен.");
             storage.saveFriend(userId, friendId);
         }
