@@ -7,7 +7,6 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
 import javax.validation.Valid;
-import javax.validation.constraints.Positive;
 import java.util.Collection;
 import java.util.Optional;
 
@@ -63,8 +62,8 @@ public class FilmController {
     public Collection<Film> findPopularFilms(@RequestParam(defaultValue = "10") int count,
                                              @RequestParam Optional<Integer> genreId,
                                              @RequestParam Optional<Integer> year
-                                             ) {
-            return filmService.findPopular(count, genreId, year);
+    ) {
+        return filmService.findPopular(count, genreId, year);
     }
 
     @DeleteMapping("/{id}")
