@@ -22,8 +22,8 @@ public class FilmController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Film addNew(@Valid @RequestBody Film film) {
-        return filmService.addNew(film);
+    public Film saveNew(@Valid @RequestBody Film film) {
+        return filmService.saveNew(film);
     }
 
     @PutMapping
@@ -34,7 +34,7 @@ public class FilmController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public Collection<Film> getAll() {
+    public Collection<Film> findAll() {
         return filmService.findAll();
     }
 

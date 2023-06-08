@@ -2,7 +2,10 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.exceptions.exceptions.GenreNotFoundException;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.storage.dao.GenresStorage;
 
@@ -21,22 +24,38 @@ public class GenresService {
     }
 
     public Collection<Genre> findAllGenres() {
-        return genresStorage.findAll();
+        Collection<Genre> genres = genresStorage.findAll();
+        if (genres.isEmpty()) {
+            log.info("Жанры не найдены.");
+        } else {
+            log.info("Жанры найдены.");
+        }
+        return genres;
     }
 
     public Genre findGenreById(int genreId) {
-        return genresStorage.findById(genreId);
+        Genre genre;
+        try {
+            genre = genresStorage.findById(genreId);
+        } catch (EmptyResultDataAccessException exception) {
+            throw new GenreNotFoundException("Жанр с ID " + genreId + " не найден.");
+        }
+        return genre;
     }
 
-    public void addFilmGenresToDB(List<Genre> genres, int filmId) {
-        genresStorage.addFilmGenresToDB(genres, filmId);
+    public void saveGenresToDBFromFilm(List<Genre> genres, int filmId) {
+        try {
+            genresStorage.saveGenresToDBFromFilm(genres, filmId);
+        } catch (DataIntegrityViolationException exception) {
+            throw new DataIntegrityViolationException("В запросе неправильно указаны данные о фильме.");
+        }
     }
 
-    public void clearFilmGenres(int filmId) {
-        genresStorage.clearFilmGenres(filmId);
+    public void removeFilmGenres(int filmId) {
+        genresStorage.removeFilmGenres(filmId);
     }
 
-    public List<Genre> placeGenresToFilmFromDB(int filmId) {
-        return genresStorage.placeGenresToFilmFromDB(filmId);
+    public List<Genre> saveGenresToFilmFromDB(int filmId) {
+        return genresStorage.saveGenresToFilmFromDB(filmId);
     }
 }

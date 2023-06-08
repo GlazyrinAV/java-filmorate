@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.exceptions.FriendAlreadyExistException;
 import ru.yandex.practicum.filmorate.exceptions.exceptions.UserNotFoundException;
@@ -22,9 +23,9 @@ public class UserService {
         this.storage = storage;
     }
 
-    public User addNew(User user) {
+    public User saveNew(User user) {
         checkName(user);
-        return findById(storage.addNew(user));
+        return findById(storage.saveNew(user));
     }
 
     public User update(User user) {
@@ -35,42 +36,32 @@ public class UserService {
         return storage.findAll();
     }
 
-    public User findById(int  userId) {
-        if (!isExists(userId)) {
-            log.info("Пользователь c ID " + userId + " не найден.");
+    public User findById(int userId) {
+        User user;
+        try {
+            user = storage.findById(userId);
+        } catch (EmptyResultDataAccessException exception) {
             throw new UserNotFoundException("Пользователь c ID " + userId + " не найден.");
-        } else {
-            return storage.findById(userId);
         }
+        return user;
     }
 
-    public void addFriend(int userId, int friendId) {
-        if (!isExists(userId)) {
-            log.info("Пользователь c ID " + userId + " не найден.");
-            throw new UserNotFoundException("Пользователь c ID " + userId + " не найден.");
-        } else if (!isExists(friendId)) {
-            log.info("Пользователь c ID " + friendId + " не найден.");
-            throw new UserNotFoundException("Пользователь c ID " + friendId + " не найден.");
-        } else if (storage.findFriends(userId).contains(storage.findById(friendId))) {
-            log.info("Друг уже в друзьях.");
+    public void saveFriend(int userId, int friendId) {
+        findById(userId);
+        findById(friendId);
+        if (storage.findFriends(userId).contains(storage.findById(friendId))) {
             throw new FriendAlreadyExistException("Пользователь с ID " + userId +
                     " уже добавил в друзья пользователя c ID " + friendId);
-        }
-        else {
+        } else {
             log.info("Друг добавлен.");
-            storage.makeFriend(userId, friendId);
+            storage.saveFriend(userId, friendId);
         }
     }
 
     public void removeFriend(int userId, int friendId) {
-        if (!isExists(userId)) {
-            log.info("Пользователь c ID " + userId + " не найден.");
-            throw new UserNotFoundException("Пользователь c ID " + userId + " не найден.");
-        } else if (!isExists(friendId)) {
-            log.info("Пользователь c ID " + friendId + " не найден.");
-            throw new UserNotFoundException("Пользователь c ID " + friendId + " не найден.");
-        } else if (!storage.findFriends(userId).contains(findById(friendId))) {
-            log.info("У юзера нет такого друга.");
+        findById(userId);
+        findById(friendId);
+        if (!storage.findFriends(userId).contains(findById(friendId))) {
             throw new FriendAlreadyExistException("Пользователь с ID " + userId +
                     " не имеет в друзьях пользователя c ID " + friendId);
         } else {
@@ -80,28 +71,14 @@ public class UserService {
     }
 
     public Collection<User> findFriends(int userId) {
-        if (!isExists(userId)) {
-            log.info("Пользователь c ID " + userId + " не найден.");
-            throw new UserNotFoundException("Пользователь c ID " + userId + " не найден.");
-        } else {
-            return storage.findFriends(userId);
-        }
+        findById(userId);
+        return storage.findFriends(userId);
     }
 
     public Collection<User> findCommonFriends(int userId, int otherUserId) {
-        if (!isExists(userId)) {
-            log.info("Пользователь c ID " + userId + " не найден.");
-            throw new UserNotFoundException("Пользователь c ID " + userId + " не найден.");
-        } else if (!isExists(otherUserId)) {
-            log.info("Пользователь c ID " + otherUserId + " не найден.");
-            throw new UserNotFoundException("Пользователь c ID " + otherUserId + " не найден.");
-        } else {
-            return storage.findCommonFriends(userId, otherUserId);
-        }
-    }
-
-    protected Boolean isExists(int userID) {
-        return storage.isExists(userID);
+        findById(userId);
+        findById(otherUserId);
+        return storage.findCommonFriends(userId, otherUserId);
     }
 
     private void checkName(User user) {
