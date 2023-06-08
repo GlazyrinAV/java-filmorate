@@ -19,9 +19,7 @@ public class FilmService {
 
     private final FilmStorage filmStorage;
     private final UserService userService;
-
     private final GenresService genresService;
-
     private final RatingsService ratingsService;
 
     @Autowired
@@ -34,34 +32,28 @@ public class FilmService {
 
     public Film saveNew(Film film) {
         int filmId = filmStorage.saveNew(film);
-        if (isGenresExists(film)) {
-            genresService.addFilmGenresToDB(film.getGenres(), filmId);
-        }
+        saveAdditionalInfoFromFilm(film, filmId);
         return findById(filmId);
     }
 
     public Film update(Film film) {
         int filmId = filmStorage.update(film);
         genresService.removeFilmGenres(filmId);
-        if (isGenresExists(film)) {
-            genresService.addFilmGenresToDB(film.getGenres(), filmId);
-        }
+        saveAdditionalInfoFromFilm(film, filmId);
         return findById(filmId);
     }
 
     public Collection<Film> findAll() {
         Collection<Film> films = filmStorage.findAll();
         for (Film film : films) {
-            film.setGenres(genresService.saveGenresToFilmFromDB(film.getId()));
-            film.setMpa(ratingsService.saveRatingToFilmFromDB(film.getId()));
+            saveAdditionalInfoToFilm(film);
         }
         return films;
     }
 
     public Film findById(int filmId) {
         Film film = filmStorage.findById(filmId);
-        film.setGenres(genresService.saveGenresToFilmFromDB(filmId));
-        film.setMpa(ratingsService.saveRatingToFilmFromDB(filmId));
+        saveAdditionalInfoToFilm(film);
         return film;
     }
 
@@ -100,8 +92,7 @@ public class FilmService {
         } else {
             Collection<Film> films = filmStorage.findPopular(count);
             for (Film film : films) {
-                film.setGenres(genresService.saveGenresToFilmFromDB(film.getId()));
-                film.setMpa(ratingsService.saveRatingToFilmFromDB(film.getId()));
+                saveAdditionalInfoToFilm(film);
             }
             return films;
         }
@@ -117,5 +108,16 @@ public class FilmService {
 
     private boolean isGenresExists(Film film) {
         return film.getGenres() != null;
+    }
+
+    private void saveAdditionalInfoToFilm(Film film) {
+        film.setGenres(genresService.saveGenresToFilmFromDB(film.getId()));
+        film.setMpa(ratingsService.saveRatingToFilmFromDB(film.getId()));
+    }
+
+    private void saveAdditionalInfoFromFilm(Film film, int filmId) {
+        if (isGenresExists(film)) {
+            genresService.addFilmGenresToDB(film.getGenres(), filmId);
+        }
     }
 }
