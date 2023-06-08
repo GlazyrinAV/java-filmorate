@@ -136,4 +136,10 @@ public class FilmService {
             directorsService.saveDirectorsToDBFromFilm(film.getDirectors(), filmId);
         }
     }
+
+    public void removeFilm(int filmId) {
+        findById(filmId);
+        log.info("Фильм удален.");
+        filmStorage.removeFilm(filmId);
+    }
 }
