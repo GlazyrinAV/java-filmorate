@@ -100,6 +100,16 @@ public class UserService {
         }
     }
 
+    public void removeUser(int userId) {
+        if (!isExists(userId)) {
+            log.info("Пользователь c ID " + userId + " не найден.");
+            throw new UserNotFoundException("Пользователь c ID " + userId + " не найден.");
+        } else {
+            log.info("Пользователь удален.");
+            storage.removeUser(userId);
+        }
+    }
+
     protected Boolean isExists(int userID) {
         return storage.isExists(userID);
     }

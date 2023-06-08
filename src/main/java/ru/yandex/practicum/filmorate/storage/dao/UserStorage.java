@@ -23,4 +23,6 @@ public interface UserStorage {
     Collection<User> findCommonFriends(int user1Id, int user2Id);
 
     boolean isExists(int userId);
+
+    void removeUser(int userId);
 }
