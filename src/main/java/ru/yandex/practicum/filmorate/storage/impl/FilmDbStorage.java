@@ -139,11 +139,7 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public void removeFilm(int filmId) {
-        String sqlQueryGenre = "DELETE FROM film_genres WHERE film_id = ?";
-        jdbcTemplate.update(sqlQueryGenre, filmId);
-        String sqlQueryLike = "DELETE FROM FILM_LIKES WHERE film_id = ?";
-        jdbcTemplate.update(sqlQueryLike, filmId);
-        String sqlQuery = "DELETE FROM PUBLIC.films WHERE film_id = ?";
+        String sqlQuery = "DELETE FROM FILMS WHERE film_id = ?";
         jdbcTemplate.update(sqlQuery, filmId);
     }
 
