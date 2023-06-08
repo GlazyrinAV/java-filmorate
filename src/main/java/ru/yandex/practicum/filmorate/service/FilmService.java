@@ -94,18 +94,11 @@ public class FilmService {
             films = filmStorage.findPopular(count);
         }
         for (Film film : films) {
-            film.setGenres(genresService.placeGenresToFilmFromDB(film.getId()));
-            film.setMpa(ratingsService.placeRatingToFilmFromDB(film.getId()));
+            saveAdditionalInfoFromDb(film);
         }
+        log.info("Популярные фильмы найдены.");
         return films;
-            Collection<Film> films = filmStorage.findPopular(count);
-            for (Film film : films) {
-                saveAdditionalInfoFromDb(film);
-            }
-            log.info("Популярные фильмы найдены.");
-            return films;
-        }
-    }
+}
 
     public Collection<Integer> findLikes(int filmId) {
         log.info("Лайки к фильму найдены.");
