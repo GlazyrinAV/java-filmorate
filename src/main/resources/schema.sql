@@ -132,5 +132,10 @@ create table if not exists PUBLIC.FILM_DIRECTOR
 (
     FILM_ID     INTEGER not null,
     DIRECTOR_ID INTEGER not null,
-    primary key (DIRECTOR_ID, FILM_ID)
+    primary key (DIRECTOR_ID, FILM_ID),
+    constraint "FILM_DIRECTOR_DIRECTORS_DIRECTOR_ID_fk"
+        foreign key (DIRECTOR_ID) references PUBLIC.DIRECTORS
+            on delete cascade,
+    constraint "FILM_DIRECTOR_FILMS_FILM_ID_fk"
+        foreign key (FILM_ID) references PUBLIC.FILMS
 );

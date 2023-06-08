@@ -34,7 +34,7 @@ public class FilmService {
 
     public Film saveNew(Film film) {
         int filmId = filmStorage.saveNew(film);
-        saveAdditionalInfoFromFilm(film, filmId);
+        saveAdditionalInfoToDb(film, filmId);
         return findById(filmId);
     }
 
@@ -42,14 +42,14 @@ public class FilmService {
         int filmId = filmStorage.update(film);
         genresService.removeFilmGenres(filmId);
         directorsService.removeFromFilmByFilmId(filmId);
-        saveAdditionalInfoFromFilm(film, filmId);
+        saveAdditionalInfoToDb(film, filmId);
         return findById(filmId);
     }
 
     public Collection<Film> findAll() {
         Collection<Film> films = filmStorage.findAll();
         for (Film film : films) {
-            saveAdditionalInfoToFilm(film);
+            saveAdditionalInfoFromDb(film);
         }
         return films;
     }
@@ -61,7 +61,7 @@ public class FilmService {
         } catch (EmptyResultDataAccessException exception) {
             throw new FilmNotFoundException("Фильм c ID " + filmId + " не найден.");
         }
-        saveAdditionalInfoToFilm(film);
+        saveAdditionalInfoFromDb(film);
         return film;
     }
 
@@ -85,7 +85,7 @@ public class FilmService {
         } else {
             Collection<Film> films = filmStorage.findPopular(count);
             for (Film film : films) {
-                saveAdditionalInfoToFilm(film);
+                saveAdditionalInfoFromDb(film);
             }
             log.info("Популярные фильмы найдены.");
             return films;
@@ -99,20 +99,19 @@ public class FilmService {
 
     public Collection<Film> findByDirectorId(int directorId, String sortBy) {
         directorsService.findById(directorId);
-        if (sortBy.equals("year") || sortBy.equals("likes")) {
-            Collection<Film> films = filmStorage.findByDirectorId(directorId, sortBy);
-            if (films.isEmpty()) {
-                log.info("Фильмы по указанному режиссеру не найдены.");
-            } else {
-                log.info("Фильмы по указанному режиссеру найдены.");
-                for (Film film : films) {
-                    saveAdditionalInfoToFilm(film);
-                }
-            }
-            return films;
-        } else {
+        if (!(sortBy.equals("year") || sortBy.equals("likes"))) {
             throw new ValidationException("Недопустимый параметр запроса.");
         }
+        Collection<Film> films = filmStorage.findByDirectorId(directorId, sortBy);
+        if (films.isEmpty()) {
+            log.info("Фильмы по указанному режиссеру не найдены.");
+        } else {
+            log.info("Фильмы по указанному режиссеру найдены.");
+            for (Film film : films) {
+                saveAdditionalInfoFromDb(film);
+            }
+        }
+        return films;
     }
 
     private boolean isGenresExists(Film film) {
@@ -123,13 +122,13 @@ public class FilmService {
         return film.getDirectors() != null;
     }
 
-    private void saveAdditionalInfoToFilm(Film film) {
+    private void saveAdditionalInfoFromDb(Film film) {
         film.setGenres(genresService.saveGenresToFilmFromDB(film.getId()));
         film.setMpa(ratingsService.saveRatingToFilmFromDB(film.getId()));
         film.setDirectors(directorsService.saveDirectorsToFilmFromDB(film.getId()));
     }
 
-    private void saveAdditionalInfoFromFilm(Film film, int filmId) {
+    private void saveAdditionalInfoToDb(Film film, int filmId) {
         if (isGenresExists(film)) {
             genresService.saveGenresToDBFromFilm(film.getGenres(), filmId);
         }
