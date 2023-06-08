@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.exceptions.DirectorNotFoundException;
 import ru.yandex.practicum.filmorate.model.Director;
@@ -28,14 +29,10 @@ public class DirectorsService {
     }
 
     public Director update(Director director) {
-        if (!directorStorage.isExists(director.getId())) {
-            log.info("Режиссер не найден.");
-            throw new DirectorNotFoundException("Режиссер не найден.");
-        } else {
-            int id = directorStorage.update(director);
-            log.info("Режиссер обновлен.");
-            return findById(id);
-        }
+        findById(director.getId());
+        int id = directorStorage.update(director);
+        log.info("Режиссер обновлен.");
+        return findById(id);
     }
 
     public Collection<Director> findAll() {
@@ -44,27 +41,20 @@ public class DirectorsService {
     }
 
     public Director findById(int id) {
-        if (!directorStorage.isExists(id)) {
-            log.info("Режиссер c ID " + id + " не найден.");
+        Director director;
+        try {
+            director = directorStorage.findById(id);
+        } catch (EmptyResultDataAccessException exception) {
             throw new DirectorNotFoundException("Режиссер c ID " + id + " не найден.");
-        } else {
-            log.info("Режиссер найден.");
-            return directorStorage.findById(id);
         }
+        log.info("Режиссер найден.");
+        return director;
     }
 
     public void removeById(int id) {
-        if (!directorStorage.isExists(id)) {
-            log.info("Режиссер c ID " + id + " не найден.");
-            throw new DirectorNotFoundException("Режиссер c ID " + id + " не найден.");
-        } else {
-            log.info("Режиссер удален.");
-            directorStorage.removeById(id);
-        }
-    }
-
-    public boolean isExists(int directorId) {
-        return directorStorage.isExists(directorId);
+        findById(id);
+        log.info("Режиссер удален.");
+        directorStorage.removeById(id);
     }
 
     public List<Director> saveDirectorsToFilmFromDB(int filmId) {
@@ -75,7 +65,7 @@ public class DirectorsService {
         directorStorage.saveDirectorsToDBFromFilm(directors, filmId);
     }
 
-    public void removeByFilmId(int filmId) {
-        directorStorage.removeByFilmId(filmId);
+    public void removeFromFilmByFilmId(int filmId) {
+        directorStorage.removeFromFilmByFilmID(filmId);
     }
 }

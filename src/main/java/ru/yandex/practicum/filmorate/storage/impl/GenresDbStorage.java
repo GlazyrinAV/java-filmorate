@@ -56,12 +56,8 @@ public class GenresDbStorage implements GenresStorage {
 
     @Override
     public Genre findById(int genreId) {
-        if (genreId >= genresInMemory.size() || genresInMemory.get(genreId - 1) == null) {
-            String sqlQuery = "SELECT * FROM GENRES WHERE genre_id = ?";
-            return jdbcTemplate.queryForObject(sqlQuery, this::mapRowToGenre, genreId);
-        } else {
-            return genresInMemory.get(genreId - 1);
-        }
+        String sqlQuery = "SELECT * FROM GENRES WHERE genre_id = ?";
+        return jdbcTemplate.queryForObject(sqlQuery, this::mapRowToGenre, genreId);
     }
 
     private Genre mapRowToGenre(ResultSet resultSet, int rowNum) throws SQLException {

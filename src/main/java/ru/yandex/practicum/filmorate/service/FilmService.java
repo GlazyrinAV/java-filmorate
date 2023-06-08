@@ -7,7 +7,6 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.exceptions.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.exceptions.ValidationException;
-import ru.yandex.practicum.filmorate.exceptions.exceptions.*;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.dao.FilmStorage;
 
@@ -42,6 +41,7 @@ public class FilmService {
     public Film update(Film film) {
         int filmId = filmStorage.update(film);
         genresService.removeFilmGenres(filmId);
+        directorsService.removeFromFilmByFilmId(filmId);
         saveAdditionalInfoFromFilm(film, filmId);
         return findById(filmId);
     }
@@ -81,7 +81,6 @@ public class FilmService {
 
     public Collection<Film> findPopular(int count) {
         if (count <= 0) {
-            log.info("Count меньше или равен нулю.");
             throw new ValidationException("Значение выводимых фильмов не может быть меньше или равно нулю.");
         } else {
             Collection<Film> films = filmStorage.findPopular(count);
@@ -99,44 +98,43 @@ public class FilmService {
     }
 
     public Collection<Film> findByDirectorId(int directorId, String sortBy) {
-        if (directorsService.isExists(directorId) && (sortBy.equals("year") || sortBy.equals("likes"))) {
+        directorsService.findById(directorId);
+        if (sortBy.equals("year") || sortBy.equals("likes")) {
             Collection<Film> films = filmStorage.findByDirectorId(directorId, sortBy);
             if (films.isEmpty()) {
                 log.info("Фильмы по указанному режиссеру не найдены.");
             } else {
                 log.info("Фильмы по указанному режиссеру найдены.");
                 for (Film film : films) {
-                    film.setGenres(genresService.placeGenresToFilmFromDB(film.getId()));
-                    film.setMpa(ratingsService.placeRatingToFilmFromDB(film.getId()));
-                    film.setDirectors(directorsService.saveDirectorsToFilmFromDB(film.getId()));
+                    saveAdditionalInfoToFilm(film);
                 }
             }
             return films;
-        } else if (!directorsService.isExists(directorId) && (sortBy.equals("year") || sortBy.equals("likes"))) {
-            log.info("Режиссер c ID " + directorId + " не найден.");
-            throw new DirectorNotFoundException("Режиссер c ID " + directorId + " не найден.");
         } else {
-            log.info("Недопустимый параметр запроса.");
             throw new ValidationException("Недопустимый параметр запроса.");
         }
-    }
-
-    private boolean isExists(int filmId) {
-        return filmStorage.isExists(filmId);
     }
 
     private boolean isGenresExists(Film film) {
         return film.getGenres() != null;
     }
 
+    private boolean isDirectorsExists(Film film) {
+        return film.getDirectors() != null;
+    }
+
     private void saveAdditionalInfoToFilm(Film film) {
         film.setGenres(genresService.saveGenresToFilmFromDB(film.getId()));
         film.setMpa(ratingsService.saveRatingToFilmFromDB(film.getId()));
+        film.setDirectors(directorsService.saveDirectorsToFilmFromDB(film.getId()));
     }
 
     private void saveAdditionalInfoFromFilm(Film film, int filmId) {
         if (isGenresExists(film)) {
             genresService.saveGenresToDBFromFilm(film.getGenres(), filmId);
+        }
+        if (isDirectorsExists(film)) {
+            directorsService.saveDirectorsToDBFromFilm(film.getDirectors(), filmId);
         }
     }
 }

@@ -26,12 +26,6 @@ public class ErrorHandler {
         return sendErrorResponse("data access error", exception.getMessage());
     }
 
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse dataIntegrityViolationException(DataIntegrityViolationException exception) {
-        return new ErrorResponse("data access error", "Ошибка при добавлении данных в базу данных.");
-    }
-
     @ExceptionHandler({UserAlreadyExistsException.class, FilmAlreadyExistsException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse userAlreadyExistsException(RuntimeException exception) {
@@ -39,13 +33,10 @@ public class ErrorHandler {
     }
 
     @ExceptionHandler({UserNotFoundException.class, FilmNotFoundException.class, ReviewNotFoundException.class,
-    RatingNotFoundException.class, GenreNotFoundException.class})
-    @ExceptionHandler({UserNotFoundException.class, FilmNotFoundException.class, DirectorNotFoundException.class})
+    RatingNotFoundException.class, GenreNotFoundException.class, DirectorNotFoundException.class})
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse entityNotFoundException(RuntimeException exception) {
         return sendErrorResponse("error", exception.getMessage());
-    public ErrorResponse entityNotFoundException(RuntimeException exception) {
-        return new ErrorResponse("error", exception.getMessage());
     }
 
     @ExceptionHandler

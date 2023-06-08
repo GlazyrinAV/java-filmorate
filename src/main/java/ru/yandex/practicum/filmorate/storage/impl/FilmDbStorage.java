@@ -123,12 +123,6 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Override
-    public Boolean isExists(int filmId) {
-        String sqlQuery = "SELECT EXISTS ( SELECT * FROM PUBLIC.films WHERE film_id =? )";
-        return Boolean.TRUE.equals(jdbcTemplate.queryForObject(sqlQuery, Boolean.TYPE, filmId));
-    }
-
-    @Override
     public Collection<Film> findByDirectorId(int directorId, String sortBy) {
         if (sortBy.equals("year")) {
             String sqlQuery = "SELECT * FROM FILMS WHERE FILM_ID IN (SELECT FILM_ID FROM FILM_DIRECTOR WHERE DIRECTOR_ID = ?) " +

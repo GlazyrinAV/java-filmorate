@@ -10,7 +10,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.test.context.jdbc.Sql;
 import ru.yandex.practicum.filmorate.exceptions.exceptions.DirectorNotFoundException;
-import ru.yandex.practicum.filmorate.exceptions.exceptions.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.service.DirectorsService;
 import ru.yandex.practicum.filmorate.service.FilmService;
@@ -91,7 +90,7 @@ public class DirectorStorageTests {
         Director director = new Director(99, "Director update");
         DirectorNotFoundException exception = Assertions.assertThrows(DirectorNotFoundException.class, () ->
                 directorsService.update(director));
-        Assertions.assertEquals(exception.getMessage(), "Режиссер не найден.",
+        Assertions.assertEquals(exception.getMessage(), "Режиссер c ID 99 не найден.",
                 "Ошибка при обновлении режиссера c указанием несуществующего ид.");
     }
 
@@ -101,7 +100,7 @@ public class DirectorStorageTests {
         Director director = new Director(-1, "Director update");
         DirectorNotFoundException exception = Assertions.assertThrows(DirectorNotFoundException.class, () ->
                 directorsService.update(director));
-        Assertions.assertEquals(exception.getMessage(), "Режиссер не найден.",
+        Assertions.assertEquals(exception.getMessage(), "Режиссер c ID -1 не найден.",
                 "Ошибка при обновлении режиссера c указанием отрицательного ид.");
 }
 
@@ -111,7 +110,7 @@ public class DirectorStorageTests {
         Director director = new Director(0, "Director update");
         DirectorNotFoundException exception = Assertions.assertThrows(DirectorNotFoundException.class, () ->
                 directorsService.update(director));
-        Assertions.assertEquals(exception.getMessage(), "Режиссер не найден.",
+        Assertions.assertEquals(exception.getMessage(), "Режиссер c ID 0 не найден.",
                 "Ошибка при обновлении режиссера c указанием нулевого ид.");
     }
 
@@ -201,50 +200,9 @@ public class DirectorStorageTests {
     @Test
     @Sql(value = {"/dataForDirectorTests.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     public void removeByFilmIdNormal() {
-        directorsService.removeByFilmId(1);
+        directorsService.removeFromFilmByFilmId(1);
         Assertions.assertTrue(filmService.findById(1).getDirectors().isEmpty(),
                 "Ошибка при нормальном удалении режиссеров из фильма.");
-    }
-
-    @Test
-    @Sql(value = {"/dataForDirectorTests.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-    public void removeByFilmIdWithNegativeId() {
-        FilmNotFoundException exception = Assertions.assertThrows(FilmNotFoundException.class, () ->
-                directorsService.removeByFilmId(-1));
-        Assertions.assertEquals(exception.getMessage(), "Фильм c ID -1 не найден.",
-                "Ошибка при нормальном удалении режиссеров из фильма с -1 ид.");
-    }
-
-    @Test
-    @Sql(value = {"/dataForDirectorTests.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-    public void removeByFilmIdWithZeroId() {
-        FilmNotFoundException exception = Assertions.assertThrows(FilmNotFoundException.class, () ->
-                directorsService.removeByFilmId(0));
-        Assertions.assertEquals(exception.getMessage(), "Фильм c ID 0 не найден.",
-                "Ошибка при нормальном удалении режиссеров из фильма с 0 ид.");
-    }
-
-    @Test
-    @Sql(value = {"/dataForDirectorTests.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-    public void removeByFilmIdWithWrongId() {
-        FilmNotFoundException exception = Assertions.assertThrows(FilmNotFoundException.class, () ->
-                directorsService.removeByFilmId(99));
-        Assertions.assertEquals(exception.getMessage(), "Фильм c ID 99 не найден.",
-                "Ошибка при нормальном удалении режиссеров из фильма с 99 ид.");
-    }
-
-    @Test
-    @Sql(value = {"/dataForDirectorTests.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-    public void isExistsTrue() {
-        Assertions.assertTrue(directorsService.isExists(1),
-                "Ошибка при проверке существующего режиссера.");
-    }
-
-    @Test
-    @Sql(value = {"/dataForDirectorTests.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-    public void isExistsFalse() {
-        Assertions.assertFalse(directorsService.isExists(99),
-                "Ошибка при проверке несущесвующего режиссера.");
     }
 
     @Test

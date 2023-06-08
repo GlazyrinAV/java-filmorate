@@ -3,13 +3,10 @@ package ru.yandex.practicum.filmorate.storage.impl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
-import ru.yandex.practicum.filmorate.exceptions.exceptions.FilmNotFoundException;
-import ru.yandex.practicum.filmorate.exceptions.exceptions.NoResultDataAccessException;
 import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.storage.dao.DirectorStorage;
 
@@ -66,11 +63,7 @@ public class DirectorDbStorage implements DirectorStorage {
     @Override
     public Director findById(int id) {
         String sqlQuery = "SELECT * FROM DIRECTORS WHERE DIRECTOR_ID = ?";
-        try {
-            return jdbcTemplate.queryForObject(sqlQuery, this::mapRowToDirector, id);
-        } catch (EmptyResultDataAccessException exception) {
-            throw new NoResultDataAccessException("Запрос на получение режиссера получен пустой ответ.", 1);
-        }
+        return jdbcTemplate.queryForObject(sqlQuery, this::mapRowToDirector, id);
     }
 
     @Override
@@ -104,12 +97,9 @@ public class DirectorDbStorage implements DirectorStorage {
     }
 
     @Override
-    public void removeByFilmId(int filmId) {
+    public void removeFromFilmByFilmID(int filmId) {
         String sqlQuery = "DELETE FROM FILM_DIRECTOR WHERE film_id = ?";
-        int result = jdbcTemplate.update(sqlQuery, filmId);
-        if (result == 0) {
-            throw new FilmNotFoundException("Фильм c ID " + filmId + " не найден.");
-        }
+        jdbcTemplate.update(sqlQuery, filmId);
     }
 
     @Override
