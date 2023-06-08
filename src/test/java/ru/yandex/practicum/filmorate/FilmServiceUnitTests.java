@@ -10,7 +10,6 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.jdbc.Sql;
 import ru.yandex.practicum.filmorate.exceptions.exceptions.FilmNotFoundException;
-import ru.yandex.practicum.filmorate.exceptions.exceptions.NoResultDataAccessException;
 import ru.yandex.practicum.filmorate.exceptions.exceptions.UserNotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
@@ -105,8 +104,8 @@ public class FilmServiceUnitTests {
         Film film = new Film("Name", "Description", LocalDate.of(1990, Month.APRIL, 13), Duration.ofMinutes(100), null, List.of(new Genre(1, null)), new Rating(1, null));
         Set<ConstraintViolation<Film>> violations = validator.validate(film);
         filmService.saveNew(film);
-        NoResultDataAccessException exception = Assertions.assertThrows(NoResultDataAccessException.class, () -> filmService.findById(99));
-        Assertions.assertEquals("Получен пустой ответ на запрос.", exception.getMessage(),
+        FilmNotFoundException exception = Assertions.assertThrows(FilmNotFoundException.class, () -> filmService.findById(99));
+        Assertions.assertEquals("Фильм c ID 99 не найден.", exception.getMessage(),
                 "Ошибка при получении из хранилища фильма с неправильным ID.");
     }
 
@@ -167,7 +166,7 @@ public class FilmServiceUnitTests {
         User user = new User("abc@acb.ru", "login", "name", LocalDate.of(1986, Month.APRIL, 13), 1);
         userService.saveNew(user);
         UserNotFoundException exception = Assertions.assertThrows(UserNotFoundException.class, () -> filmService.makeLike(1, 0));
-        Assertions.assertEquals(exception.getMessage(), "Юзер c ID 0 не найден.",
+        Assertions.assertEquals(exception.getMessage(), "Пользователь c ID 0 не найден.",
                 "Ошибка при добавлении лайка к фильму с юзером ID0.");
     }
 
@@ -178,7 +177,7 @@ public class FilmServiceUnitTests {
         User user = new User("abc@acb.ru", "login", "name", LocalDate.of(1986, Month.APRIL, 13), 1);
         userService.saveNew(user);
         UserNotFoundException exception = Assertions.assertThrows(UserNotFoundException.class, () -> filmService.makeLike(1, -1));
-        Assertions.assertEquals(exception.getMessage(), "Юзер c ID -1 не найден.",
+        Assertions.assertEquals(exception.getMessage(), "Пользователь c ID -1 не найден.",
                 "Ошибка при добавлении лайка к фильму с юзером ID-1.");
     }
 
@@ -189,7 +188,7 @@ public class FilmServiceUnitTests {
         User user = new User("abc@acb.ru", "login", "name", LocalDate.of(1986, Month.APRIL, 13), 1);
         userService.saveNew(user);
         UserNotFoundException exception = Assertions.assertThrows(UserNotFoundException.class, () -> filmService.makeLike(1, 99));
-        Assertions.assertEquals(exception.getMessage(), "Юзер c ID 99 не найден.",
+        Assertions.assertEquals(exception.getMessage(), "Пользователь c ID 99 не найден.",
                 "Ошибка при добавлении лайка к фильму с юзером ID99.");
     }
 
@@ -248,7 +247,7 @@ public class FilmServiceUnitTests {
         userService.saveNew(user);
         filmService.makeLike(1, 1);
         UserNotFoundException exception = Assertions.assertThrows(UserNotFoundException.class, () -> filmService.removeLike(1, 0));
-        Assertions.assertEquals(exception.getMessage(), "Юзер c ID 0 не найден.",
+        Assertions.assertEquals(exception.getMessage(), "Пользователь c ID 0 не найден.",
                 "Ошибка при удалении лайка к фильму с юзером ID0.");
     }
 
@@ -260,7 +259,7 @@ public class FilmServiceUnitTests {
         userService.saveNew(user);
         filmService.makeLike(1, 1);
         UserNotFoundException exception = Assertions.assertThrows(UserNotFoundException.class, () -> filmService.removeLike(1, -1));
-        Assertions.assertEquals(exception.getMessage(), "Юзер c ID -1 не найден.",
+        Assertions.assertEquals(exception.getMessage(), "Пользователь c ID -1 не найден.",
                 "Ошибка при удалении лайка к фильму с юзером ID-1.");
     }
 
@@ -272,7 +271,7 @@ public class FilmServiceUnitTests {
         userService.saveNew(user);
         filmService.makeLike(1, 1);
         UserNotFoundException exception = Assertions.assertThrows(UserNotFoundException.class, () -> filmService.removeLike(1, 99));
-        Assertions.assertEquals(exception.getMessage(), "Юзер c ID 99 не найден.",
+        Assertions.assertEquals(exception.getMessage(), "Пользователь c ID 99 не найден.",
                 "Ошибка при удалении лайка к фильму с юзером ID99.");
     }
 

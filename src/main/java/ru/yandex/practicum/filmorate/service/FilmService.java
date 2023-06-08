@@ -3,10 +3,9 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.exceptions.FilmNotFoundException;
-import ru.yandex.practicum.filmorate.exceptions.exceptions.LikeNotFoundException;
-import ru.yandex.practicum.filmorate.exceptions.exceptions.UserNotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.dao.FilmStorage;
@@ -52,33 +51,28 @@ public class FilmService {
     }
 
     public Film findById(int filmId) {
-        Film film = filmStorage.findById(filmId);
+        Film film;
+        try {
+            film = filmStorage.findById(filmId);
+        } catch (EmptyResultDataAccessException exception) {
+            throw new FilmNotFoundException("Фильм c ID " + filmId + " не найден.");
+        }
         saveAdditionalInfoToFilm(film);
         return film;
     }
 
     public void makeLike(int filmId, int userId) {
-        if (!isExists(filmId)) {
-            throw new FilmNotFoundException("Фильм c ID " + filmId + " не найден.");
-        } else if (!userService.isExists(userId)) {
-            throw new UserNotFoundException("Юзер c ID " + userId + " не найден.");
-        } else {
-            log.info("К фильму добавлен лайк.");
-            filmStorage.makeLike(filmId, userId);
-        }
+        userService.findById(userId);
+        findById(filmId);
+        log.info("К фильму добавлен лайк.");
+        filmStorage.makeLike(filmId, userId);
     }
 
     public void removeLike(int filmId, int userId) {
-        if (!isExists(filmId)) {
-            throw new FilmNotFoundException("Фильм c ID " + filmId + " не найден.");
-        } else if (!userService.isExists(userId)) {
-            throw new UserNotFoundException("Юзер c ID " + userId + " не найден.");
-        } else if (!filmStorage.findLikes(filmId).contains(userId)) {
-            throw new LikeNotFoundException("Юзер с ID " + userId + " не ставил лайк данному фильму.");
-        } else {
-            log.info("У фильма удален лайк.");
-            filmStorage.removeLike(filmId, userId);
-        }
+        userService.findById(userId);
+        findById(filmId);
+        log.info("У фильма удален лайк.");
+        filmStorage.removeLike(filmId, userId);
     }
 
     public Collection<Film> findPopular(int count) {
@@ -96,10 +90,6 @@ public class FilmService {
 
     public Collection<Integer> findLikes(int filmId) {
         return filmStorage.findLikes(filmId);
-    }
-
-    public boolean isExists(int filmId) {
-        return filmStorage.isExists(filmId);
     }
 
     private boolean isGenresExists(Film film) {

@@ -106,7 +106,7 @@ create table IF NOT EXISTS REVIEWS
     CONSTRAINT  REVIEWS_UNIQUE UNIQUE (USER_ID, FILM_ID, CONTENT)
 );
 
-create table IF NOT EXISTS REVIEWS_LIKES
+create table if not exists PUBLIC.REVIEWS_LIKES
 (
     USER_ID   INTEGER not null,
     REVIEW_ID INTEGER not null,
@@ -114,7 +114,8 @@ create table IF NOT EXISTS REVIEWS_LIKES
     constraint REVIEWS_LIKES_PK
         primary key (USER_ID, REVIEW_ID),
     constraint "REVIEWS_LIKES_REVIEWS_REVIEW_ID_fk"
-        foreign key (REVIEW_ID) references PUBLIC.REVIEWS
-            on update cascade on delete cascade
+        foreign key (REVIEW_ID) references PUBLIC.REVIEWS (REVIEW_ID)
+            on update cascade on delete cascade,
+    constraint CHECK_LIKES
+        check ("USEFUL" IN (1, -1))
 );
-

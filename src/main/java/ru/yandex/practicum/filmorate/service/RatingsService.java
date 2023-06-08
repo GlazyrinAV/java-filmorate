@@ -4,7 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exceptions.exceptions.NoResultDataAccessException;
+import ru.yandex.practicum.filmorate.exceptions.exceptions.RatingNotFoundException;
 import ru.yandex.practicum.filmorate.model.Rating;
 import ru.yandex.practicum.filmorate.storage.dao.RatingStorage;
 
@@ -36,7 +36,7 @@ public class RatingsService {
         try {
             rating = ratingStorage.findById(ratingId);
         } catch (EmptyResultDataAccessException exception) {
-            throw new NoResultDataAccessException("Запрос на получение рейтинга вернул пустой результат.", 1);
+            throw new RatingNotFoundException("Рейтинг с ID " + ratingId + " не найден.");
         }
         return rating;
     }

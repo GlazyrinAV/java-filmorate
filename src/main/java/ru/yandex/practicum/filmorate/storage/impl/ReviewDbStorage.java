@@ -46,7 +46,6 @@ public class ReviewDbStorage implements ReviewStorage {
             throw new DataIntegrityViolationException("В запросе неправильно указаны данные по отзыву.");
         }
         Optional<Integer> reviewId = Optional.of(Objects.requireNonNull(keyHolder.getKey()).intValue());
-        saveOwnLikeOnOwnReview(review.getUserId(), reviewId.get());
 
         return reviewId.get();
     }
@@ -63,7 +62,7 @@ public class ReviewDbStorage implements ReviewStorage {
                     review.getContent(),
                     review.getIsPositive(),
                     review.getReviewId()
-                    );
+            );
         } catch (DataIntegrityViolationException exception) {
             throw new DataIntegrityViolationException("В запросе неправильно указаны данные об отзыве.");
         }
@@ -85,8 +84,7 @@ public class ReviewDbStorage implements ReviewStorage {
 
     @Override
     public Collection<Review> findAll(int count) {
-        String sqlQuery = "SELECT R.* FROM REVIEWS AS R left join REVIEWS_LIKES RL on R.REVIEW_ID = RL.REVIEW_ID " +
-                "GROUP BY R.REVIEW_ID ORDER BY SUM(RL.USEFUL) DESC, R.REVIEW_ID LIMIT ?";
+        String sqlQuery = "SELECT * FROM REVIEWS LIMIT ?";
         return jdbcTemplate.query(sqlQuery, this::mapRowToReview, count);
     }
 
@@ -100,13 +98,9 @@ public class ReviewDbStorage implements ReviewStorage {
     }
 
     @Override
-    public void saveLike(int userId, int reviewId, boolean like) {
+    public void saveLike(int userId, int reviewId, int like) {
         String sqlQuery = "INSERT INTO REVIEWS_LIKES (USER_ID, REVIEW_ID, USEFUL) VALUES ( ?, ?, ? )";
-        if (like) {
-            jdbcTemplate.update(sqlQuery, userId, reviewId, 1);
-        } else {
-            jdbcTemplate.update(sqlQuery, userId, reviewId,-1);
-        }
+        jdbcTemplate.update(sqlQuery, userId, reviewId, like);
     }
 
     @Override
@@ -143,11 +137,6 @@ public class ReviewDbStorage implements ReviewStorage {
                 .isPositive(resultSet.getBoolean("is_positive"))
                 .useful(findUseful(resultSet.getInt("review_id")))
                 .build();
-    }
-
-    private void saveOwnLikeOnOwnReview(int userId, int reviewId) {
-        String sqlQuery = "INSERT INTO REVIEWS_LIKES (USER_ID, REVIEW_ID, USEFUL) VALUES ( ?, ?, ? )";
-        jdbcTemplate.update(sqlQuery, userId, reviewId, 0);
     }
 
     private int findUseful(int reviewId) {

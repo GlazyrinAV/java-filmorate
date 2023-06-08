@@ -5,7 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exceptions.exceptions.NoResultDataAccessException;
+import ru.yandex.practicum.filmorate.exceptions.exceptions.GenreNotFoundException;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.storage.dao.GenresStorage;
 
@@ -38,7 +38,7 @@ public class GenresService {
         try {
             genre = genresStorage.findById(genreId);
         } catch (EmptyResultDataAccessException exception) {
-            throw new NoResultDataAccessException("Запрос на получение жанра получен пустой ответ.", 1);
+            throw new GenreNotFoundException("Жанр с ID " + genreId + " не найден.");
         }
         return genre;
     }
@@ -57,9 +57,5 @@ public class GenresService {
 
     public List<Genre> saveGenresToFilmFromDB(int filmId) {
         return genresStorage.saveGenresToFilmFromDB(filmId);
-    }
-
-    private boolean isExists(int genreId) {
-        return findGenreById(genreId) != null;
     }
 }

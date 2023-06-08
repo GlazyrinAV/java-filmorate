@@ -118,12 +118,6 @@ public class UserDbStorage implements UserStorage {
     }
 
     @Override
-    public boolean isExists(int userId) {
-        String sqlQuery = "SELECT EXISTS ( SELECT * FROM PUBLIC.users WHERE user_id = ?)";
-        return Boolean.TRUE.equals(jdbcTemplate.queryForObject(sqlQuery, Boolean.TYPE, userId));
-    }
-
-    @Override
     public Collection<User> findFriends(int userId) {
         String sqlQuery = "SELECT * FROM users WHERE user_id IN (" +
                 "SELECT friend_id FROM list_of_friends WHERE user_id = ?)";

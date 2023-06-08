@@ -18,7 +18,7 @@ public interface ReviewStorage {
 
     Collection<Review> findByFilmId(int filmId, int count);
 
-    void saveLike(int userId, int reviewId, boolean like);
+    void saveLike(int userId, int reviewId, int like);
 
     void removeLike(int userId, int reviewId);
 
