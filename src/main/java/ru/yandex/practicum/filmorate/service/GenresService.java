@@ -2,7 +2,10 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.exceptions.exceptions.NoResultDataAccessException;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.storage.dao.GenresStorage;
 
@@ -21,15 +24,31 @@ public class GenresService {
     }
 
     public Collection<Genre> findAllGenres() {
-        return genresStorage.findAll();
+        Collection<Genre> genres = genresStorage.findAll();
+        if (genres.isEmpty()) {
+            log.info("Жанры не найдены.");
+        } else {
+            log.info("Жанры найдены.");
+        }
+        return genres;
     }
 
     public Genre findGenreById(int genreId) {
-        return genresStorage.findById(genreId);
+        Genre genre;
+        try {
+            genre = genresStorage.findById(genreId);
+        } catch (EmptyResultDataAccessException exception) {
+            throw new NoResultDataAccessException("Запрос на получение жанра получен пустой ответ.", 1);
+        }
+        return genre;
     }
 
-    public void addFilmGenresToDB(List<Genre> genres, int filmId) {
-        genresStorage.saveFilmGenresToDB(genres, filmId);
+    public void saveGenresToDBFromFilm(List<Genre> genres, int filmId) {
+        try {
+            genresStorage.saveGenresToDBFromFilm(genres, filmId);
+        } catch (DataIntegrityViolationException exception) {
+            throw new DataIntegrityViolationException("В запросе неправильно указаны данные о фильме.");
+        }
     }
 
     public void removeFilmGenres(int filmId) {
@@ -38,5 +57,9 @@ public class GenresService {
 
     public List<Genre> saveGenresToFilmFromDB(int filmId) {
         return genresStorage.saveGenresToFilmFromDB(filmId);
+    }
+
+    private boolean isExists(int genreId) {
+        return findGenreById(genreId) != null;
     }
 }

@@ -1,11 +1,8 @@
 package ru.yandex.practicum.filmorate.storage.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
-import ru.yandex.practicum.filmorate.exceptions.exceptions.NoResultDataAccessException;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.storage.dao.GenresStorage;
 
@@ -29,16 +26,12 @@ public class GenresDbStorage implements GenresStorage {
     }
 
     @Override
-    public void saveFilmGenresToDB(List<Genre> genres, int filmId) {
+    public void saveGenresToDBFromFilm(List<Genre> genres, int filmId) {
         String sqlQueryForGenres = "MERGE INTO film_genres (film_id, genre_id) VALUES (?, ?)";
-        try {
-            jdbcTemplate.batchUpdate(sqlQueryForGenres, genres, genres.size(), (ps, genre) -> {
-                ps.setInt(1, filmId);
-                ps.setInt(2, genre.getId());
-            });
-        } catch (DataIntegrityViolationException exception) {
-            throw new DataIntegrityViolationException("В запросе неправильно указаны данные о фильме.");
-        }
+        jdbcTemplate.batchUpdate(sqlQueryForGenres, genres, genres.size(), (ps, genre) -> {
+            ps.setInt(1, filmId);
+            ps.setInt(2, genre.getId());
+        });
     }
 
     @Override
@@ -68,11 +61,7 @@ public class GenresDbStorage implements GenresStorage {
     public Genre findById(int genreId) {
         if (genreId >= genresInMemory.size() || genresInMemory.get(genreId - 1) == null) {
             String sqlQuery = "SELECT * FROM GENRES WHERE genre_id = ?";
-            try {
-                return jdbcTemplate.queryForObject(sqlQuery, this::mapRowToGenre, genreId);
-            } catch (EmptyResultDataAccessException exception) {
-                throw new NoResultDataAccessException("Запрос на получение жанра получен пустой ответ.", 1);
-            }
+            return jdbcTemplate.queryForObject(sqlQuery, this::mapRowToGenre, genreId);
         } else {
             return genresInMemory.get(genreId - 1);
         }

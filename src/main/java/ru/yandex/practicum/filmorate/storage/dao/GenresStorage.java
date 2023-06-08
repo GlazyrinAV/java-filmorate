@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface GenresStorage {
 
-    void saveFilmGenresToDB(List<Genre> genres, int filmId);
+    void saveGenresToDBFromFilm(List<Genre> genres, int filmId);
 
     void removeFilmGenres(int filmId);
 

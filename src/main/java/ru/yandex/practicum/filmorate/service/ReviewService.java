@@ -29,10 +29,8 @@ public class ReviewService {
 
     public Review saveNew(Review review) {
         if (!filmService.isExists(review.getFilmId())) {
-            log.info("Фильм c ID " + review.getFilmId() + " не найден.");
             throw new FilmNotFoundException("Фильм c ID " + review.getFilmId() + " не найден.");
         } else if (!userService.isExists(review.getUserId())) {
-            log.info("Юзер c ID " + review.getUserId() + " не найден.");
             throw new UserNotFoundException("Юзер c ID " + review.getUserId() + " не найден.");
         } else if (isExists(review)) {
             log.info("Такой отзыв уже существует.");
@@ -46,7 +44,6 @@ public class ReviewService {
 
     public Review update(Review review) {
         if (!isExistsByReviewId(review.getReviewId())) {
-            log.info("Такой отзыв не существует.");
             throw new ReviewNotFoundException("Такой отзыв не существует.");
         } else {
             int id = reviewStorage.update(review);
@@ -60,10 +57,8 @@ public class ReviewService {
             log.info("Отзыв удален.");
             reviewStorage.remove(reviewId);
         } else if (!isExists(reviewStorage.findById(reviewId))) {
-            log.info("Такой отзыв не существует.");
             throw new ReviewNotFoundException("Такой отзыв не существует.");
         } else {
-            log.info("Отзыв c ID " + reviewId + " не найден.");
             throw new ReviewNotFoundException("Отзыв c ID " + reviewId + " не найден.");
         }
     }
@@ -73,7 +68,6 @@ public class ReviewService {
         try {
             review = reviewStorage.findById(reviewId);
         } catch (EmptyResultDataAccessException exception) {
-            log.info("Отзыв c ID " + reviewId + " не найден.");
             throw new ReviewNotFoundException("Отзыв c ID " + reviewId + " не найден.");
         }
         log.info("Отзыв найден.");
@@ -98,7 +92,6 @@ public class ReviewService {
         if (count <= 0) {
             throw new ValidationException("Значение выводимых отзывов не может быть меньше или равно нулю.");
         } else if (!filmService.isExists(filmId)) {
-            log.info("Фильм c ID " + filmId + " не найден.");
             throw new FilmNotFoundException("Фильм c ID " + filmId + " не найден.");
         } else {
             log.info("Отзывы найдены.");
@@ -108,13 +101,10 @@ public class ReviewService {
 
     public void saveLike(int userId, int reviewId, String like) {
         if (!isExistsByReviewId(reviewId)) {
-            log.info("Отзыв c ID " + reviewId + " не найден.");
             throw new ReviewNotFoundException("Отзыв c ID " + reviewId + " не найден.");
         } else if (!userService.isExists(userId)) {
-            log.info("Юзер c ID " + userId + " не найден.");
             throw new UserNotFoundException("Юзер c ID " + userId + " не найден.");
         } else if (reviewStorage.isLikeExists(userId, reviewId)) {
-            log.info("Оценка отзыву уже поставлена.");
             throw new LikeAlreadyExistsException("Оценка отзыву уже поставлена.");
         } else {
             boolean opinion;
@@ -125,7 +115,6 @@ public class ReviewService {
                 opinion = false;
                 log.info("Отзыву поставлен дисклайк.");
             } else {
-                log.info("Ошибка в виде оценке отзыва.");
                 throw new ValidationException("Ошибка в виде оценке отзыва.");
             }
             reviewStorage.saveLike(userId, reviewId, opinion);
@@ -134,19 +123,15 @@ public class ReviewService {
 
     public void removeLike(int userId, int reviewId, String like) {
         if (!isExistsByReviewId(reviewId)) {
-            log.info("Отзыв c ID " + reviewId + " не найден.");
             throw new ReviewNotFoundException("Отзыв c ID " + reviewId + " не найден.");
         } else if (!userService.isExists(userId)) {
-            log.info("Юзер c ID " + userId + " не найден.");
             throw new UserNotFoundException("Юзер c ID " + userId + " не найден.");
         } else if (!reviewStorage.isLikeExists(userId, reviewId)) {
-            log.info("Оценка отзыву еще не поставлена.");
             throw new LikeAlreadyExistsException("Оценка отзыву еще не поставлена.");
         } else {
             if (like.equals("like") || like.equals("dislike")) {
                 log.info("У отзыва удалена оценка.");
             } else {
-                log.info("Ошибка в виде оценке отзыва.");
                 throw new ValidationException("Ошибка в виде оценке отзыва.");
             }
             reviewStorage.removeLike(userId, reviewId);
@@ -155,13 +140,10 @@ public class ReviewService {
 
     public void removeDislike(int userId, int reviewId) {
         if (!isExistsByReviewId(reviewId)) {
-            log.info("Отзыв c ID " + reviewId + " не найден.");
             throw new ReviewNotFoundException("Отзыв c ID " + reviewId + " не найден.");
         } else if (!userService.isExists(userId)) {
-            log.info("Юзер c ID " + userId + " не найден.");
             throw new UserNotFoundException("Юзер c ID " + userId + " не найден.");
         } else if (!reviewStorage.isDislikeExists(userId, reviewId)) {
-            log.info("У отзыва отсутствует отрицательная оценка от пользователя.");
             throw new LikeAlreadyExistsException("У отзыва отсутствует отрицательная оценка от пользователя.");
         } else {
             log.info("У отзыва удалена отрицательная оценка от пользователя.");

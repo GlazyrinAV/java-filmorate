@@ -37,7 +37,6 @@ public class UserService {
 
     public User findById(int  userId) {
         if (!isExists(userId)) {
-            log.info("Пользователь c ID " + userId + " не найден.");
             throw new UserNotFoundException("Пользователь c ID " + userId + " не найден.");
         } else {
             return storage.findById(userId);
@@ -46,13 +45,10 @@ public class UserService {
 
     public void saveFriend(int userId, int friendId) {
         if (!isExists(userId)) {
-            log.info("Пользователь c ID " + userId + " не найден.");
             throw new UserNotFoundException("Пользователь c ID " + userId + " не найден.");
         } else if (!isExists(friendId)) {
-            log.info("Пользователь c ID " + friendId + " не найден.");
             throw new UserNotFoundException("Пользователь c ID " + friendId + " не найден.");
         } else if (storage.findFriends(userId).contains(storage.findById(friendId))) {
-            log.info("Друг уже в друзьях.");
             throw new FriendAlreadyExistException("Пользователь с ID " + userId +
                     " уже добавил в друзья пользователя c ID " + friendId);
         } else {
@@ -63,13 +59,10 @@ public class UserService {
 
     public void removeFriend(int userId, int friendId) {
         if (!isExists(userId)) {
-            log.info("Пользователь c ID " + userId + " не найден.");
             throw new UserNotFoundException("Пользователь c ID " + userId + " не найден.");
         } else if (!isExists(friendId)) {
-            log.info("Пользователь c ID " + friendId + " не найден.");
             throw new UserNotFoundException("Пользователь c ID " + friendId + " не найден.");
         } else if (!storage.findFriends(userId).contains(findById(friendId))) {
-            log.info("У юзера нет такого друга.");
             throw new FriendAlreadyExistException("Пользователь с ID " + userId +
                     " не имеет в друзьях пользователя c ID " + friendId);
         } else {
@@ -80,7 +73,6 @@ public class UserService {
 
     public Collection<User> findFriends(int userId) {
         if (!isExists(userId)) {
-            log.info("Пользователь c ID " + userId + " не найден.");
             throw new UserNotFoundException("Пользователь c ID " + userId + " не найден.");
         } else {
             return storage.findFriends(userId);
@@ -89,10 +81,8 @@ public class UserService {
 
     public Collection<User> findCommonFriends(int userId, int otherUserId) {
         if (!isExists(userId)) {
-            log.info("Пользователь c ID " + userId + " не найден.");
             throw new UserNotFoundException("Пользователь c ID " + userId + " не найден.");
         } else if (!isExists(otherUserId)) {
-            log.info("Пользователь c ID " + otherUserId + " не найден.");
             throw new UserNotFoundException("Пользователь c ID " + otherUserId + " не найден.");
         } else {
             return storage.findCommonFriends(userId, otherUserId);

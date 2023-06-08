@@ -59,10 +59,8 @@ public class FilmService {
 
     public void makeLike(int filmId, int userId) {
         if (!isExists(filmId)) {
-            log.info("Фильм c ID " + filmId + " не найден.");
             throw new FilmNotFoundException("Фильм c ID " + filmId + " не найден.");
         } else if (!userService.isExists(userId)) {
-            log.info("Юзер c ID " + filmId + " не найден.");
             throw new UserNotFoundException("Юзер c ID " + userId + " не найден.");
         } else {
             log.info("К фильму добавлен лайк.");
@@ -72,13 +70,10 @@ public class FilmService {
 
     public void removeLike(int filmId, int userId) {
         if (!isExists(filmId)) {
-            log.info("Фильм c ID " + filmId + " не найден.");
             throw new FilmNotFoundException("Фильм c ID " + filmId + " не найден.");
         } else if (!userService.isExists(userId)) {
-            log.info("Юзер c ID " + userId + " не найден.");
             throw new UserNotFoundException("Юзер c ID " + userId + " не найден.");
         } else if (!filmStorage.findLikes(filmId).contains(userId)) {
-            log.info("Юзер с ID " + userId + " не ставил лайк данному фильму.");
             throw new LikeNotFoundException("Юзер с ID " + userId + " не ставил лайк данному фильму.");
         } else {
             log.info("У фильма удален лайк.");
@@ -94,6 +89,7 @@ public class FilmService {
             for (Film film : films) {
                 saveAdditionalInfoToFilm(film);
             }
+            log.info("Популярные фильмы найдены.");
             return films;
         }
     }
@@ -117,7 +113,7 @@ public class FilmService {
 
     private void saveAdditionalInfoFromFilm(Film film, int filmId) {
         if (isGenresExists(film)) {
-            genresService.addFilmGenresToDB(film.getGenres(), filmId);
+            genresService.saveGenresToDBFromFilm(film.getGenres(), filmId);
         }
     }
 }
