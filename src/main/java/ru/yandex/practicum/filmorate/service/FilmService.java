@@ -148,9 +148,13 @@ public class FilmService {
         userService.findById(userId);
         userService.findById(friendId);
 
+        if (userId == friendId) {
+            throw new ValidationException("Не допустимый параметр запроса. Пользователь сравнивается сам с собой");
+        }
+
         Collection<Film> films = filmStorage.findCommonFilms(userId, friendId);
         for (Film film : films) {
-            saveAdditionalInfoToFilm(film);
+            saveAdditionalInfoFromDb(film);
         }
         return films;
 

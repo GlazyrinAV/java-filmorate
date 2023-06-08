@@ -26,8 +26,6 @@ public interface FilmStorage {
 
     Collection<Film> findByDirectorId(int directorId, String sortBy);
 
-    //  Boolean isExists(int filmId);
-
     Collection<Film> findCommonFilms(int userId, int friendId);
 
 }
