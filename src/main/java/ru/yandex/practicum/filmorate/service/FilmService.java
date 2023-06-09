@@ -150,4 +150,23 @@ public class FilmService {
         log.info("Фильм удален.");
         filmStorage.removeFilm(filmId);
     }
+
+    public Collection<Film> findCommonFilms(int userId, int friendId) {
+
+        userService.findById(userId);
+        userService.findById(friendId);
+
+        if (userId == friendId) {
+            throw new ValidationException("Не допустимый параметр запроса. Пользователь сравнивается сам с собой");
+        }
+
+        Collection<Film> films = filmStorage.findCommonFilms(userId, friendId);
+        for (Film film : films) {
+            saveAdditionalInfoFromDb(film);
+        }
+        return films;
+
+    }
+
 }
+

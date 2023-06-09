@@ -31,4 +31,7 @@ public interface FilmStorage {
     void removeFilm(int filmId);
 
     Collection<Film> findByDirectorId(int directorId, String sortBy);
+
+    Collection<Film> findCommonFilms(int userId, int friendId);
+
 }
