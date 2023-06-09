@@ -241,7 +241,7 @@ public class DirectorServiceTests {
     @Sql(value = {"/dataForDirectorTests.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     public void saveFilmDirectorsToDBNormal() {
         directorsService.saveDirectorsToDBFromFilm(Optional.of(List.of(new Director(1, null))), 2);
-        Assertions.assertEquals(2, filmService.findByDirectorId(1, Optional.of("year")).size(),
+        Assertions.assertEquals(2, filmService.findByDirectorId(Optional.of(1), Optional.of("year")).size(),
                 "Ошибка при нормальном добавлении режиссера в БД.");
     }
 
@@ -303,7 +303,7 @@ public class DirectorServiceTests {
     @Test
     @Sql(value = {"/dataForDirectorTests.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     public void findByDirectorIdNormal() {
-        Assertions.assertEquals(filmService.findByDirectorId(1, Optional.of("year")).toString(),
+        Assertions.assertEquals(filmService.findByDirectorId(Optional.of(1), Optional.of("year")).toString(),
                 "[Film(name=film, description=description, releaseDate=1999-04-30, duration=PT0.1S, id=1, genres=[], mpa=Rating(id=1, name=G), directors=[Director(id=1, name=Director)])]",
                 "Ошибка при нормальном поиске фильмов по режиссеру.");
     }
@@ -312,7 +312,7 @@ public class DirectorServiceTests {
     @Sql(value = {"/dataForDirectorTests.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     public void findByDirectorIdNegativeId() {
         DirectorNotFoundException exception = Assertions.assertThrows(DirectorNotFoundException.class, () ->
-                filmService.findByDirectorId(-1, Optional.of("year")));
+                filmService.findByDirectorId(Optional.of(-1), Optional.of("year")));
         Assertions.assertEquals(exception.getMessage(), "Режиссер c ID -1 не найден.",
                 "Ошибка при поиске фильмов по режиссеру c bl -1.");
     }
@@ -322,7 +322,7 @@ public class DirectorServiceTests {
     @Sql(value = {"/dataForDirectorTests.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     public void findByDirectorIdZeroId() {
         DirectorNotFoundException exception = Assertions.assertThrows(DirectorNotFoundException.class, () ->
-                filmService.findByDirectorId(0, Optional.of("year")));
+                filmService.findByDirectorId(Optional.of(0), Optional.of("year")));
         Assertions.assertEquals(exception.getMessage(), "Режиссер c ID 0 не найден.",
                 "Ошибка при поиске фильмов по режиссеру c bl 0.");
     }
@@ -331,7 +331,7 @@ public class DirectorServiceTests {
     @Sql(value = {"/dataForDirectorTests.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     public void findByDirectorIdWrongId() {
         DirectorNotFoundException exception = Assertions.assertThrows(DirectorNotFoundException.class, () ->
-                filmService.findByDirectorId(99, Optional.of("year")));
+                filmService.findByDirectorId(Optional.of(99), Optional.of("year")));
         Assertions.assertEquals(exception.getMessage(), "Режиссер c ID 99 не найден.",
                 "Ошибка при поиске фильмов по режиссеру c bl 99.");
     }
@@ -340,7 +340,7 @@ public class DirectorServiceTests {
     @Sql(value = {"/dataForDirectorTests.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     public void findByDirectorIdWithoutSort() {
         ValidationException exception = Assertions.assertThrows(ValidationException.class, () ->
-                filmService.findByDirectorId(1, Optional.ofNullable(null)));
+                filmService.findByDirectorId(Optional.of(1), Optional.ofNullable(null)));
         Assertions.assertEquals(exception.getMessage(), "Не указан параметр сортировки.",
                 "Ошибка при поиске фильмов по режисеру без указания сортировки.");
     }
@@ -349,8 +349,17 @@ public class DirectorServiceTests {
     @Sql(value = {"/dataForDirectorTests.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     public void findByDirectorIdWithRWongSort() {
         ValidationException exception = Assertions.assertThrows(ValidationException.class, () ->
-                filmService.findByDirectorId(1, Optional.of("nothing")));
+                filmService.findByDirectorId(Optional.of(1), Optional.of("nothing")));
         Assertions.assertEquals(exception.getMessage(), "Недопустимый параметр сортировки.",
                 "Ошибка при поиске фильмов по режисеру неправильному указанию типа сортировки.");
+    }
+
+    @Test
+    @Sql(value = {"/dataForDirectorTests.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    public void findByDirectorIdWithoutId() {
+        ValidationException exception = Assertions.assertThrows(ValidationException.class, () ->
+                filmService.findByDirectorId(Optional.ofNullable(null), Optional.of("year")));
+        Assertions.assertEquals(exception.getMessage(), "Не указан ид режиссера.",
+                "Ошибка при поиске фильмов по режисеру без указания ид режиссера.");
     }
 }
