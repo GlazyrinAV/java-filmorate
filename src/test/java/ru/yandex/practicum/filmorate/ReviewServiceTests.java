@@ -132,7 +132,7 @@ public class ReviewServiceTests {
     @MethodSource("wrongIdParameters")
     public void removeWithWrongId(int id) {
         ReviewNotFoundException exception = Assertions.assertThrows(ReviewNotFoundException.class, () -> {
-            reviewService.findById(id);
+            reviewService.remove(id);
         });
         Assertions.assertEquals(exception.getMessage(), "Отзыв c ID " + id + " не найден.",
                 "Ошибка при удалении отзыва c ид " + id + ".");
@@ -148,7 +148,11 @@ public class ReviewServiceTests {
     @ParameterizedTest
     @MethodSource("wrongIdParameters")
     public void findByIdWithWrongId(int id) {
-
+        ReviewNotFoundException exception = Assertions.assertThrows(ReviewNotFoundException.class, () -> {
+            reviewService.findById(id);
+        });
+        Assertions.assertEquals(exception.getMessage(), "Отзыв c ID " + id + " не найден.",
+                "Ошибка при поиске отзыва c ид " + id + ".");
     }
 
     @Test
