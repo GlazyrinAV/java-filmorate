@@ -217,11 +217,13 @@ public class ReviewServiceTests {
 
     @Test
     public void isExistsTrue() {
-
+        Assertions.assertTrue(reviewService.isExists(reviewService.findById(2)),
+                "Ошибка при проверки наличия отзыва");
     }
 
     @Test
     public void isExistsFalse() {
-
+        Assertions.assertFalse(reviewService.isExists(new Review("c", 1, 2, true, null, 99)),
+                "Ошибка при проверке несущетсвующего отзыва.");
     }
 }
