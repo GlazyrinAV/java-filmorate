@@ -5,14 +5,16 @@ import lombok.Builder;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Positive;
 
 @Data
 @AllArgsConstructor
 @Builder
 public class Director {
 
-    Integer id;
+    @Positive
+    private final Integer id;
 
     @NotBlank
-    String name;
+    private final String name;
 }

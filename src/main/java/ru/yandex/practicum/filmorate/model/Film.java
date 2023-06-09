@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import ru.yandex.practicum.filmorate.customConstraints.durationConstraint.DurationConstraint;
+import org.hibernate.validator.constraints.time.DurationMin;
 import ru.yandex.practicum.filmorate.customConstraints.releaseDateConstraint.ReleaseDateConstraint;
 
 import javax.validation.constraints.NotBlank;
@@ -28,7 +28,7 @@ public class Film {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private final LocalDate releaseDate;
 
-    @DurationConstraint
+    @DurationMin(minutes = 1)
     private final Duration duration;
 
     private Integer id;
