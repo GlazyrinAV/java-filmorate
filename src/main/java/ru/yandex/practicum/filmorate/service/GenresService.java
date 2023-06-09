@@ -2,7 +2,6 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.exceptions.GenreNotFoundException;
@@ -11,6 +10,7 @@ import ru.yandex.practicum.filmorate.storage.dao.GenresStorage;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -43,12 +43,8 @@ public class GenresService {
         return genre;
     }
 
-    public void saveGenresToDBFromFilm(List<Genre> genres, int filmId) {
-        try {
-            genresStorage.saveGenresToDBFromFilm(genres, filmId);
-        } catch (DataIntegrityViolationException exception) {
-            throw new DataIntegrityViolationException("В запросе неправильно указаны данные о фильме.");
-        }
+    public void saveGenresToDBFromFilm(Optional<List<Genre>> genres, int filmId) {
+        genres.ifPresent(genreList -> genresStorage.saveGenresToDBFromFilm(genreList, filmId));
     }
 
     public void removeFilmGenres(int filmId) {

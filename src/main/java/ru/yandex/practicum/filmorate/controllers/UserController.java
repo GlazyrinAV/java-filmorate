@@ -46,13 +46,17 @@ public class UserController {
 
     @PutMapping("/{id}/friends/{friendId}")
     @ResponseStatus(HttpStatus.OK)
-    public void saveFriend(@PathVariable int id, @PathVariable int friendId) {
+    public void saveFriend(@PathVariable int id,
+                           @PathVariable int friendId
+    ) {
         userService.saveFriend(id, friendId);
     }
 
     @DeleteMapping("/{id}/friends/{friendId}")
     @ResponseStatus(HttpStatus.OK)
-    public void removeFriend(@PathVariable int id, @PathVariable int friendId) {
+    public void removeFriend(@PathVariable int id,
+                             @PathVariable int friendId
+    ) {
         userService.removeFriend(id, friendId);
     }
 
@@ -64,7 +68,9 @@ public class UserController {
 
     @GetMapping("/{id}/friends/common/{otherId}")
     @ResponseStatus(HttpStatus.OK)
-    public Collection<User> findCommonFriends(@PathVariable int id, @PathVariable int otherId) {
+    public Collection<User> findCommonFriends(@PathVariable int id,
+                                              @PathVariable int otherId
+    ) {
         return userService.findCommonFriends(id, otherId);
     }
 

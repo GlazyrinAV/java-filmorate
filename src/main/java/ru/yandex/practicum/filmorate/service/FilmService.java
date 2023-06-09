@@ -11,6 +11,7 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.dao.FilmStorage;
 
 import java.util.Collection;
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -114,14 +115,6 @@ public class FilmService {
         return films;
     }
 
-    private boolean isGenresExists(Film film) {
-        return film.getGenres() != null;
-    }
-
-    private boolean isDirectorsExists(Film film) {
-        return film.getDirectors() != null;
-    }
-
     private void saveAdditionalInfoFromDb(Film film) {
         film.setGenres(genresService.saveGenresToFilmFromDB(film.getId()));
         film.setMpa(ratingsService.saveRatingToFilmFromDB(film.getId()));
@@ -129,12 +122,8 @@ public class FilmService {
     }
 
     private void saveAdditionalInfoToDb(Film film, int filmId) {
-        if (isGenresExists(film)) {
-            genresService.saveGenresToDBFromFilm(film.getGenres(), filmId);
-        }
-        if (isDirectorsExists(film)) {
-            directorsService.saveDirectorsToDBFromFilm(film.getDirectors(), filmId);
-        }
+        genresService.saveGenresToDBFromFilm(Optional.ofNullable(film.getGenres()), filmId);
+        directorsService.saveDirectorsToDBFromFilm(Optional.ofNullable(film.getDirectors()), filmId);
     }
 
     public void removeFilm(int filmId) {
