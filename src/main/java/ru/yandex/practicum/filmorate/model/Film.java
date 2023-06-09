@@ -5,8 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import ru.yandex.practicum.filmorate.customConstraints.durationConstraint.DurationConstraint;
-import ru.yandex.practicum.filmorate.customConstraints.genreIdConstraint.GenreIdConstraint;
-import ru.yandex.practicum.filmorate.customConstraints.ratingIdConstraint.RatingIdConstraint;
 import ru.yandex.practicum.filmorate.customConstraints.releaseDateConstraint.ReleaseDateConstraint;
 
 import javax.validation.constraints.NotBlank;
@@ -35,10 +33,8 @@ public class Film {
 
     private Integer id;
 
-    @GenreIdConstraint
     private List<Genre> genres;
 
-    @RatingIdConstraint
     private Rating mpa;
 
     private List<Director> directors;

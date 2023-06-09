@@ -46,9 +46,7 @@ public class FilmServiceUnitTests {
                 new Film("name", "adipisicing", LocalDate.of(1967, Month.APRIL, 25), Duration.ofMinutes(-100), null, List.of(new Genre(1, null)), new Rating(1, null), new ArrayList<>()),
                 new Film("name", "nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn" +
                         "nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn",
-                        LocalDate.of(1967, Month.APRIL, 25), Duration.ofMinutes(100), null, List.of(new Genre(1, null)), new Rating(1, null), List.of(new Director(1, null))),
-                new Film("name", "adipisicing", LocalDate.of(1967, Month.APRIL, 25), Duration.ofMinutes(100), null, List.of(new Genre(99, null)), new Rating(1, null), new ArrayList<>()),
-                new Film("name", "adipisicing", LocalDate.of(1967, Month.APRIL, 25), Duration.ofMinutes(100), null, List.of(new Genre(1, null)), new Rating(99, null), new ArrayList<>())
+                        LocalDate.of(1967, Month.APRIL, 25), Duration.ofMinutes(100), null, List.of(new Genre(1, null)), new Rating(1, null), List.of(new Director(1, null)))
         );
     }
 
@@ -290,7 +288,7 @@ public class FilmServiceUnitTests {
     public void findPopularNormalWithNoCount() {
         Film film = new Film("Name", "Description", LocalDate.of(1990, Month.APRIL, 13), Duration.ofMinutes(100), 1, List.of(new Genre(1, "Комедия")), new Rating(1, "G"), new ArrayList<>());
         filmService.saveNew(film);
-        Film film2 = new Film("Name2", "Description2", LocalDate.of(1990, Month.APRIL, 13), Duration.ofMinutes(100), null, List.of(new Genre(1, "Комедия")), new Rating(1, "G"), new ArrayList<>());
+        Film film2 = new Film("Name2", "Description2", LocalDate.of(1990, Month.APRIL, 13), Duration.ofMinutes(100), 2, List.of(new Genre(1, "Комедия")), new Rating(1, "G"), new ArrayList<>());
         filmService.saveNew(film2);
         User user = new User("abc@acb.ru", "login", "name", LocalDate.of(1986, Month.APRIL, 13), null);
         userService.saveNew(user);
