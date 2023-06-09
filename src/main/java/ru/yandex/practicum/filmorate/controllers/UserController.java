@@ -9,7 +9,6 @@ import ru.yandex.practicum.filmorate.service.UserService;
 
 import javax.validation.Valid;
 import java.util.Collection;
-import java.util.List;
 
 @RestController
 @RequestMapping("/users")
@@ -77,7 +76,7 @@ public class UserController {
     }
 
     @GetMapping("/{userId}/feed")
-    public List<Feed> findFeed(@PathVariable int userId) {
+    public Collection<Feed> findFeed(@PathVariable int userId) {
         return userService.findFeed(userId);
     }
 }

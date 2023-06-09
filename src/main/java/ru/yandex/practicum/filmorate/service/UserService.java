@@ -13,7 +13,6 @@ import ru.yandex.practicum.filmorate.storage.dao.FeedStorage;
 import ru.yandex.practicum.filmorate.storage.dao.UserStorage;
 
 import java.util.Collection;
-import java.util.List;
 
 @Service
 @Slf4j
@@ -89,7 +88,7 @@ public class UserService {
         return userStorage.findCommonFriends(userId, otherUserId);
     }
 
-    public List<Feed> findFeed(int userId) {
+    public Collection<Feed> findFeed(int userId) {
         findById(userId);
         return feedStorage.findFeed(userId);
     }

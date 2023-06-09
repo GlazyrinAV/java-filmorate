@@ -2,10 +2,11 @@ package ru.yandex.practicum.filmorate.storage.dao;
 
 import ru.yandex.practicum.filmorate.model.Feed;
 
-import java.util.List;
+import java.util.Collection;
 
 public interface FeedStorage {
 
     void saveFeed(int userId, int entityId, int eventTypeId, int operationId);
-    List<Feed> findFeed(int userId);
+
+    Collection<Feed> findFeed(int userId);
 }

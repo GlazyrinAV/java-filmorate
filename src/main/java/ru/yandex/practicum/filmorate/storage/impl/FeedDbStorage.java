@@ -10,7 +10,7 @@ import ru.yandex.practicum.filmorate.storage.dao.FeedStorage;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.List;
+import java.util.Collection;
 
 @Repository
 public class FeedDbStorage implements FeedStorage {
@@ -29,7 +29,7 @@ public class FeedDbStorage implements FeedStorage {
     }
 
     @Override
-    public List<Feed> findFeed(int userId) {
+    public Collection<Feed> findFeed(int userId) {
         String sql = "SELECT * FROM FEEDS F " +
                 "LEFT JOIN EVENT_TYPE AS ET ON F.EVENT_TYPE_ID = ET.EVENT_TYPE_ID " +
                 "LEFT JOIN OPERATION_FOR_FEEDS AS OFF ON F.OPERATION_ID = OFF.OPERATION_ID " +
