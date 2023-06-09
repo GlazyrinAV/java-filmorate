@@ -22,5 +22,4 @@ public interface DirectorStorage {
 
     void removeFromFilmByFilmID(int filmId);
 
-    Boolean isExists(int directorId);
 }

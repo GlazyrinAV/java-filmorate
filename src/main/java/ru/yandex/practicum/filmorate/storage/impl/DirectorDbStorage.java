@@ -102,12 +102,6 @@ public class DirectorDbStorage implements DirectorStorage {
         jdbcTemplate.update(sqlQuery, filmId);
     }
 
-    @Override
-    public Boolean isExists(int directorId) {
-        String sqlQuery = "SELECT EXISTS ( SELECT * FROM DIRECTORS WHERE DIRECTOR_ID =? )";
-        return Boolean.TRUE.equals(jdbcTemplate.queryForObject(sqlQuery, Boolean.TYPE, directorId));
-    }
-
     private Director mapRowToDirector(ResultSet resultSet, int rowNum) throws SQLException {
         return Director.builder()
                 .id(resultSet.getInt("director_id"))
