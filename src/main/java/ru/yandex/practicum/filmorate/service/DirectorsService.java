@@ -10,6 +10,7 @@ import ru.yandex.practicum.filmorate.storage.dao.DirectorStorage;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -61,8 +62,8 @@ public class DirectorsService {
         return directorStorage.saveDirectorsToFilmFromDB(filmId);
     }
 
-    public void saveDirectorsToDBFromFilm(List<Director> directors, int filmId) {
-        directorStorage.saveDirectorsToDBFromFilm(directors, filmId);
+    public void saveDirectorsToDBFromFilm(Optional<List<Director>> directors, int filmId) {
+        directors.ifPresent(directorList -> directorStorage.saveDirectorsToDBFromFilm(directorList, filmId));
     }
 
     public void removeFromFilmByFilmId(int filmId) {

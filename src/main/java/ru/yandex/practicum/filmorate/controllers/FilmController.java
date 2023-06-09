@@ -61,8 +61,7 @@ public class FilmController {
     @ResponseStatus(HttpStatus.OK)
     public Collection<Film> findPopularFilms(@RequestParam(defaultValue = "10") int count,
                                              @RequestParam Optional<Integer> genreId,
-                                             @RequestParam Optional<Integer> year
-    ) {
+                                             @RequestParam Optional<Integer> year) {
         return filmService.findPopular(count, genreId, year);
     }
 
