@@ -11,6 +11,7 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.dao.FilmStorage;
 
 import java.util.Collection;
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -79,18 +80,25 @@ public class FilmService {
         filmStorage.removeLike(filmId, userId);
     }
 
-    public Collection<Film> findPopular(int count) {
+    public Collection<Film> findPopular(int count, Optional<Integer> genreId, Optional<Integer> year) {
+        Collection<Film> films;
         if (count <= 0) {
             throw new ValidationException("Значение выводимых фильмов не может быть меньше или равно нулю.");
+        } else if (genreId.isPresent() & year.isPresent()) {
+            films = filmStorage.findPopularByGenreAndYear(count, genreId.get(), year.get());
+        } else if (genreId.isPresent()) {
+            films = filmStorage.findPopularByGenre(count, genreId.get());
+        } else if (year.isPresent()) {
+            films = filmStorage.findPopularByYear(count, year.get());
         } else {
-            Collection<Film> films = filmStorage.findPopular(count);
-            for (Film film : films) {
-                saveAdditionalInfoFromDb(film);
-            }
-            log.info("Популярные фильмы найдены.");
-            return films;
+            films = filmStorage.findPopular(count);
         }
-    }
+        for (Film film : films) {
+            saveAdditionalInfoFromDb(film);
+        }
+        log.info("Популярные фильмы найдены.");
+        return films;
+}
 
     public Collection<Integer> findLikes(int filmId) {
         log.info("Лайки к фильму найдены.");

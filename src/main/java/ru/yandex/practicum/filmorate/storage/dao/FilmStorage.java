@@ -16,6 +16,12 @@ public interface FilmStorage {
 
     Collection<Film> findPopular(int count);
 
+    Collection<Film> findPopularByGenreAndYear(int count, int genreId, int year);
+
+    Collection<Film> findPopularByGenre(int count, int genreId);
+
+    Collection<Film> findPopularByYear(int count, int year);
+
     void makeLike(int filmId, int userId);
 
     void removeLike(int filmId, int userId);
