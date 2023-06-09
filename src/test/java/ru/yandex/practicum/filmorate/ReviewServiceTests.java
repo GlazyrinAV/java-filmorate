@@ -10,6 +10,7 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.jdbc.Sql;
 import ru.yandex.practicum.filmorate.exceptions.exceptions.FilmNotFoundException;
+import ru.yandex.practicum.filmorate.exceptions.exceptions.ReviewNotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.exceptions.UserNotFoundException;
 import ru.yandex.practicum.filmorate.model.Review;
 import ru.yandex.practicum.filmorate.service.ReviewService;
@@ -37,6 +38,16 @@ public class ReviewServiceTests {
                 new Review("content", null, 1, true, null, null),
                 new Review("content", 1, null, true, null, null),
                 new Review("content", 1, 1, null, null, null)
+        );
+    }
+
+    static Stream<Review> wrongUpdateReviewParameters() {
+        return Stream.of(
+                new Review("", 1, 1, true, null, 2),
+                new Review(null, 1, 1, true, null, 2),
+                new Review("content", null, 1, true, null, 2),
+                new Review("content", 1, null, true, null, 2),
+                new Review("content", 1, 1, null, null, 2)
         );
     }
 
@@ -99,20 +110,32 @@ public class ReviewServiceTests {
     }
 
     @ParameterizedTest
-    @MethodSource("wrongIdParameters")
-    public void updateWithErrors(int id) {
-
+    @MethodSource("wrongUpdateReviewParameters")
+    public void updateWithErrors(Review review) {
+        Set<ConstraintViolation<Review>> violations = validator.validate(review);
+        violations.stream().map(ConstraintViolation::getMessage).forEach(System.out::println);
+        Assertions.assertSame(1, violations.size(),
+                "Ошибка при выявлении ошибок в данных обновленных отзывов.");
     }
 
     @Test
     public void removeNormal() {
-
+        reviewService.remove(2);
+        ReviewNotFoundException exception = Assertions.assertThrows(ReviewNotFoundException.class, () -> {
+            reviewService.findById(2);
+        });
+        Assertions.assertEquals(exception.getMessage(), "Отзыв c ID 2 не найден.",
+                "Ошибка при нормальном удалении отзыва.");
     }
 
     @ParameterizedTest
     @MethodSource("wrongIdParameters")
     public void removeWithWrongId(int id) {
-
+        ReviewNotFoundException exception = Assertions.assertThrows(ReviewNotFoundException.class, () -> {
+            reviewService.findById(id);
+        });
+        Assertions.assertEquals(exception.getMessage(), "Отзыв c ID " + id + " не найден.",
+                "Ошибка при удалении отзыва c ид " + id + ".");
     }
 
     @Test
