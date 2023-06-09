@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import ru.yandex.practicum.filmorate.customConstraints.durationConstraint.DurationConstraint;
 import ru.yandex.practicum.filmorate.customConstraints.genreIdConstraint.GenreIdConstraint;
 import ru.yandex.practicum.filmorate.customConstraints.ratingIdConstraint.RatingIdConstraint;
@@ -18,7 +17,6 @@ import java.util.List;
 
 @Data
 @AllArgsConstructor
-@EqualsAndHashCode(exclude = "id")
 @Builder
 public class Film {
 
