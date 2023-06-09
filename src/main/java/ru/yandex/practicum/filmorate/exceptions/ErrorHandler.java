@@ -39,9 +39,9 @@ public class ErrorHandler {
         return sendErrorResponse("error", exception.getMessage());
     }
 
-    @ExceptionHandler
+    @ExceptionHandler({ValidationException.class})
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorResponse validationException(ValidationException exception) {
+    public ErrorResponse validationException(RuntimeException exception) {
         return sendErrorResponse("error", exception.getMessage());
     }
 

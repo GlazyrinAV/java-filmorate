@@ -105,12 +105,17 @@ public class FilmService {
         return filmStorage.findLikes(filmId);
     }
 
-    public Collection<Film> findByDirectorId(int directorId, String sortBy) {
-        directorsService.findById(directorId);
-        if (!(sortBy.equals("year") || sortBy.equals("likes"))) {
-            throw new ValidationException("Недопустимый параметр запроса.");
+    public Collection<Film> findByDirectorId(Optional<Integer> directorId, Optional<String> sortBy) {
+        if (directorId.isEmpty()) {
+            throw new ValidationException("Не указан ид режиссера.");
         }
-        Collection<Film> films = filmStorage.findByDirectorId(directorId, sortBy);
+        directorsService.findById(directorId.get());
+        if (sortBy.isEmpty()) {
+            throw new ValidationException("Не указан параметр сортировки.");
+        } else if (!(sortBy.get().equals("year") || sortBy.get().equals("likes"))) {
+            throw new ValidationException("Недопустимый параметр сортировки.");
+        }
+        Collection<Film> films = filmStorage.findByDirectorId(directorId.get(), sortBy.get());
         if (films.isEmpty()) {
             log.info("Фильмы по указанному режиссеру не найдены.");
         } else {

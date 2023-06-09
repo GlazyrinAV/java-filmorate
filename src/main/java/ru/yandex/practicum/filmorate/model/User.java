@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import ru.yandex.practicum.filmorate.customConstraints.whiteSpaceConstraint.WhiteSpaceConstraint;
 
 import javax.validation.constraints.Email;
@@ -14,7 +13,6 @@ import java.time.LocalDate;
 
 @Data
 @AllArgsConstructor
-@EqualsAndHashCode(exclude = "id")
 @Builder
 public class User {
 
