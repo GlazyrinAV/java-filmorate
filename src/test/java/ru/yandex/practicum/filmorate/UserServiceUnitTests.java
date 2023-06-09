@@ -21,7 +21,6 @@ import javax.validation.Validator;
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -169,13 +168,15 @@ public class UserServiceUnitTests {
         Assertions.assertTrue(userService.findFriends(1).size() == 1 &&
                         userService.findFriends(2).isEmpty(),
                 "Ошибка при нормальном добавлении друга.");
-        Collection<Feed> feeds = feedStorage.findFeed(1);
+
+        List<Feed> feeds = new ArrayList<>(feedStorage.findFeed(1));
         Assertions.assertEquals(feeds.size(), 1);
-        Assertions.assertEquals(feeds.iterator().next().getEventId(), 1);
-        Assertions.assertEquals(feeds.iterator().next().getUserId(), 1);
-        Assertions.assertEquals(feeds.iterator().next().getEntityId(), 2);
-        Assertions.assertEquals(feeds.iterator().next().getEventType().getEventTypeId(), 3);
-        Assertions.assertEquals(feeds.iterator().next().getOperation().getOperationId(), 2);
+        Feed feed = feeds.get(0);
+        Assertions.assertEquals(feed.getEventId(), 1);
+        Assertions.assertEquals(feed.getUserId(), 1);
+        Assertions.assertEquals(feed.getEntityId(), 2);
+        Assertions.assertEquals(feed.getEventType().getEventTypeId(), 3);
+        Assertions.assertEquals(feed.getOperation().getOperationId(), 2);
     }
 
     @Test
@@ -268,6 +269,21 @@ public class UserServiceUnitTests {
         Assertions.assertTrue(userService.findFriends(1).isEmpty() &&
                         userService.findFriends(2).isEmpty(),
                 "Ошибка при нормальном удалении друга.");
+
+        List<Feed> feeds = new ArrayList<>(feedStorage.findFeed(1));
+        Assertions.assertEquals(feeds.size(), 2);
+        Feed firstFeed = feeds.get(0);
+        Assertions.assertEquals(firstFeed.getEventId(), 1);
+        Assertions.assertEquals(firstFeed.getUserId(), 1);
+        Assertions.assertEquals(firstFeed.getEntityId(), 2);
+        Assertions.assertEquals(firstFeed.getEventType().getEventTypeId(), 3);
+        Assertions.assertEquals(firstFeed.getOperation().getOperationId(), 2);
+        Feed secondFeed = feeds.get(1);
+        Assertions.assertEquals(secondFeed.getEventId(), 2);
+        Assertions.assertEquals(secondFeed.getUserId(), 1);
+        Assertions.assertEquals(secondFeed.getEntityId(), 2);
+        Assertions.assertEquals(secondFeed.getEventType().getEventTypeId(), 3);
+        Assertions.assertEquals(secondFeed.getOperation().getOperationId(), 1);
     }
 
     @Test

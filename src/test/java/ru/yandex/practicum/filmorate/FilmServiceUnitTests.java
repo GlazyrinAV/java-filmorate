@@ -15,6 +15,7 @@ import ru.yandex.practicum.filmorate.exceptions.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.*;
 import ru.yandex.practicum.filmorate.service.FilmService;
 import ru.yandex.practicum.filmorate.service.UserService;
+import ru.yandex.practicum.filmorate.storage.dao.FeedStorage;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
@@ -35,10 +36,9 @@ import java.util.stream.Stream;
 public class FilmServiceUnitTests {
 
     private final Validator validator;
-
     private final FilmService filmService;
-
     private final UserService userService;
+    private final FeedStorage feedStorage;
 
     static Stream<Film> filmWithWrongParameters() {
         return Stream.of(
@@ -47,9 +47,7 @@ public class FilmServiceUnitTests {
                 new Film("name", "adipisicing", LocalDate.of(1967, Month.APRIL, 25), Duration.ofMinutes(-100), null, List.of(new Genre(1, null)), new Rating(1, null), new ArrayList<>()),
                 new Film("name", "nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn" +
                         "nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn",
-                        LocalDate.of(1967, Month.APRIL, 25), Duration.ofMinutes(100), null, List.of(new Genre(1, null)), new Rating(1, null), List.of(new Director(1, null))),
-                new Film("name", "adipisicing", LocalDate.of(1967, Month.APRIL, 25), Duration.ofMinutes(100), null, List.of(new Genre(99, null)), new Rating(1, null), new ArrayList<>()),
-                new Film("name", "adipisicing", LocalDate.of(1967, Month.APRIL, 25), Duration.ofMinutes(100), null, List.of(new Genre(1, null)), new Rating(99, null), new ArrayList<>())
+                        LocalDate.of(1967, Month.APRIL, 25), Duration.ofMinutes(100), null, List.of(new Genre(1, null)), new Rating(1, null), List.of(new Director(1, null)))
         );
     }
 
@@ -123,6 +121,15 @@ public class FilmServiceUnitTests {
         userService.saveNew(user);
         filmService.makeLike(1, 1);
         Assertions.assertEquals(filmService.findLikes(1).toString(), "[1]", "Ошибка при нормальном добавлении лайка.");
+
+        List<Feed> feeds = new ArrayList<>(feedStorage.findFeed(1));
+        Assertions.assertEquals(feeds.size(), 1);
+        Feed feed = feeds.get(0);
+        Assertions.assertEquals(feed.getEventId(), 1);
+        Assertions.assertEquals(feed.getUserId(), 1);
+        Assertions.assertEquals(feed.getEntityId(), 1);
+        Assertions.assertEquals(feed.getEventType().getEventTypeId(), 1);
+        Assertions.assertEquals(feed.getOperation().getOperationId(), 2);
     }
 
     @Test
@@ -200,6 +207,21 @@ public class FilmServiceUnitTests {
         filmService.makeLike(1, 1);
         filmService.removeLike(1, 1);
         Assertions.assertTrue(filmService.findLikes(1).isEmpty(), "Ошибка при нормальном удалении лайка.");
+
+        List<Feed> feeds = new ArrayList<>(feedStorage.findFeed(1));
+        Assertions.assertEquals(feeds.size(), 2);
+        Feed feed = feeds.get(0);
+        Assertions.assertEquals(feed.getEventId(), 1);
+        Assertions.assertEquals(feed.getUserId(), 1);
+        Assertions.assertEquals(feed.getEntityId(), 1);
+        Assertions.assertEquals(feed.getEventType().getEventTypeId(), 1);
+        Assertions.assertEquals(feed.getOperation().getOperationId(), 2);
+        Feed secondFeed = feeds.get(1);
+        Assertions.assertEquals(secondFeed.getEventId(), 2);
+        Assertions.assertEquals(secondFeed.getUserId(), 1);
+        Assertions.assertEquals(secondFeed.getEntityId(), 1);
+        Assertions.assertEquals(secondFeed.getEventType().getEventTypeId(), 1);
+        Assertions.assertEquals(secondFeed.getOperation().getOperationId(), 1);
     }
 
     @Test

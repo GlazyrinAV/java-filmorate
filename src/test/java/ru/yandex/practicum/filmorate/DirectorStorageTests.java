@@ -17,6 +17,7 @@ import ru.yandex.practicum.filmorate.service.FilmService;
 @SpringBootTest
 @AutoConfigureTestDatabase
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
+@Sql(value = {"/schema.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 @Sql(value = {"/data.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 public class DirectorStorageTests {
 
@@ -102,7 +103,7 @@ public class DirectorStorageTests {
                 directorsService.update(director));
         Assertions.assertEquals(exception.getMessage(), "Режиссер c ID -1 не найден.",
                 "Ошибка при обновлении режиссера c указанием отрицательного ид.");
-}
+    }
 
     @Test
     @Sql(value = {"/dataForDirectorTests.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
@@ -122,7 +123,7 @@ public class DirectorStorageTests {
 
     @Test
     @Sql(value = {"/dataForDirectorTests.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-    public void findAllWithDirectors()  {
+    public void findAllWithDirectors() {
         Assertions.assertTrue(directorsService.findAll().size() == 2,
                 "Ошибка при получении всех режиссеров при заполненной базе.");
     }

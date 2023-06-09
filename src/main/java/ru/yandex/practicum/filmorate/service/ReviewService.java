@@ -61,7 +61,6 @@ public class ReviewService {
         log.info("Отзыв удален.");
         reviewStorage.remove(reviewId);
         feedStorage.saveFeed(reviewToDelete.getUserId(), reviewId, 2, 1);
-
     }
 
     public Review findById(int reviewId) {
