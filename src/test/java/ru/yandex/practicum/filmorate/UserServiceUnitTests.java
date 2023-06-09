@@ -328,9 +328,9 @@ public class UserServiceUnitTests {
 
     @Test
     public void findFriendsNormalOneSide() {
-        User user = new User("abc@acb.ru", "login", "name", LocalDate.of(1986, Month.APRIL, 13), null);
+        User user = new User("abc@acb.ru", "login", "name", LocalDate.of(1986, Month.APRIL, 13), 1);
         userService.saveNew(user);
-        User user2 = new User("vcx@acb.ru", "afr", "hh", LocalDate.of(1986, Month.APRIL, 14), null);
+        User user2 = new User("vcx@acb.ru", "afr", "hh", LocalDate.of(1986, Month.APRIL, 14), 2);
         userService.saveNew(user2);
         userService.saveFriend(1, 2);
         Assertions.assertTrue(userService.findFriends(1).equals(new ArrayList<>(List.of(user2))) &&
@@ -340,9 +340,9 @@ public class UserServiceUnitTests {
 
     @Test
     public void findFriendsNormalTwoSides() {
-        User user = new User("abc@acb.ru", "login", "name", LocalDate.of(1986, Month.APRIL, 13), null);
+        User user = new User("abc@acb.ru", "login", "name", LocalDate.of(1986, Month.APRIL, 13), 1);
         userService.saveNew(user);
-        User user2 = new User("vcx@acb.ru", "afr", "hh", LocalDate.of(1986, Month.APRIL, 14), null);
+        User user2 = new User("vcx@acb.ru", "afr", "hh", LocalDate.of(1986, Month.APRIL, 14), 2);
         userService.saveNew(user2);
         userService.saveFriend(1, 2);
         userService.saveFriend(2,1);
@@ -390,7 +390,7 @@ public class UserServiceUnitTests {
         userService.saveNew(user);
         User user2 = new User("vcx@acb.ru", "afr", "hh", LocalDate.of(1986, Month.APRIL, 14), null);
         userService.saveNew(user2);
-        User user3 = new User("jkf@acb.ru", "dsa", "bb", LocalDate.of(1986, Month.APRIL, 14), null);
+        User user3 = new User("jkf@acb.ru", "dsa", "bb", LocalDate.of(1986, Month.APRIL, 14), 3);
         userService.saveNew(user3);
         userService.saveFriend(1,3);
         userService.saveFriend(2,3);
