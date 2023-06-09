@@ -2,11 +2,15 @@ package ru.yandex.practicum.filmorate;
 
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.jdbc.Sql;
 import ru.yandex.practicum.filmorate.service.RatingsService;
+
+import java.util.stream.Stream;
 
 @SpringBootTest
 @AutoConfigureTestDatabase
@@ -16,13 +20,18 @@ public class ReviewServiceTests {
 
     private final RatingsService ratingsService;
 
+    static Stream<Integer> wrongIdParameters() {
+        return Stream.of(-1, 0, 99);
+    }
+
     @Test
     public void saveNewNormal() {
 
     }
 
-    @Test
-    public void saveNewWithErrors() {
+    @ParameterizedTest
+    @MethodSource("wrongIdParameters")
+    public void saveNewWithErrors(int id) {
 
     }
 
@@ -31,8 +40,9 @@ public class ReviewServiceTests {
 
     }
 
-    @Test
-    public void updateWithErros() {
+    @ParameterizedTest
+    @MethodSource("wrongIdParameters")
+    public void updateWithErrors(int id) {
 
     }
 
@@ -41,18 +51,9 @@ public class ReviewServiceTests {
 
     }
 
-    @Test
-    public void removeWithNegativeId() {
-
-    }
-
-    @Test
-    public void removeWithZeroId() {
-
-    }
-
-    @Test
-    public void removeWrongId() {
+    @ParameterizedTest
+    @MethodSource("wrongIdParameters")
+    public void removeWithWrongId(int id) {
 
     }
 
@@ -61,18 +62,9 @@ public class ReviewServiceTests {
 
     }
 
-    @Test
-    public void findByIdWithNegativeId() {
-
-    }
-
-    @Test
-    public void findByIdWithZeroId() {
-
-    }
-
-    @Test
-    public void findByIdWithWrongId() {
+    @ParameterizedTest
+    @MethodSource("wrongIdParameters")
+    public void findByIdWithWrongId(int id) {
 
     }
 
@@ -91,18 +83,9 @@ public class ReviewServiceTests {
 
     }
 
-    @Test
-    public void findByFilmIdWithNegativeId() {
-
-    }
-
-    @Test
-    public void findByFilmIdWithZeroId() {
-
-    }
-
-    @Test
-    public void findByFilmIdWithWrongId() {
+    @ParameterizedTest
+    @MethodSource("wrongIdParameters")
+    public void findByFilmIdWithWrongId(int id) {
 
     }
 
@@ -116,33 +99,15 @@ public class ReviewServiceTests {
 
     }
 
-    @Test
-    public void saveLikeWithNegativeUserId() {
+    @ParameterizedTest
+    @MethodSource("wrongIdParameters")
+    public void saveLikeWithWrongUserId(int id) {
 
     }
 
-    @Test
-    public void saveLikeWithZeroUserId() {
-
-    }
-
-    @Test
-    public void saveLikeWithWrongUserId() {
-
-    }
-
-    @Test
-    public void saveLikeNegativeReviewId() {
-
-    }
-
-    @Test
-    public void saveLikeZeroReviewId() {
-
-    }
-
-    @Test
-    public void saveLikeWrongReviewId() {
+    @ParameterizedTest
+    @MethodSource("wrongIdParameters")
+    public void saveLikeWrongReviewId(int id) {
 
     }
 
@@ -156,33 +121,15 @@ public class ReviewServiceTests {
 
     }
 
-    @Test
-    public void removeLikeWithNegativeUserId() {
+    @ParameterizedTest
+    @MethodSource("wrongIdParameters")
+    public void removeLikeWithWrongUserId(int id) {
 
     }
 
-    @Test
-    public void removeLikeWithZeroUserId() {
-
-    }
-
-    @Test
-    public void removeLikeWithWrongUserId() {
-
-    }
-
-    @Test
-    public void removeLikeNegativeReviewId() {
-
-    }
-
-    @Test
-    public void removeLikeZeroReviewId() {
-
-    }
-
-    @Test
-    public void removeLikeWrongReviewId() {
+    @ParameterizedTest
+    @MethodSource("wrongIdParameters")
+    public void removeLikeWrongReviewId(int id) {
 
     }
 
@@ -196,33 +143,15 @@ public class ReviewServiceTests {
 
     }
 
-    @Test
-    public void removeDisLikeWithNegativeUserId() {
+    @ParameterizedTest
+    @MethodSource("wrongIdParameters")
+    public void removeDisLikeWithWrongUserId(int id) {
 
     }
 
-    @Test
-    public void removeDisLikeWithZeroUserId() {
-
-    }
-
-    @Test
-    public void removeDisLikeWithWrongUserId() {
-
-    }
-
-    @Test
-    public void removeDisLikeNegativeReviewId() {
-
-    }
-
-    @Test
-    public void removeDisLikeZeroReviewId() {
-
-    }
-
-    @Test
-    public void removeDisLikeWrongReviewId() {
+    @ParameterizedTest
+    @MethodSource("wrongIdParameters")
+    public void removeDisLikeWrongReviewId(int id) {
 
     }
 
