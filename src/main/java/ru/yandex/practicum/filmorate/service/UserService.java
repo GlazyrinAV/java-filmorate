@@ -7,39 +7,45 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.exceptions.FriendAlreadyExistException;
 import ru.yandex.practicum.filmorate.exceptions.exceptions.UserNotFoundException;
+import ru.yandex.practicum.filmorate.model.Feed;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.dao.FeedStorage;
 import ru.yandex.practicum.filmorate.storage.dao.UserStorage;
 
 import java.util.Collection;
+import java.util.List;
 
 @Service
 @Slf4j
 public class UserService {
 
-    private final UserStorage storage;
+    private final UserStorage userStorage;
+    private final FeedStorage feedStorage;
 
     @Autowired
-    public UserService(@Qualifier("UserDbStorage") UserStorage storage) {
-        this.storage = storage;
+    public UserService(@Qualifier("UserDbStorage") UserStorage userStorage,
+                       FeedStorage feedStorage) {
+        this.userStorage = userStorage;
+        this.feedStorage = feedStorage;
     }
 
     public User saveNew(User user) {
         checkName(user);
-        return findById(storage.saveNew(user));
+        return findById(userStorage.saveNew(user));
     }
 
     public User update(User user) {
-        return findById(storage.update(user));
+        return findById(userStorage.update(user));
     }
 
     public Collection<User> findAll() {
-        return storage.findAll();
+        return userStorage.findAll();
     }
 
     public User findById(int userId) {
         User user;
         try {
-            user = storage.findById(userId);
+            user = userStorage.findById(userId);
         } catch (EmptyResultDataAccessException exception) {
             throw new UserNotFoundException("Пользователь c ID " + userId + " не найден.");
         }
@@ -49,45 +55,50 @@ public class UserService {
     public void saveFriend(int userId, int friendId) {
         findById(userId);
         findById(friendId);
-        if (storage.findFriends(userId).contains(storage.findById(friendId))) {
+        if (userStorage.findFriends(userId).contains(userStorage.findById(friendId))) {
             throw new FriendAlreadyExistException("Пользователь с ID " + userId +
                     " уже добавил в друзья пользователя c ID " + friendId);
         } else {
             log.info("Друг добавлен.");
-            storage.saveFriend(userId, friendId);
+            userStorage.saveFriend(userId, friendId);
+            feedStorage.saveFeed(userId, friendId, 3, 2);
         }
     }
 
     public void removeFriend(int userId, int friendId) {
         findById(userId);
         findById(friendId);
-        if (!storage.findFriends(userId).contains(findById(friendId))) {
+        if (!userStorage.findFriends(userId).contains(findById(friendId))) {
             throw new FriendAlreadyExistException("Пользователь с ID " + userId +
                     " не имеет в друзьях пользователя c ID " + friendId);
         } else {
             log.info("Друг удален.");
-            storage.removeFriend(userId, friendId);
+            userStorage.removeFriend(userId, friendId);
+            feedStorage.saveFeed(userId, friendId, 3, 1);
         }
     }
 
     public Collection<User> findFriends(int userId) {
         findById(userId);
-        return storage.findFriends(userId);
+        return userStorage.findFriends(userId);
     }
 
     public Collection<User> findCommonFriends(int userId, int otherUserId) {
         findById(userId);
         findById(otherUserId);
-        return storage.findCommonFriends(userId, otherUserId);
+        return userStorage.findCommonFriends(userId, otherUserId);
+    }
+
+    public List<Feed> findFeed(int userId) {
+        findById(userId);
+        return feedStorage.findFeed(userId);
     }
 
     public void removeUser(int userId) {
         findById(userId);
         log.info("Пользователь удален.");
-        storage.removeUser(userId);
-
+        userStorage.removeUser(userId);
     }
-
 
     private void checkName(User user) {
         if (user.getName().isBlank()) {

@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.exceptions.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.storage.dao.FeedStorage;
 import ru.yandex.practicum.filmorate.storage.dao.FilmStorage;
 
 import java.util.Collection;
@@ -22,15 +23,18 @@ public class FilmService {
     private final UserService userService;
     private final GenresService genresService;
     private final RatingsService ratingsService;
+    private final FeedStorage feedStorage;
 
     @Autowired
     public FilmService(@Qualifier("FilmDbStorage") FilmStorage filmStorage, UserService userService,
-                       GenresService genresService, RatingsService ratingsService, DirectorsService directorsService) {
+                       GenresService genresService, RatingsService ratingsService, DirectorsService directorsService,
+                       FeedStorage feedStorage) {
         this.filmStorage = filmStorage;
         this.directorsService = directorsService;
         this.userService = userService;
         this.genresService = genresService;
         this.ratingsService = ratingsService;
+        this.feedStorage = feedStorage;
     }
 
     public Film saveNew(Film film) {
@@ -71,6 +75,7 @@ public class FilmService {
         findById(filmId);
         log.info("К фильму добавлен лайк.");
         filmStorage.makeLike(filmId, userId);
+        feedStorage.saveFeed(userId, filmId, 1, 2);
     }
 
     public void removeLike(int filmId, int userId) {
@@ -78,6 +83,7 @@ public class FilmService {
         findById(filmId);
         log.info("У фильма удален лайк.");
         filmStorage.removeLike(filmId, userId);
+        feedStorage.saveFeed(userId, filmId, 1, 1);
     }
 
     public Collection<Film> findPopular(int count, Optional<Integer> genreId, Optional<Integer> year) {
@@ -98,7 +104,7 @@ public class FilmService {
         }
         log.info("Популярные фильмы найдены.");
         return films;
-}
+    }
 
     public Collection<Integer> findLikes(int filmId) {
         log.info("Лайки к фильму найдены.");
