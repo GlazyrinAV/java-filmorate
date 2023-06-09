@@ -50,8 +50,7 @@ public class ReviewController {
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public Collection<Review> findByFilmId(@RequestParam Optional<Integer> filmId,
-                                           @RequestParam(defaultValue = "10") int count
-    ) {
+                                           @RequestParam(defaultValue = "10") int count) {
         if (filmId.isEmpty()) {
             return reviewService.findAll(count);
         } else {
@@ -61,27 +60,19 @@ public class ReviewController {
 
     @PutMapping("/{id}/{like}/{userId}")
     @ResponseStatus(HttpStatus.OK)
-    public void saveLike(@PathVariable int id,
-                         @PathVariable int userId,
-                         @PathVariable String like
-    ) {
+    public void saveLike(@PathVariable int id, @PathVariable int userId, @PathVariable String like) {
         reviewService.saveLike(userId, id, like);
     }
 
     @DeleteMapping("/{id}/{like}/{userId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void removeLike(@PathVariable int id,
-                           @PathVariable int userId,
-                           @PathVariable String like
-    ) {
+    public void removeLike(@PathVariable int id, @PathVariable int userId, @PathVariable String like) {
         reviewService.removeLike(userId, id, like);
     }
 
     @DeleteMapping("/{id}/dislike/{userId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void removeDislike(@PathVariable int id,
-                              @PathVariable int userId
-    ) {
+    public void removeDislike(@PathVariable int id, @PathVariable int userId) {
         reviewService.removeDislike(userId, id);
     }
 }

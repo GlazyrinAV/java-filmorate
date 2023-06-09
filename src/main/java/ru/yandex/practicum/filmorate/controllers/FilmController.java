@@ -47,17 +47,13 @@ public class FilmController {
 
     @PutMapping("/{id}/like/{userId}")
     @ResponseStatus(HttpStatus.OK)
-    public void makeNewLike(@PathVariable int id,
-                            @PathVariable int userId
-    ) {
+    public void makeNewLike(@PathVariable int id, @PathVariable int userId) {
         filmService.makeLike(id, userId);
     }
 
     @DeleteMapping("/{id}/like/{userId}")
     @ResponseStatus(HttpStatus.OK)
-    public void removeLike(@PathVariable int id,
-                           @PathVariable int userId
-    ) {
+    public void removeLike(@PathVariable int id, @PathVariable int userId) {
         filmService.removeLike(id, userId);
     }
 
@@ -65,8 +61,7 @@ public class FilmController {
     @ResponseStatus(HttpStatus.OK)
     public Collection<Film> findPopularFilms(@RequestParam(defaultValue = "10") int count,
                                              @RequestParam Optional<Integer> genreId,
-                                             @RequestParam Optional<Integer> year
-    ) {
+                                             @RequestParam Optional<Integer> year) {
         return filmService.findPopular(count, genreId, year);
     }
 
@@ -78,9 +73,7 @@ public class FilmController {
 
     @GetMapping("/director/{directorId}")
     @ResponseStatus(HttpStatus.OK)
-    public Collection<Film> findByDirectorId(@PathVariable int directorId,
-                                             @RequestParam String sortBy
-    ) {
+    public Collection<Film> findByDirectorId(@PathVariable int directorId, @RequestParam String sortBy) {
         return filmService.findByDirectorId(directorId, sortBy);
     }
 
