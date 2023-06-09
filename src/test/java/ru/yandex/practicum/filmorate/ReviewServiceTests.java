@@ -111,7 +111,128 @@ public class ReviewServiceTests {
 
     }
 
+    @Test
     public void saveLikeNormal() {
+
+    }
+
+    @Test
+    public void saveLikeWithNegativeUserId() {
+
+    }
+
+    @Test
+    public void saveLikeWithZeroUserId() {
+
+    }
+
+    @Test
+    public void saveLikeWithWrongUserId() {
+
+    }
+
+    @Test
+    public void saveLikeNegativeReviewId() {
+
+    }
+
+    @Test
+    public void saveLikeZeroReviewId() {
+
+    }
+
+    @Test
+    public void saveLikeWrongReviewId() {
+
+    }
+
+    @Test
+    public void saveLikeWithWrongOpinion() {
+
+    }
+
+    @Test
+    public void removeLikeNormal() {
+
+    }
+
+    @Test
+    public void removeLikeWithNegativeUserId() {
+
+    }
+
+    @Test
+    public void removeLikeWithZeroUserId() {
+
+    }
+
+    @Test
+    public void removeLikeWithWrongUserId() {
+
+    }
+
+    @Test
+    public void removeLikeNegativeReviewId() {
+
+    }
+
+    @Test
+    public void removeLikeZeroReviewId() {
+
+    }
+
+    @Test
+    public void removeLikeWrongReviewId() {
+
+    }
+
+    @Test
+    public void removeLikeWithWrongOpinion() {
+
+    }
+
+    @Test
+    public void removeDisLikeNormal() {
+
+    }
+
+    @Test
+    public void removeDisLikeWithNegativeUserId() {
+
+    }
+
+    @Test
+    public void removeDisLikeWithZeroUserId() {
+
+    }
+
+    @Test
+    public void removeDisLikeWithWrongUserId() {
+
+    }
+
+    @Test
+    public void removeDisLikeNegativeReviewId() {
+
+    }
+
+    @Test
+    public void removeDisLikeZeroReviewId() {
+
+    }
+
+    @Test
+    public void removeDisLikeWrongReviewId() {
+
+    }
+
+    @Test
+    public void isExistsTrue() {
+
+    }
+
+    @Test
+    public void isExistsFalse() {
 
     }
 }
