@@ -37,11 +37,11 @@ public class ReviewService {
         if (isExists(review)) {
             log.info("Такой отзыв уже существует.");
             throw new ReviewAlreadyExistsException("Такой отзыв уже существует.");
-        } else {
-            log.info("Отзыв добавлен.");
-            int id = reviewStorage.saveNew(review);
-            return reviewStorage.findById(id);
         }
+
+        log.info("Отзыв добавлен.");
+        int id = reviewStorage.saveNew(review);
+        return reviewStorage.findById(id);
     }
 
     public Review update(Review review) {
@@ -71,67 +71,66 @@ public class ReviewService {
     public Collection<Review> findAll(int count) {
         if (count <= 0) {
             throw new ValidationException("Значение выводимых отзывов не может быть меньше или равно нулю.");
-        } else {
-            ArrayList<Review> reviews = new ArrayList<>(reviewStorage.findAll(count));
-            reviews.sort(Comparator.comparing(Review::getUseful).reversed().thenComparing(Review::getReviewId));
-            return reviews;
         }
+        ArrayList<Review> reviews = new ArrayList<>(reviewStorage.findAll(count));
+        reviews.sort(Comparator.comparing(Review::getUseful).reversed().thenComparing(Review::getReviewId));
+        return reviews;
     }
 
     public Collection<Review> findByFilmId(int filmId, int count) {
         if (count <= 0) {
             throw new ValidationException("Значение выводимых отзывов не может быть меньше или равно нулю.");
-        } else {
-            filmService.findById(filmId);
-            log.info("Отзывы найдены.");
-            return reviewStorage.findByFilmId(filmId, count);
         }
+        filmService.findById(filmId);
+
+        log.info("Отзывы найдены.");
+        return reviewStorage.findByFilmId(filmId, count);
     }
 
     public void saveLike(int userId, int reviewId, String like) {
         userService.findById(userId);
         if (reviewStorage.isLikeExists(userId, reviewId)) {
             throw new LikeAlreadyExistsException("Оценка отзыву уже поставлена.");
-        } else {
-            findById(reviewId);
-            int opinion;
-            if (like.equals("like")) {
-                opinion = 1;
-                log.info("Отзыву поставлен лайк.");
-            } else if (like.equals("dislike")) {
-                opinion = -1;
-                log.info("Отзыву поставлен дисклайк.");
-            } else {
-                throw new ValidationException("Ошибка в виде оценке отзыва.");
-            }
-            reviewStorage.saveLike(userId, reviewId, opinion);
         }
+        findById(reviewId);
+
+        int opinion;
+        if (like.equals("like")) {
+            opinion = 1;
+            log.info("Отзыву поставлен лайк.");
+        } else if (like.equals("dislike")) {
+            opinion = -1;
+            log.info("Отзыву поставлен дисклайк.");
+        } else {
+            throw new ValidationException("Ошибка в виде оценке отзыва.");
+        }
+        reviewStorage.saveLike(userId, reviewId, opinion);
     }
 
     public void removeLike(int userId, int reviewId, String like) {
         userService.findById(userId);
         if (!reviewStorage.isLikeExists(userId, reviewId)) {
             throw new LikeAlreadyExistsException("Оценка отзыву еще не поставлена.");
-        } else {
-            findById(reviewId);
-            if (like.equals("like") || like.equals("dislike")) {
-                log.info("У отзыва удалена оценка.");
-            } else {
-                throw new ValidationException("Ошибка в виде оценке отзыва.");
-            }
-            reviewStorage.removeLike(userId, reviewId);
         }
+        findById(reviewId);
+
+        if (like.equals("like") || like.equals("dislike")) {
+            log.info("У отзыва удалена оценка.");
+        } else {
+            throw new ValidationException("Ошибка в виде оценке отзыва.");
+        }
+        reviewStorage.removeLike(userId, reviewId);
     }
 
     public void removeDislike(int userId, int reviewId) {
         userService.findById(userId);
         if (!reviewStorage.isDislikeExists(userId, reviewId)) {
             throw new LikeAlreadyExistsException("У отзыва отсутствует отрицательная оценка от пользователя.");
-        } else {
-            findById(reviewId);
-            log.info("У отзыва удалена отрицательная оценка от пользователя.");
-            reviewStorage.removeLike(userId, reviewId);
         }
+        findById(reviewId);
+
+        log.info("У отзыва удалена отрицательная оценка от пользователя.");
+        reviewStorage.removeLike(userId, reviewId);
     }
 
     public Boolean isExists(Review review) {
