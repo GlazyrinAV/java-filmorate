@@ -9,3 +9,4 @@ INSERT INTO USERS VALUES ( 1, 'Name', 'Login', 'abc@bca.ru', '1986-04-13' );
 INSERT INTO USERS VALUES ( 2, 'Other_Name', 'Other_Login', 'zxy@yxz.ru', '1985-04-13' );
 DELETE FROM REVIEWS;
 insert into REVIEWS values (2, 'other content', 2, 2, 'true');
+insert into REVIEWS values (3, 'last content', 1, 2, 'false');

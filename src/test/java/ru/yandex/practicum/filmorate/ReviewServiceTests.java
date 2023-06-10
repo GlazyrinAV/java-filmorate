@@ -12,6 +12,7 @@ import org.springframework.test.context.jdbc.Sql;
 import ru.yandex.practicum.filmorate.exceptions.exceptions.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.exceptions.ReviewNotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.exceptions.UserNotFoundException;
+import ru.yandex.practicum.filmorate.exceptions.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Feed;
 import ru.yandex.practicum.filmorate.model.Review;
 import ru.yandex.practicum.filmorate.service.ReviewService;
@@ -195,28 +196,53 @@ public class ReviewServiceTests {
 
     @Test
     public void findAllNormal() {
-
+        Assertions.assertEquals(reviewService.findAll(10).toString(),
+                "[Review(content=other content, userId=2, filmId=2, isPositive=true, useful=0, reviewId=2), " +
+                        "Review(content=last content, userId=1, filmId=2, isPositive=false, useful=0, reviewId=3)]",
+                "Ошибка при нормальном поиске всех отзывов.");
     }
 
     @Test
     public void findAllWithNegativeCount() {
-
+        ValidationException exception = Assertions.assertThrows(ValidationException.class, () -> {
+            reviewService.findAll(-1);
+        });
+        Assertions.assertEquals(exception.getMessage(),
+                "Значение выводимых отзывов не может быть меньше или равно нулю.",
+                "Ошибка при поиске отзыва c ид " + -1 + ".");
     }
 
     @Test
     public void findByFilmIdNormal() {
+        Assertions.assertEquals(reviewService.findByFilmId(2, 1).toString(),
+                "[Review(content=last content, userId=1, filmId=2, isPositive=false, useful=0, reviewId=3)]",
+                "Ошибка при нормальном поиске отзыва по ид.");
+    }
 
+    @Test
+    public void findNoneByFilmIdNormal() {
+        Assertions.assertTrue(reviewService.findByFilmId(3, 1).isEmpty(),
+                "Ошибка при нормальном поиске отзыва по ид.");
     }
 
     @ParameterizedTest
     @MethodSource("wrongIdParameters")
     public void findByFilmIdWithWrongId(int id) {
-
+        ReviewNotFoundException exception = Assertions.assertThrows(ReviewNotFoundException.class, () -> {
+            reviewService.findById(id);
+        });
+        Assertions.assertEquals(exception.getMessage(), "Отзыв c ID " + id + " не найден.",
+                "Ошибка при удалении отзыва c ид " + id + ".");
     }
 
     @Test
     public void findByFilmIdWithNegativeCount() {
-
+        ValidationException exception = Assertions.assertThrows(ValidationException.class, () -> {
+            reviewService.findByFilmId(2, -1);
+        });
+        Assertions.assertEquals(exception.getMessage(),
+                "Значение выводимых отзывов не может быть меньше или равно нулю.",
+                "Ошибка при поиске отзыва c ид " + -1 + ".");
     }
 
     @Test
