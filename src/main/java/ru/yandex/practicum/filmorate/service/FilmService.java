@@ -150,22 +150,21 @@ public class FilmService {
         filmStorage.removeFilm(filmId);
     }
 
-    public Collection<Film> findCommonFilms(int userId, int friendId) {
-
-        userService.findById(userId);
-        userService.findById(friendId);
-
-        if (userId == friendId) {
-            throw new ValidationException("Не допустимый параметр запроса. Пользователь сравнивается сам с собой");
+    public Collection<Film> findCommonFilms(Optional<Integer> userId, Optional<Integer> friendId) {
+        if (userId.isEmpty() || friendId.isEmpty()) {
+            throw new ValidationException("Не допустимый параметр запроса.");
         }
+        if (userId == friendId) {
+            throw new ValidationException("Не допустимый параметр запроса. Пользователь сравнивается сам с собой.");
+        }
+        userService.findById(userId.get());
+        userService.findById(friendId.get());
 
-        Collection<Film> films = filmStorage.findCommonFilms(userId, friendId);
+        Collection<Film> films = filmStorage.findCommonFilms(userId.get(), friendId.get());
         for (Film film : films) {
             saveAdditionalInfoFromDb(film);
         }
         return films;
-
     }
-
 }
 

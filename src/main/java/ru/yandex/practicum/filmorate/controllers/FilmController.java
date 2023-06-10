@@ -79,7 +79,7 @@ public class FilmController {
 
     @GetMapping("/common")
     @ResponseStatus(HttpStatus.OK)
-    public Collection<Film> findCommonFilms(@RequestParam int userId, @RequestParam int friendId) {
+    public Collection<Film> findCommonFilms(@RequestParam Optional<Integer> userId, @RequestParam Optional<Integer> friendId) {
         log.info("Получен запрос на получение общих фильмов у юзера ID" + userId + " и юзера ID" + friendId);
         return filmService.findCommonFilms(userId, friendId);
     }
