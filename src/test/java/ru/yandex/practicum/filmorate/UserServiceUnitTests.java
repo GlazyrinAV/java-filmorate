@@ -11,8 +11,10 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.jdbc.Sql;
 import ru.yandex.practicum.filmorate.exceptions.exceptions.UserNotFoundException;
+import ru.yandex.practicum.filmorate.model.Feed;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
+import ru.yandex.practicum.filmorate.storage.dao.FeedStorage;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
@@ -26,12 +28,12 @@ import java.util.stream.Stream;
 @SpringBootTest
 @AutoConfigureTestDatabase
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
+@Sql(value = {"/schema.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 @Sql(value = {"/data.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 public class UserServiceUnitTests {
-
-    private  final Validator validator;
-
+    private final Validator validator;
     private final UserService userService;
+    private final FeedStorage feedStorage;
 
     static Stream<User> userWithWrongParameters() {
         return Stream.of(
@@ -164,8 +166,17 @@ public class UserServiceUnitTests {
         userService.saveNew(user2);
         userService.saveFriend(1, 2);
         Assertions.assertTrue(userService.findFriends(1).size() == 1 &&
-                userService.findFriends(2).isEmpty(),
+                        userService.findFriends(2).isEmpty(),
                 "Ошибка при нормальном добавлении друга.");
+
+        List<Feed> feeds = new ArrayList<>(feedStorage.findFeed(1));
+        Assertions.assertEquals(feeds.size(), 1);
+        Feed feed = feeds.get(0);
+        Assertions.assertEquals(feed.getEventId(), 1);
+        Assertions.assertEquals(feed.getUserId(), 1);
+        Assertions.assertEquals(feed.getEntityId(), 2);
+        Assertions.assertEquals(feed.getEventType().getEventTypeId(), 3);
+        Assertions.assertEquals(feed.getOperation().getOperationId(), 2);
     }
 
     @Test
@@ -258,6 +269,21 @@ public class UserServiceUnitTests {
         Assertions.assertTrue(userService.findFriends(1).isEmpty() &&
                         userService.findFriends(2).isEmpty(),
                 "Ошибка при нормальном удалении друга.");
+
+        List<Feed> feeds = new ArrayList<>(feedStorage.findFeed(1));
+        Assertions.assertEquals(feeds.size(), 2);
+        Feed firstFeed = feeds.get(0);
+        Assertions.assertEquals(firstFeed.getEventId(), 1);
+        Assertions.assertEquals(firstFeed.getUserId(), 1);
+        Assertions.assertEquals(firstFeed.getEntityId(), 2);
+        Assertions.assertEquals(firstFeed.getEventType().getEventTypeId(), 3);
+        Assertions.assertEquals(firstFeed.getOperation().getOperationId(), 2);
+        Feed secondFeed = feeds.get(1);
+        Assertions.assertEquals(secondFeed.getEventId(), 2);
+        Assertions.assertEquals(secondFeed.getUserId(), 1);
+        Assertions.assertEquals(secondFeed.getEntityId(), 2);
+        Assertions.assertEquals(secondFeed.getEventType().getEventTypeId(), 3);
+        Assertions.assertEquals(secondFeed.getOperation().getOperationId(), 1);
     }
 
     @Test
@@ -345,7 +371,7 @@ public class UserServiceUnitTests {
         User user2 = new User("vcx@acb.ru", "afr", "hh", LocalDate.of(1986, Month.APRIL, 14), 2);
         userService.saveNew(user2);
         userService.saveFriend(1, 2);
-        userService.saveFriend(2,1);
+        userService.saveFriend(2, 1);
         Assertions.assertTrue(userService.findFriends(1).equals(new ArrayList<>(List.of(user2))) &&
                         userService.findFriends(2).equals(new ArrayList<>(List.of(user))),
                 "Ошибка при нормально получении списка друзей.");
@@ -392,8 +418,8 @@ public class UserServiceUnitTests {
         userService.saveNew(user2);
         User user3 = new User("jkf@acb.ru", "dsa", "bb", LocalDate.of(1986, Month.APRIL, 14), 3);
         userService.saveNew(user3);
-        userService.saveFriend(1,3);
-        userService.saveFriend(2,3);
+        userService.saveFriend(1, 3);
+        userService.saveFriend(2, 3);
         Assertions.assertEquals(userService.findCommonFriends(1, 2), new ArrayList<>(List.of(user3)), "Ошибка в нормальном получении общих друзей.");
     }
 
@@ -405,8 +431,8 @@ public class UserServiceUnitTests {
         userService.saveNew(user2);
         User user3 = new User("jkf@acb.ru", "dsa", "bb", LocalDate.of(1986, Month.APRIL, 14), null);
         userService.saveNew(user3);
-        userService.saveFriend(1,3);
-        userService.saveFriend(2,3);
+        userService.saveFriend(1, 3);
+        userService.saveFriend(2, 3);
         UserNotFoundException exception = Assertions.assertThrows(UserNotFoundException.class, () -> userService.findCommonFriends(0, 2));
         Assertions.assertEquals(exception.getMessage(), "Пользователь c ID 0 не найден.",
                 "Ошибка в получении ошибка при поиске общих друзей юзера с ID 0.");
@@ -420,8 +446,8 @@ public class UserServiceUnitTests {
         userService.saveNew(user2);
         User user3 = new User("jkf@acb.ru", "dsa", "bb", LocalDate.of(1986, Month.APRIL, 14), null);
         userService.saveNew(user3);
-        userService.saveFriend(1,3);
-        userService.saveFriend(2,3);
+        userService.saveFriend(1, 3);
+        userService.saveFriend(2, 3);
         UserNotFoundException exception = Assertions.assertThrows(UserNotFoundException.class, () -> userService.findCommonFriends(-1, 2));
         Assertions.assertEquals(exception.getMessage(), "Пользователь c ID -1 не найден.",
                 "Ошибка в получении ошибка при поиске общих друзей юзера с ID -1.");
@@ -435,8 +461,8 @@ public class UserServiceUnitTests {
         userService.saveNew(user2);
         User user3 = new User("jkf@acb.ru", "dsa", "bb", LocalDate.of(1986, Month.APRIL, 14), null);
         userService.saveNew(user3);
-        userService.saveFriend(1,3);
-        userService.saveFriend(2,3);
+        userService.saveFriend(1, 3);
+        userService.saveFriend(2, 3);
         UserNotFoundException exception = Assertions.assertThrows(UserNotFoundException.class, () -> userService.findCommonFriends(99, 2));
         Assertions.assertEquals(exception.getMessage(), "Пользователь c ID 99 не найден.",
                 "Ошибка в получении ошибка при поиске общих друзей юзера с ID 99.");
@@ -450,8 +476,8 @@ public class UserServiceUnitTests {
         userService.saveNew(user2);
         User user3 = new User("jkf@acb.ru", "dsa", "bb", LocalDate.of(1986, Month.APRIL, 14), null);
         userService.saveNew(user3);
-        userService.saveFriend(1,3);
-        userService.saveFriend(2,3);
+        userService.saveFriend(1, 3);
+        userService.saveFriend(2, 3);
         UserNotFoundException exception = Assertions.assertThrows(UserNotFoundException.class, () -> userService.findCommonFriends(1, 0));
         Assertions.assertEquals(exception.getMessage(), "Пользователь c ID 0 не найден.",
                 "Ошибка в получении ошибка при поиске общих друзей юзера с ID 0.");
@@ -465,8 +491,8 @@ public class UserServiceUnitTests {
         userService.saveNew(user2);
         User user3 = new User("jkf@acb.ru", "dsa", "bb", LocalDate.of(1986, Month.APRIL, 14), null);
         userService.saveNew(user3);
-        userService.saveFriend(1,3);
-        userService.saveFriend(2,3);
+        userService.saveFriend(1, 3);
+        userService.saveFriend(2, 3);
         UserNotFoundException exception = Assertions.assertThrows(UserNotFoundException.class, () -> userService.findCommonFriends(1, -1));
         Assertions.assertEquals(exception.getMessage(), "Пользователь c ID -1 не найден.",
                 "Ошибка в получении ошибка при поиске общих друзей юзера с ID -1.");
@@ -480,8 +506,8 @@ public class UserServiceUnitTests {
         userService.saveNew(user2);
         User user3 = new User("jkf@acb.ru", "dsa", "bb", LocalDate.of(1986, Month.APRIL, 14), null);
         userService.saveNew(user3);
-        userService.saveFriend(1,3);
-        userService.saveFriend(2,3);
+        userService.saveFriend(1, 3);
+        userService.saveFriend(2, 3);
         UserNotFoundException exception = Assertions.assertThrows(UserNotFoundException.class, () -> userService.findCommonFriends(1, 99));
         Assertions.assertEquals(exception.getMessage(), "Пользователь c ID 99 не найден.",
                 "Ошибка в получении ошибка при поиске общих друзей юзера с ID 99.");

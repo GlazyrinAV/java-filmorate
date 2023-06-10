@@ -12,24 +12,29 @@ import org.springframework.test.context.jdbc.Sql;
 import ru.yandex.practicum.filmorate.exceptions.exceptions.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.exceptions.ReviewNotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.exceptions.UserNotFoundException;
+import ru.yandex.practicum.filmorate.model.Feed;
 import ru.yandex.practicum.filmorate.model.Review;
 import ru.yandex.practicum.filmorate.service.ReviewService;
+import ru.yandex.practicum.filmorate.storage.dao.FeedStorage;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
 
 @SpringBootTest
 @AutoConfigureTestDatabase
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
+@Sql(value = {"/schema.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 @Sql(value = {"/data.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 @Sql(value = {"/dataForReviewTests.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 public class ReviewServiceTests {
 
     private final ReviewService reviewService;
-
     private final Validator validator;
+    private final FeedStorage feedStorage;
 
     static Stream<Review> wrongReviewParameters() {
         return Stream.of(
@@ -72,6 +77,15 @@ public class ReviewServiceTests {
                         .saveNew(new Review("content", 1, 1, true, null, null)),
                 new Review("content", 1, 1, true, 0, 1),
                 "Ошибка при нормальном добавлении отзыва.");
+
+        List<Feed> feeds = new ArrayList<>(feedStorage.findFeed(1));
+        Assertions.assertEquals(feeds.size(), 1);
+        Feed firstFeed = feeds.get(0);
+        Assertions.assertEquals(firstFeed.getEventId(), 1);
+        Assertions.assertEquals(firstFeed.getUserId(), 1);
+        Assertions.assertEquals(firstFeed.getEntityId(), 1);
+        Assertions.assertEquals(firstFeed.getEventType().getEventTypeId(), 2);
+        Assertions.assertEquals(firstFeed.getOperation().getOperationId(), 2);
     }
 
     @ParameterizedTest
@@ -107,6 +121,21 @@ public class ReviewServiceTests {
                         .update(new Review("new content", 1, 1, true, null, 1)),
                 new Review("new content", 1, 1, true, 0, 1),
                 "Ошибка при нормальном обновлении отзыва.");
+
+        List<Feed> feeds = new ArrayList<>(feedStorage.findFeed(1));
+        Assertions.assertEquals(feeds.size(), 2);
+        Feed firstFeed = feeds.get(0);
+        Assertions.assertEquals(firstFeed.getEventId(), 1);
+        Assertions.assertEquals(firstFeed.getUserId(), 1);
+        Assertions.assertEquals(firstFeed.getEntityId(), 1);
+        Assertions.assertEquals(firstFeed.getEventType().getEventTypeId(), 2);
+        Assertions.assertEquals(firstFeed.getOperation().getOperationId(), 2);
+        Feed secondFeed = feeds.get(1);
+        Assertions.assertEquals(secondFeed.getEventId(), 2);
+        Assertions.assertEquals(secondFeed.getUserId(), 1);
+        Assertions.assertEquals(secondFeed.getEntityId(), 1);
+        Assertions.assertEquals(secondFeed.getEventType().getEventTypeId(), 2);
+        Assertions.assertEquals(secondFeed.getOperation().getOperationId(), 3);
     }
 
     @ParameterizedTest
@@ -126,6 +155,15 @@ public class ReviewServiceTests {
         });
         Assertions.assertEquals(exception.getMessage(), "Отзыв c ID 2 не найден.",
                 "Ошибка при нормальном удалении отзыва.");
+
+        List<Feed> feeds = new ArrayList<>(feedStorage.findFeed(2));
+        Assertions.assertEquals(feeds.size(), 1);
+        Feed firstFeed = feeds.get(0);
+        Assertions.assertEquals(firstFeed.getEventId(), 1);
+        Assertions.assertEquals(firstFeed.getUserId(), 2);
+        Assertions.assertEquals(firstFeed.getEntityId(), 2);
+        Assertions.assertEquals(firstFeed.getEventType().getEventTypeId(), 2);
+        Assertions.assertEquals(firstFeed.getOperation().getOperationId(), 1);
     }
 
     @ParameterizedTest

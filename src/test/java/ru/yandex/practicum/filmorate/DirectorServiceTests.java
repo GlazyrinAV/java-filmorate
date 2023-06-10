@@ -20,6 +20,7 @@ import java.util.Optional;
 @SpringBootTest
 @AutoConfigureTestDatabase
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
+@Sql(value = {"/schema.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 @Sql(value = {"/data.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 public class DirectorServiceTests {
 
@@ -126,7 +127,8 @@ public class DirectorServiceTests {
     @Test
     @Sql(value = {"/dataForDirectorTests.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     public void findAllWithDirectors() {
-        Assertions.assertEquals(2, directorsService.findAll().size(), "Ошибка при получении всех режиссеров при заполненной базе.");
+        Assertions.assertTrue(directorsService.findAll().size() == 2,
+                "Ошибка при получении всех режиссеров при заполненной базе.");
     }
 
     @Test
