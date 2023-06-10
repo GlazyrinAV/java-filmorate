@@ -60,7 +60,7 @@ public class ReviewController {
 
     @PutMapping("/{id}/{like}/{userId}")
     @ResponseStatus(HttpStatus.OK)
-    public void saveLike(@PathVariable int id, @PathVariable int userId, @PathVariable String like) {
+    public void saveLike(@PathVariable int id, @PathVariable int userId, @PathVariable Optional<String> like) {
         reviewService.saveLike(userId, id, like);
     }
 

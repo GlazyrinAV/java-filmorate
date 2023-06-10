@@ -195,8 +195,10 @@ public class ReviewServiceTests {
     @Test
     public void findAllNormal() {
         Assertions.assertEquals(reviewService.findAll(10).toString(),
-                "[Review(content=other content, userId=2, filmId=2, isPositive=true, useful=0, reviewId=2), " +
-                        "Review(content=last content, userId=1, filmId=2, isPositive=false, useful=0, reviewId=3)]",
+                "[Review(content=with like content, userId=2, filmId=1, isPositive=true, useful=1, reviewId=4), " +
+                        "Review(content=other content, userId=2, filmId=2, isPositive=true, useful=0, reviewId=2), " +
+                        "Review(content=last content, userId=1, filmId=2, isPositive=false, useful=0, reviewId=3), " +
+                        "Review(content=with like content, userId=1, filmId=3, isPositive=false, useful=-1, reviewId=5)]",
                 "Ошибка при нормальном поиске всех отзывов.");
     }
 
@@ -219,7 +221,7 @@ public class ReviewServiceTests {
 
     @Test
     public void findNoneByFilmIdNormal() {
-        Assertions.assertTrue(reviewService.findByFilmId(3, 1).isEmpty(),
+        Assertions.assertTrue(reviewService.findByFilmId(4, 1).isEmpty(),
                 "Ошибка при нормальном поиске отзыва по ид.");
     }
 
@@ -245,23 +247,23 @@ public class ReviewServiceTests {
 
     @Test
     public void saveLikeNormal() {
-        reviewService.saveLike(1, 2, "like");
+        reviewService.saveLike(1, 2, Optional.of("like"));
         Assertions.assertEquals(1, (int) reviewService.findById(2).getUseful(),
                 "Ошибка при нормальном добавлении лайка отзыву.");
     }
 
     @Test
     public void saveDisLikeNormal() {
-        reviewService.saveLike(1, 2, "dislike");
+        reviewService.saveLike(1, 2, Optional.of("dislike"));
         Assertions.assertEquals(-1, (int) reviewService.findById(2).getUseful(),
                 "Ошибка при нормальном добавлении дислайка отзыву.");
     }
 
     @Test
     public void saveLikeTwice() {
-        reviewService.saveLike(1, 2, "like");
+        reviewService.saveLike(1, 2, Optional.of("like"));
         LikeAlreadyExistsException exception = Assertions.assertThrows(LikeAlreadyExistsException.class, () -> {
-            reviewService.saveLike(1, 2, "like");
+            reviewService.saveLike(1, 2, Optional.of("like"));
         });
         Assertions.assertEquals(exception.getMessage(), "Оценка отзыву уже поставлена.",
                 "Ошибка повторной установке лайка отзыву.");
@@ -271,7 +273,7 @@ public class ReviewServiceTests {
     @MethodSource("wrongIdParameters")
     public void saveLikeWithWrongUserId(int id) {
         UserNotFoundException exception = Assertions.assertThrows(UserNotFoundException.class, () -> {
-            reviewService.saveLike(id, 2, "like");
+            reviewService.saveLike(id, 2, Optional.of("like"));
             ;
         });
         Assertions.assertEquals(exception.getMessage(), "Пользователь c ID " + id + " не найден.",
@@ -282,7 +284,7 @@ public class ReviewServiceTests {
     @MethodSource("wrongIdParameters")
     public void saveLikeWrongReviewId(int id) {
         ReviewNotFoundException exception = Assertions.assertThrows(ReviewNotFoundException.class, () -> {
-            reviewService.saveLike(1, id, "like");
+            reviewService.saveLike(1, id, Optional.of("like"));
         });
         Assertions.assertEquals(exception.getMessage(), "Отзыв c ID " + id + " не найден.",
                 "Ошибка при установке лайка отзыву c ид отзыва " + id + ".");
@@ -291,7 +293,16 @@ public class ReviewServiceTests {
     @Test
     public void saveLikeWithWrongOpinion() {
         ValidationException exception = Assertions.assertThrows(ValidationException.class, () -> {
-            reviewService.saveLike(1, 2, "other");
+            reviewService.saveLike(1, 2, Optional.of("other"));
+        });
+        Assertions.assertEquals(exception.getMessage(), "Ошибка в виде оценке отзыва.",
+                "Ошибка при установке лайка отзыву c неправильным типом оценки.");
+    }
+
+    @Test
+    public void saveLikeWithNullOpinion() {
+        ValidationException exception = Assertions.assertThrows(ValidationException.class, () -> {
+            reviewService.saveLike(1, 2, Optional.ofNullable(null));
         });
         Assertions.assertEquals(exception.getMessage(), "Ошибка в виде оценке отзыва.",
                 "Ошибка при установке лайка отзыву c неправильным типом оценки.");
@@ -299,7 +310,7 @@ public class ReviewServiceTests {
 
     @Test
     public void removeLikeNormal() {
-        reviewService.removeLike(1,4, Optional.of("like"));
+        reviewService.removeLike(1, 4, Optional.of("like"));
         Assertions.assertEquals(0, reviewService.findById(4).getUseful());
     }
 
@@ -343,19 +354,29 @@ public class ReviewServiceTests {
 
     @Test
     public void removeDisLikeNormal() {
-
+        reviewService.removeDislike(2, 5);
+        Assertions.assertEquals(0, reviewService.findById(5).getUseful(),
+                "Ошибка при нормальном удалении дизлайка.");
     }
 
     @ParameterizedTest
     @MethodSource("wrongIdParameters")
     public void removeDisLikeWithWrongUserId(int id) {
-
+        UserNotFoundException exception = Assertions.assertThrows(UserNotFoundException.class, () -> {
+            reviewService.removeDislike(id, 5);
+        });
+        Assertions.assertEquals(exception.getMessage(), "Пользователь c ID " + id + " не найден.",
+                "Ошибка при удалении лайка отзыву c ид юзера " + id + ".");
     }
 
     @ParameterizedTest
     @MethodSource("wrongIdParameters")
     public void removeDisLikeWrongReviewId(int id) {
-
+        ReviewNotFoundException exception = Assertions.assertThrows(ReviewNotFoundException.class, () -> {
+            reviewService.removeDislike(2, id);
+        });
+        Assertions.assertEquals(exception.getMessage(), "Отзыв c ID " + id + " не найден.",
+                "Ошибка при установке лайка отзыву c ид отзыва " + id + ".");
     }
 
     @Test

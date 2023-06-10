@@ -94,18 +94,19 @@ public class ReviewService {
         return reviewStorage.findByFilmId(filmId, count);
     }
 
-    public void saveLike(int userId, int reviewId, String like) {
+    public void saveLike(int userId, int reviewId, Optional<String> like) {
         userService.findById(userId);
-        if (reviewStorage.isLikeExists(userId, reviewId)) {
+        findById(reviewId);
+        if (like.isEmpty()) {
+            throw new ValidationException("Ошибка в виде оценке отзыва.");
+        } else if (reviewStorage.isLikeExists(userId, reviewId)) {
             throw new LikeAlreadyExistsException("Оценка отзыву уже поставлена.");
         }
-        findById(reviewId);
-
         int opinion;
-        if (like.equals("like")) {
+        if (like.get().equals("like")) {
             opinion = 1;
             log.info("Отзыву поставлен лайк.");
-        } else if (like.equals("dislike")) {
+        } else if (like.get().equals("dislike")) {
             opinion = -1;
             log.info("Отзыву поставлен дисклайк.");
         } else {
@@ -131,10 +132,10 @@ public class ReviewService {
 
     public void removeDislike(int userId, int reviewId) {
         userService.findById(userId);
+        findById(reviewId);
         if (!reviewStorage.isDislikeExists(userId, reviewId)) {
             throw new LikeAlreadyExistsException("У отзыва отсутствует отрицательная оценка от пользователя.");
         }
-        findById(reviewId);
 
         log.info("У отзыва удалена отрицательная оценка от пользователя.");
         reviewStorage.removeLike(userId, reviewId);
