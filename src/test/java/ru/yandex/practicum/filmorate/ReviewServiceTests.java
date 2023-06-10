@@ -19,6 +19,7 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 
@@ -298,24 +299,46 @@ public class ReviewServiceTests {
 
     @Test
     public void removeLikeNormal() {
-
+        reviewService.removeLike(1,4, Optional.of("like"));
+        Assertions.assertEquals(0, reviewService.findById(4).getUseful());
     }
 
     @ParameterizedTest
     @MethodSource("wrongIdParameters")
     public void removeLikeWithWrongUserId(int id) {
-
+        UserNotFoundException exception = Assertions.assertThrows(UserNotFoundException.class, () -> {
+            reviewService.removeLike(id, 4, Optional.of("like"));
+        });
+        Assertions.assertEquals(exception.getMessage(), "Пользователь c ID " + id + " не найден.",
+                "Ошибка при удалении лайка отзыву c ид юзера " + id + ".");
     }
 
     @ParameterizedTest
     @MethodSource("wrongIdParameters")
     public void removeLikeWrongReviewId(int id) {
-
+        ReviewNotFoundException exception = Assertions.assertThrows(ReviewNotFoundException.class, () -> {
+            reviewService.removeLike(2, id, Optional.of("like"));
+        });
+        Assertions.assertEquals(exception.getMessage(), "Отзыв c ID " + id + " не найден.",
+                "Ошибка при установке лайка отзыву c ид отзыва " + id + ".");
     }
 
     @Test
     public void removeLikeWithWrongOpinion() {
+        ValidationException exception = Assertions.assertThrows(ValidationException.class, () -> {
+            reviewService.removeLike(2, 4, Optional.of("other"));
+        });
+        Assertions.assertEquals(exception.getMessage(), "Ошибка в виде оценке отзыва.",
+                "Ошибка при удалении лайка отзыву c неправильным типом оценки.");
+    }
 
+    @Test
+    public void removeLikeWithNullOpinion() {
+        ValidationException exception = Assertions.assertThrows(ValidationException.class, () -> {
+            reviewService.removeLike(2, 4, Optional.ofNullable(null));
+        });
+        Assertions.assertEquals(exception.getMessage(), "Ошибка в форме запроса на удаление лайука у отзыва.",
+                "Ошибка при удалении лайка отзыву c неправильным типом оценки.");
     }
 
     @Test

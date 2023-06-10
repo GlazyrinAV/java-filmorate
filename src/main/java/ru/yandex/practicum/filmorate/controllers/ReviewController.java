@@ -66,7 +66,7 @@ public class ReviewController {
 
     @DeleteMapping("/{id}/{like}/{userId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void removeLike(@PathVariable int id, @PathVariable int userId, @PathVariable String like) {
+    public void removeLike(@PathVariable int id, @PathVariable int userId, @PathVariable Optional<String> like) {
         reviewService.removeLike(userId, id, like);
     }
 

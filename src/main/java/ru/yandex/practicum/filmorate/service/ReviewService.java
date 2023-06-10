@@ -15,6 +15,7 @@ import ru.yandex.practicum.filmorate.storage.dao.ReviewStorage;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -113,17 +114,17 @@ public class ReviewService {
         reviewStorage.saveLike(userId, reviewId, opinion);
     }
 
-    public void removeLike(int userId, int reviewId, String like) {
+    public void removeLike(int userId, int reviewId, Optional<String> like) {
         userService.findById(userId);
-        if (!reviewStorage.isLikeExists(userId, reviewId)) {
-            throw new LikeAlreadyExistsException("Оценка отзыву еще не поставлена.");
-        }
         findById(reviewId);
-
-        if (like.equals("like") || like.equals("dislike")) {
-            log.info("У отзыва удалена оценка.");
-        } else {
+        if (like.isEmpty()) {
+            throw new ValidationException("Ошибка в форме запроса на удаление лайука у отзыва.");
+        } else if (!(like.get().equals("like") || like.get().equals("dislike"))) {
             throw new ValidationException("Ошибка в виде оценке отзыва.");
+        } else if (!reviewStorage.isLikeExists(userId, reviewId)) {
+            throw new LikeAlreadyExistsException("Оценка отзыву еще не поставлена.");
+        } else {
+            log.info("У отзыва удалена оценка.");
         }
         reviewStorage.removeLike(userId, reviewId);
     }

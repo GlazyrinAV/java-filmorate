@@ -10,3 +10,5 @@ INSERT INTO USERS VALUES ( 2, 'Other_Name', 'Other_Login', 'zxy@yxz.ru', '1985-0
 DELETE FROM REVIEWS;
 insert into REVIEWS values (2, 'other content', 2, 2, 'true');
 insert into REVIEWS values (3, 'last content', 1, 2, 'false');
+insert into REVIEWS values (4, 'with kike content', 2, 1, 'true');
+INSERT INTO REVIEWS_LIKES values (1, 4, 1)
