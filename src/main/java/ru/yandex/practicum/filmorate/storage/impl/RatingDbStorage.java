@@ -28,8 +28,8 @@ public class RatingDbStorage implements RatingStorage {
 
     @Override
     public Rating findById(int ratingId) {
-            String sqlQuery = "SELECT * FROM RATINGS WHERE rating_id = ?";
-            return jdbcTemplate.queryForObject(sqlQuery, this::mapRowToRating, ratingId);
+        String sqlQuery = "SELECT * FROM RATINGS WHERE rating_id = ?";
+        return jdbcTemplate.queryForObject(sqlQuery, this::mapRowToRating, ratingId);
     }
 
     @Override

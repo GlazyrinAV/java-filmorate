@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.controllers;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.model.Feed;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
 
@@ -72,5 +73,10 @@ public class UserController {
     @ResponseStatus(HttpStatus.OK)
     public void removeUser(@PathVariable int userId) {
         userService.removeUser(userId);
+    }
+
+    @GetMapping("/{userId}/feed")
+    public Collection<Feed> findFeed(@PathVariable int userId) {
+        return userService.findFeed(userId);
     }
 }

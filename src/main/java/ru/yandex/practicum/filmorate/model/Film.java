@@ -5,9 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import ru.yandex.practicum.filmorate.customConstraints.durationConstraint.DurationConstraint;
-import ru.yandex.practicum.filmorate.customConstraints.genreIdConstraint.GenreIdConstraint;
-import ru.yandex.practicum.filmorate.customConstraints.ratingIdConstraint.RatingIdConstraint;
+import org.hibernate.validator.constraints.time.DurationMin;
 import ru.yandex.practicum.filmorate.customConstraints.releaseDateConstraint.ReleaseDateConstraint;
 
 import javax.validation.constraints.NotBlank;
@@ -32,15 +30,13 @@ public class Film {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private final LocalDate releaseDate;
 
-    @DurationConstraint
+    @DurationMin(minutes = 1)
     private final Duration duration;
 
     private Integer id;
 
-    @GenreIdConstraint
     private List<Genre> genres;
 
-    @RatingIdConstraint
     private Rating mpa;
 
     private List<Director> directors;

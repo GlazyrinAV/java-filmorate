@@ -33,7 +33,7 @@ public class ErrorHandler {
     }
 
     @ExceptionHandler({UserNotFoundException.class, FilmNotFoundException.class, ReviewNotFoundException.class,
-    RatingNotFoundException.class, GenreNotFoundException.class, DirectorNotFoundException.class})
+            RatingNotFoundException.class, GenreNotFoundException.class, DirectorNotFoundException.class})
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse entityNotFoundException(RuntimeException exception) {
         return sendErrorResponse("error", exception.getMessage());
