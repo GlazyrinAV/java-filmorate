@@ -9,10 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.jdbc.Sql;
-import ru.yandex.practicum.filmorate.exceptions.exceptions.FilmNotFoundException;
-import ru.yandex.practicum.filmorate.exceptions.exceptions.ReviewNotFoundException;
-import ru.yandex.practicum.filmorate.exceptions.exceptions.UserNotFoundException;
-import ru.yandex.practicum.filmorate.exceptions.exceptions.ValidationException;
+import ru.yandex.practicum.filmorate.exceptions.exceptions.*;
 import ru.yandex.practicum.filmorate.model.Feed;
 import ru.yandex.practicum.filmorate.model.Review;
 import ru.yandex.practicum.filmorate.service.ReviewService;
@@ -247,24 +244,56 @@ public class ReviewServiceTests {
 
     @Test
     public void saveLikeNormal() {
+        reviewService.saveLike(1, 2, "like");
+        Assertions.assertEquals(1, (int) reviewService.findById(2).getUseful(),
+                "Ошибка при нормальном добавлении лайка отзыву.");
+    }
 
+    @Test
+    public void saveDisLikeNormal() {
+        reviewService.saveLike(1, 2, "dislike");
+        Assertions.assertEquals(-1, (int) reviewService.findById(2).getUseful(),
+                "Ошибка при нормальном добавлении дислайка отзыву.");
+    }
+
+    @Test
+    public void saveLikeTwice() {
+        reviewService.saveLike(1, 2, "like");
+        LikeAlreadyExistsException exception = Assertions.assertThrows(LikeAlreadyExistsException.class, () -> {
+            reviewService.saveLike(1, 2, "like");
+        });
+        Assertions.assertEquals(exception.getMessage(), "Оценка отзыву уже поставлена.",
+                "Ошибка повторной установке лайка отзыву.");
     }
 
     @ParameterizedTest
     @MethodSource("wrongIdParameters")
     public void saveLikeWithWrongUserId(int id) {
-
+        UserNotFoundException exception = Assertions.assertThrows(UserNotFoundException.class, () -> {
+            reviewService.saveLike(id, 2, "like");
+            ;
+        });
+        Assertions.assertEquals(exception.getMessage(), "Пользователь c ID " + id + " не найден.",
+                "Ошибка при установке лайка отзыву c ид юзера " + id + ".");
     }
 
     @ParameterizedTest
     @MethodSource("wrongIdParameters")
     public void saveLikeWrongReviewId(int id) {
-
+        ReviewNotFoundException exception = Assertions.assertThrows(ReviewNotFoundException.class, () -> {
+            reviewService.saveLike(1, id, "like");
+        });
+        Assertions.assertEquals(exception.getMessage(), "Отзыв c ID " + id + " не найден.",
+                "Ошибка при установке лайка отзыву c ид отзыва " + id + ".");
     }
 
     @Test
     public void saveLikeWithWrongOpinion() {
-
+        ValidationException exception = Assertions.assertThrows(ValidationException.class, () -> {
+            reviewService.saveLike(1, 2, "other");
+        });
+        Assertions.assertEquals(exception.getMessage(), "Ошибка в виде оценке отзыва.",
+                "Ошибка при установке лайка отзыву c неправильным типом оценки.");
     }
 
     @Test
