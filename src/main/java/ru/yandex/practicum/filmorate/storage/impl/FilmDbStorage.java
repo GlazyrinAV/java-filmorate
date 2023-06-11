@@ -15,6 +15,8 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.Duration;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Objects;
 import java.util.Optional;
@@ -207,5 +209,24 @@ public class FilmDbStorage implements FilmStorage {
                 "GROUP BY FILMS.FILM_ID ORDER BY COUNT(FL.USER_ID) desc ";
 
         return jdbcTemplate.query(sqlQuery, this::mapRowToFilm, userId, friendId);
+    }
+
+    public Collection<Film> getRecommendation(int id) {
+
+        String sqlQuery = "SELECT *" +
+                " FROM FILM_LIKES as F  WHERE F.FILM_ID in (select FILM_ID from  FILM_LIKES where USER_ID = ?) and not F.USER_ID = ?" +
+                "GROUP BY F.USER_ID ORDER BY COUNT(FILM_ID) desc LIMIT 1";
+
+        Integer idRecommendationUser = jdbcTemplate.query(sqlQuery, (rs, rowNum) ->
+                rs.getInt("USER_ID"), id, id).stream().findFirst().orElse(null);
+        if (idRecommendationUser == null)
+            return new ArrayList<>();
+
+        String sqlQuery2 = "SELECT *" +
+                " FROM FILMS LEFT JOIN FILM_LIKES FL on FILMS.FILM_ID = FL.FILM_ID WHERE Films.FILM_ID in (select FILM_ID from  FILM_LIKES " +
+                " where USER_ID = ? AND FILM_ID not in (select FILM_ID from FILM_LIKES where USER_ID = ?))" +
+                "GROUP BY FILMS.FILM_ID ";
+
+        return jdbcTemplate.query(sqlQuery2, this::mapRowToFilm, idRecommendationUser, id);
     }
 }

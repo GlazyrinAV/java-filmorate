@@ -11,7 +11,6 @@ import java.util.Collection;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/films")
 @Slf4j
 public class FilmController {
 
@@ -21,43 +20,43 @@ public class FilmController {
         this.filmService = filmService;
     }
 
-    @PostMapping
+    @PostMapping("/films")
     @ResponseStatus(HttpStatus.CREATED)
     public Film saveNew(@Valid @RequestBody Film film) {
         return filmService.saveNew(film);
     }
 
-    @PutMapping
+    @PutMapping("/films")
     @ResponseStatus(HttpStatus.OK)
     public Film update(@Valid @RequestBody Film film) {
         return filmService.update(film);
     }
 
-    @GetMapping
+    @GetMapping("/films")
     @ResponseStatus(HttpStatus.OK)
     public Collection<Film> findAll() {
         return filmService.findAll();
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/films/{id}")
     @ResponseStatus(HttpStatus.OK)
     public Film findById(@PathVariable int id) {
         return filmService.findById(id);
     }
 
-    @PutMapping("/{id}/like/{userId}")
+    @PutMapping("/films/{id}/like/{userId}")
     @ResponseStatus(HttpStatus.OK)
     public void makeNewLike(@PathVariable int id, @PathVariable int userId) {
         filmService.makeLike(id, userId);
     }
 
-    @DeleteMapping("/{id}/like/{userId}")
+    @DeleteMapping("/films/{id}/like/{userId}")
     @ResponseStatus(HttpStatus.OK)
     public void removeLike(@PathVariable int id, @PathVariable int userId) {
         filmService.removeLike(id, userId);
     }
 
-    @GetMapping("/popular")
+    @GetMapping("/films/popular")
     @ResponseStatus(HttpStatus.OK)
     public Collection<Film> findPopularFilms(@RequestParam(defaultValue = "10") int count,
                                              @RequestParam Optional<Integer> genreId,
@@ -65,22 +64,29 @@ public class FilmController {
         return filmService.findPopular(count, genreId, year);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/films/{id}")
     @ResponseStatus(HttpStatus.OK)
     public void removeFilm(@PathVariable int id) {
         filmService.removeFilm(id);
     }
 
-    @GetMapping("/director/{directorId}")
+    @GetMapping("/films/director/{directorId}")
     @ResponseStatus(HttpStatus.OK)
     public Collection<Film> findByDirectorId(@PathVariable Optional<Integer> directorId, @RequestParam Optional<String> sortBy) {
         return filmService.findByDirectorId(directorId, sortBy);
     }
 
-    @GetMapping("/common")
+    @GetMapping("/films/common")
     @ResponseStatus(HttpStatus.OK)
     public Collection<Film> findCommonFilms(@RequestParam Optional<Integer> userId, @RequestParam Optional<Integer> friendId) {
         log.info("Получен запрос на получение общих фильмов у юзера ID" + userId + " и юзера ID" + friendId);
         return filmService.findCommonFilms(userId, friendId);
     }
+
+    @GetMapping("/users/{id}/recommendations")
+    @ResponseStatus(HttpStatus.OK)
+    public Collection<Film> getRecommendation(@PathVariable int id) {
+        return filmService.getRecommendation(id);
+    }
+
 }

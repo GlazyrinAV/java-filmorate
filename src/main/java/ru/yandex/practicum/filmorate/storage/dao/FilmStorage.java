@@ -34,4 +34,6 @@ public interface FilmStorage {
 
     Collection<Film> findCommonFilms(int userId, int friendId);
 
+    Collection<Film> getRecommendation(int id);
+
 }
