@@ -232,8 +232,6 @@ public class FilmDbStorage implements FilmStorage {
                 " where USER_ID = ? AND FILM_ID not in (select FILM_ID from FILM_LIKES where USER_ID = ?))" +
                 "GROUP BY FILMS.FILM_ID ";
 
-        Collection<Film> films = jdbcTemplate.query(sqlQuery2, this::mapRowToFilm, idRecommendationUser.get(0), id);
-
-        return films;
+        return jdbcTemplate.query(sqlQuery2, this::mapRowToFilm, idRecommendationUser.get(0), id);
     }
 }

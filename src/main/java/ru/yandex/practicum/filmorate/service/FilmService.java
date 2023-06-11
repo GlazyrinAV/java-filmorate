@@ -163,13 +163,17 @@ public class FilmService {
     }
 
     public Collection<Film> getRecommendation(int id) {
-        findById(id);
-
+        userService.findById(id);
         Collection<Film> films = filmStorage.getRecommendation(id);
-
+        if (films.isEmpty()) {
+            log.info("Рекомендации по указанном пользователю не найдены.");
+        } else {
+            log.info("Рекомендации по указанном пользователю найдены.");
+        }
         for (Film film : films) {
             saveAdditionalInfoFromDb(film);
         }
+
         return films;
     }
 }
