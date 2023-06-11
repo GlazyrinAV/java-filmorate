@@ -224,7 +224,7 @@ public class FilmDbStorage implements FilmStorage {
                 " FROM FILMS LEFT JOIN FILM_LIKES FL on FILMS.FILM_ID = FL.FILM_ID WHERE Films.FILM_ID in (select FILM_ID from  FILM_LIKES " +
                 " where USER_ID = ? AND FILM_ID not in (select FILM_ID from FILM_LIKES where USER_ID = ?))" +
                 "GROUP BY FILMS.FILM_ID ";
-        
+
         return jdbcTemplate.query(sqlQuery2, this::mapRowToFilm, idRecommendationUser, id);
     }
 }
