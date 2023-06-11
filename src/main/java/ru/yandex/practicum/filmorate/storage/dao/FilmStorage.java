@@ -33,5 +33,6 @@ public interface FilmStorage {
     Collection<Film> findByDirectorId(int directorId, String sortBy);
 
     Collection<Film> findCommonFilms(int userId, int friendId);
+    Collection<Film> getRecommendation (int id);
 
 }

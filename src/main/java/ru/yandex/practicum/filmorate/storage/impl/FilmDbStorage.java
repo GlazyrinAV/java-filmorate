@@ -7,6 +7,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
+import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.dao.FilmStorage;
@@ -16,9 +17,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.Duration;
-import java.util.Collection;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 @Repository
 @Slf4j
@@ -210,4 +209,31 @@ public class FilmDbStorage implements FilmStorage {
         return jdbcTemplate.query(sqlQuery, this::mapRowToFilm, userId, friendId);
     }
 
+    public Collection<Film> getRecommendation(int id) {
+
+        String sqlQuery = "SELECT *" +
+                " FROM FILM_LIKES as F  WHERE F.FILM_ID in (select FILM_ID from  FILM_LIKES where USER_ID = ?) and not F.USER_ID = ?" +
+                "GROUP BY F.USER_ID ORDER BY COUNT(FILM_ID) desc LIMIT 1";
+
+        List<Integer> idRecommendationUser = new ArrayList<>();
+
+        SqlRowSet rs = jdbcTemplate.queryForRowSet(sqlQuery, id, id);
+
+        if (rs.next()) {
+            idRecommendationUser.add(rs.getInt("USER_ID"));
+        }
+
+        if (idRecommendationUser.isEmpty() || idRecommendationUser == null) {
+            return new ArrayList<>();
+        }
+
+        String sqlQuery2 = "SELECT *" +
+                " FROM FILMS LEFT JOIN FILM_LIKES FL on FILMS.FILM_ID = FL.FILM_ID WHERE Films.FILM_ID in (select FILM_ID from  FILM_LIKES " +
+                " where USER_ID = ? AND FILM_ID not in (select FILM_ID from FILM_LIKES where USER_ID = ?))" +
+                "GROUP BY FILMS.FILM_ID ";
+
+        Collection<Film> films = jdbcTemplate.query(sqlQuery2, this::mapRowToFilm, idRecommendationUser.get(0), id);
+
+        return films;
+    }
 }

@@ -162,5 +162,15 @@ public class FilmService {
 
     }
 
+    public Collection<Film> getRecommendation(int id) {
+        findById(id);
+
+        Collection<Film> films = filmStorage.getRecommendation(id);
+
+        for (Film film : films) {
+            saveAdditionalInfoFromDb(film);
+        }
+        return films;
+    }
 }
 
