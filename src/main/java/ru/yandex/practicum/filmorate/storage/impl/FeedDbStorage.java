@@ -34,7 +34,7 @@ public class FeedDbStorage implements FeedStorage {
                 "LEFT JOIN EVENT_TYPE AS ET ON F.EVENT_TYPE_ID = ET.EVENT_TYPE_ID " +
                 "LEFT JOIN OPERATION_FOR_FEEDS AS OFF ON F.OPERATION_ID = OFF.OPERATION_ID " +
                 "WHERE USER_ID = ? " +
-                "ORDER BY F.TIMESTAMP ASC";
+                "ORDER BY F.TIMESTAMP";
         return jdbcTemplate.query(sql, this::mapRowToFeed, userId);
     }
 

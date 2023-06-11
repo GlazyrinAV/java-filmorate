@@ -22,14 +22,14 @@ import java.util.Optional;
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 @Sql(value = {"/schema.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 @Sql(value = {"/data.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-public class DirectorServiceTests {
+class DirectorServiceTests {
 
     private final DirectorsService directorsService;
 
     private final FilmService filmService;
 
     @Test
-    public void saveNewDirectorNormal() {
+    void saveNewDirectorNormal() {
         Director director = new Director(1, "Director");
         directorsService.saveNew(new Director(null, "Director"));
         Assertions.assertEquals(directorsService.findById(1), director,
@@ -37,7 +37,7 @@ public class DirectorServiceTests {
     }
 
     @Test
-    public void saveNewDirectorWithNullName() {
+    void saveNewDirectorWithNullName() {
         Director director = new Director(null, null);
         DataIntegrityViolationException exception = Assertions.assertThrows(DataIntegrityViolationException.class, () ->
                 directorsService.saveNew(director));
@@ -46,7 +46,7 @@ public class DirectorServiceTests {
     }
 
     @Test
-    public void saveNewDirectorWithWrongId() {
+    void saveNewDirectorWithWrongId() {
         Director director = new Director(1, "Director");
         directorsService.saveNew(new Director(99, "Director"));
         Assertions.assertEquals(directorsService.findById(1), director,
@@ -54,7 +54,7 @@ public class DirectorServiceTests {
     }
 
     @Test
-    public void saveNewDirectorWithNegativeId() {
+    void saveNewDirectorWithNegativeId() {
         Director director = new Director(1, "Director");
         directorsService.saveNew(new Director(-1, "Director"));
         Assertions.assertEquals(directorsService.findById(1), director,
@@ -62,7 +62,7 @@ public class DirectorServiceTests {
     }
 
     @Test
-    public void saveNewDirectorWithZeroId() {
+    void saveNewDirectorWithZeroId() {
         Director director = new Director(1, "Director");
         directorsService.saveNew(new Director(0, "Director"));
         Assertions.assertEquals(directorsService.findById(1), director,
@@ -71,7 +71,7 @@ public class DirectorServiceTests {
 
     @Test
     @Sql(value = {"/dataForDirectorTests.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-    public void updateDirectorNormal() {
+    void updateDirectorNormal() {
         Director director = new Director(1, "Director update");
         directorsService.update(new Director(1, "Director update"));
         Assertions.assertEquals(directorsService.findById(1), director,
@@ -80,7 +80,7 @@ public class DirectorServiceTests {
 
     @Test
     @Sql(value = {"/dataForDirectorTests.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-    public void updateDirectorWithNullName() {
+    void updateDirectorWithNullName() {
         Director director = new Director(1, null);
         DataIntegrityViolationException exception = Assertions.assertThrows(DataIntegrityViolationException.class, () ->
                 directorsService.update(director));
@@ -90,83 +90,82 @@ public class DirectorServiceTests {
 
     @Test
     @Sql(value = {"/dataForDirectorTests.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-    public void updateDirectorWithWrongId() {
+    void updateDirectorWithWrongId() {
         Director director = new Director(99, "Director update");
         DirectorNotFoundException exception = Assertions.assertThrows(DirectorNotFoundException.class, () ->
                 directorsService.update(director));
-        Assertions.assertEquals(exception.getMessage(), "Режиссер c ID 99 не найден.",
+        Assertions.assertEquals("Режиссер c ID 99 не найден.", exception.getMessage(),
                 "Ошибка при обновлении режиссера c указанием несуществующего ид.");
     }
 
     @Test
     @Sql(value = {"/dataForDirectorTests.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-    public void updateDirectorWithNegativeId() {
+    void updateDirectorWithNegativeId() {
         Director director = new Director(-1, "Director update");
         DirectorNotFoundException exception = Assertions.assertThrows(DirectorNotFoundException.class, () ->
                 directorsService.update(director));
-        Assertions.assertEquals(exception.getMessage(), "Режиссер c ID -1 не найден.",
+        Assertions.assertEquals("Режиссер c ID -1 не найден.", exception.getMessage(),
                 "Ошибка при обновлении режиссера c указанием отрицательного ид.");
     }
 
     @Test
     @Sql(value = {"/dataForDirectorTests.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-    public void updateDirectorWithZeroId() {
+    void updateDirectorWithZeroId() {
         Director director = new Director(0, "Director update");
         DirectorNotFoundException exception = Assertions.assertThrows(DirectorNotFoundException.class, () ->
                 directorsService.update(director));
-        Assertions.assertEquals(exception.getMessage(), "Режиссер c ID 0 не найден.",
+        Assertions.assertEquals("Режиссер c ID 0 не найден.", exception.getMessage(),
                 "Ошибка при обновлении режиссера c указанием нулевого ид.");
     }
 
     @Test
-    public void findAllWithNoDirectors() {
+    void findAllWithNoDirectors() {
         Assertions.assertTrue(directorsService.findAll().isEmpty(),
                 "Ошибка при получении всех режиссеров при пустой базе.");
     }
 
     @Test
     @Sql(value = {"/dataForDirectorTests.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-    public void findAllWithDirectors() {
-        Assertions.assertTrue(directorsService.findAll().size() == 2,
-                "Ошибка при получении всех режиссеров при заполненной базе.");
+    void findAllWithDirectors() {
+        Assertions.assertEquals(2, directorsService.findAll().size(), "Ошибка при получении всех режиссеров при заполненной базе.");
     }
 
     @Test
     @Sql(value = {"/dataForDirectorTests.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-    public void findByIdNormal() {
+    void findByIdNormal() {
         Assertions.assertEquals(directorsService.findById(2), new Director(2, "Other Director"), "Ошибка при нормальном поиске по ид.");
     }
 
     @Test
     @Sql(value = {"/dataForDirectorTests.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-    public void findByIdWithNegativeId() {
+    void findByIdWithNegativeId() {
         DirectorNotFoundException exception = Assertions.assertThrows(DirectorNotFoundException.class, () ->
                 directorsService.findById(-1));
-        Assertions.assertEquals(exception.getMessage(), "Режиссер c ID -1 не найден.",
+        Assertions.assertEquals("Режиссер c ID -1 не найден.", exception.getMessage(),
                 "Ошибка при поиске по -1 ид.");
     }
 
     @Test
     @Sql(value = {"/dataForDirectorTests.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-    public void findByIdWithZeroId() {
+    void findByIdWithZeroId() {
         DirectorNotFoundException exception = Assertions.assertThrows(DirectorNotFoundException.class, () ->
                 directorsService.findById(0));
-        Assertions.assertEquals(exception.getMessage(), "Режиссер c ID 0 не найден.",
+        Assertions.assertEquals("Режиссер c ID 0 не найден.", exception.getMessage(),
                 "Ошибка при поиске по 0 ид.");
     }
 
     @Test
     @Sql(value = {"/dataForDirectorTests.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-    public void findByIdWithWrongId() {
+    void findByIdWithWrongId() {
         DirectorNotFoundException exception = Assertions.assertThrows(DirectorNotFoundException.class, () ->
                 directorsService.findById(99));
-        Assertions.assertEquals(exception.getMessage(), "Режиссер c ID 99 не найден.",
+        Assertions.assertEquals("Режиссер c ID 99 не найден.", exception.getMessage(),
                 "Ошибка при поиске по 99 ид.");
     }
 
     @Test
     @Sql(value = {"/dataForDirectorTests.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-    public void removeByIdNormal() {
+    void removeByIdNormal() {
         Director director = directorsService.findById(2);
         directorsService.removeById(2);
         Assertions.assertFalse(directorsService.findAll().contains(director),
@@ -175,34 +174,34 @@ public class DirectorServiceTests {
 
     @Test
     @Sql(value = {"/dataForDirectorTests.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-    public void removeByIdWithNegativeId() {
+    void removeByIdWithNegativeId() {
         DirectorNotFoundException exception = Assertions.assertThrows(DirectorNotFoundException.class, () ->
                 directorsService.removeById(-1));
-        Assertions.assertEquals(exception.getMessage(), "Режиссер c ID -1 не найден.",
+        Assertions.assertEquals("Режиссер c ID -1 не найден.", exception.getMessage(),
                 "Ошибка при удалении режиссера с -1 ид.");
     }
 
     @Test
     @Sql(value = {"/dataForDirectorTests.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-    public void removeByIdWithZeroId() {
+    void removeByIdWithZeroId() {
         DirectorNotFoundException exception = Assertions.assertThrows(DirectorNotFoundException.class, () ->
                 directorsService.removeById(0));
-        Assertions.assertEquals(exception.getMessage(), "Режиссер c ID 0 не найден.",
+        Assertions.assertEquals("Режиссер c ID 0 не найден.", exception.getMessage(),
                 "Ошибка при удалении режиссера с 0 ид.");
     }
 
     @Test
     @Sql(value = {"/dataForDirectorTests.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-    public void removeByIdWithWrongId() {
+    void removeByIdWithWrongId() {
         DirectorNotFoundException exception = Assertions.assertThrows(DirectorNotFoundException.class, () ->
                 directorsService.removeById(99));
-        Assertions.assertEquals(exception.getMessage(), "Режиссер c ID 99 не найден.",
+        Assertions.assertEquals("Режиссер c ID 99 не найден.", exception.getMessage(),
                 "Ошибка при удалении режиссера с 99 ид.");
     }
 
     @Test
     @Sql(value = {"/dataForDirectorTests.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-    public void removeByFilmIdNormal() {
+    void removeByFilmIdNormal() {
         directorsService.removeFromFilmByFilmId(1);
         Assertions.assertTrue(filmService.findById(1).getDirectors().isEmpty(),
                 "Ошибка при нормальном удалении режиссеров из фильма.");
@@ -210,7 +209,7 @@ public class DirectorServiceTests {
 
     @Test
     @Sql(value = {"/dataForDirectorTests.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-    public void placeOneDirectorToFilmFromDBNormal() {
+    void placeOneDirectorToFilmFromDBNormal() {
         directorsService.saveDirectorsToFilmFromDB(1);
         Assertions.assertTrue(filmService.findById(1).getDirectors().contains(new Director(1, "Director")),
                 "Ошибка при нормальном добавлении режиссеров в film.");
@@ -218,21 +217,21 @@ public class DirectorServiceTests {
 
     @Test
     @Sql(value = {"/dataForDirectorTests.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-    public void placeDirectorsToFilmFromDBWithNegativeId() {
+    void placeDirectorsToFilmFromDBWithNegativeId() {
         Assertions.assertEquals(0, directorsService.saveDirectorsToFilmFromDB(-1).size(),
                 "Ошибка при добавлении режиссеров в film с ид -1.");
     }
 
     @Test
     @Sql(value = {"/dataForDirectorTests.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-    public void placeDirectorsToFilmFromDBWithZeroId() {
+    void placeDirectorsToFilmFromDBWithZeroId() {
         Assertions.assertEquals(0, directorsService.saveDirectorsToFilmFromDB(0).size(),
                 "Ошибка при добавлении режиссеров в film с ид 0.");
     }
 
     @Test
     @Sql(value = {"/dataForDirectorTests.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-    public void placeDirectorsToFilmFromDBWrongId() {
+    void placeDirectorsToFilmFromDBWrongId() {
         Assertions.assertEquals(0, directorsService.saveDirectorsToFilmFromDB(99).size(),
                 "Ошибка при добавлении режиссеров в film с ид 99.");
     }
@@ -240,7 +239,7 @@ public class DirectorServiceTests {
 
     @Test
     @Sql(value = {"/dataForDirectorTests.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-    public void saveFilmDirectorsToDBNormal() {
+    void saveFilmDirectorsToDBNormal() {
         directorsService.saveDirectorsToDBFromFilm(Optional.of(List.of(new Director(1, null))), 2);
         Assertions.assertEquals(2, filmService.findByDirectorId(Optional.of(1), Optional.of("year")).size(),
                 "Ошибка при нормальном добавлении режиссера в БД.");
@@ -248,119 +247,119 @@ public class DirectorServiceTests {
 
     @Test
     @Sql(value = {"/dataForDirectorTests.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-    public void saveFilmDirectorsToDBWithNegativeId() {
+    void saveFilmDirectorsToDBWithNegativeId() {
         DataIntegrityViolationException exception = Assertions.assertThrows(DataIntegrityViolationException.class, () ->
                 directorsService.saveDirectorsToDBFromFilm(Optional.of(List.of(new Director(-1, null))), 2));
-        Assertions.assertEquals(exception.getMessage(), "В запросе неправильно указаны данные о фильме.",
+        Assertions.assertEquals("В запросе неправильно указаны данные о фильме.", exception.getMessage(),
                 "Ошибка при добавлении режиссера в БД с режиссером с ид -1.");
     }
 
     @Test
     @Sql(value = {"/dataForDirectorTests.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-    public void saveFilmDirectorsToDBWithZeroId() {
+    void saveFilmDirectorsToDBWithZeroId() {
         DataIntegrityViolationException exception = Assertions.assertThrows(DataIntegrityViolationException.class, () ->
                 directorsService.saveDirectorsToDBFromFilm(Optional.of(List.of(new Director(0, null))), 2));
-        Assertions.assertEquals(exception.getMessage(), "В запросе неправильно указаны данные о фильме.",
+        Assertions.assertEquals("В запросе неправильно указаны данные о фильме.", exception.getMessage(),
                 "Ошибка при добавлении режиссера в БД с режиссером с ид 0.");
     }
 
     @Test
     @Sql(value = {"/dataForDirectorTests.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-    public void saveFilmDirectorsToDBWrongId() {
+    void saveFilmDirectorsToDBWrongId() {
         DataIntegrityViolationException exception = Assertions.assertThrows(DataIntegrityViolationException.class, () ->
                 directorsService.saveDirectorsToDBFromFilm(Optional.of(List.of(new Director(99, null))), 2));
-        Assertions.assertEquals(exception.getMessage(), "В запросе неправильно указаны данные о фильме.",
+        Assertions.assertEquals("В запросе неправильно указаны данные о фильме.", exception.getMessage(),
                 "Ошибка при добавлении режиссера в БД с режиссером с ид 99.");
     }
 
     @Test
     @Sql(value = {"/dataForDirectorTests.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-    public void saveFilmDirectorsToDBWithNegativeFilmId() {
+    void saveFilmDirectorsToDBWithNegativeFilmId() {
         DataIntegrityViolationException exception = Assertions.assertThrows(DataIntegrityViolationException.class, () ->
                 directorsService.saveDirectorsToDBFromFilm(Optional.of(List.of(new Director(1, null))), -1));
-        Assertions.assertEquals(exception.getMessage(), "В запросе неправильно указаны данные о фильме.",
+        Assertions.assertEquals("В запросе неправильно указаны данные о фильме.", exception.getMessage(),
                 "Ошибка при добавлении режиссера в БД с фильмом с ид -1.");
     }
 
 
     @Test
     @Sql(value = {"/dataForDirectorTests.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-    public void saveFilmDirectorsToDBWithZeroFilmId() {
+    void saveFilmDirectorsToDBWithZeroFilmId() {
         DataIntegrityViolationException exception = Assertions.assertThrows(DataIntegrityViolationException.class, () ->
                 directorsService.saveDirectorsToDBFromFilm(Optional.of(List.of(new Director(1, null))), 0));
-        Assertions.assertEquals(exception.getMessage(), "В запросе неправильно указаны данные о фильме.",
+        Assertions.assertEquals("В запросе неправильно указаны данные о фильме.", exception.getMessage(),
                 "Ошибка при добавлении режиссера в БД с фильмом с ид 0.");
     }
 
     @Test
     @Sql(value = {"/dataForDirectorTests.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-    public void saveFilmDirectorsToDBWithWrongFilmId() {
+    void saveFilmDirectorsToDBWithWrongFilmId() {
         DataIntegrityViolationException exception = Assertions.assertThrows(DataIntegrityViolationException.class, () ->
                 directorsService.saveDirectorsToDBFromFilm(Optional.of(List.of(new Director(1, null))), 99));
-        Assertions.assertEquals(exception.getMessage(), "В запросе неправильно указаны данные о фильме.",
+        Assertions.assertEquals("В запросе неправильно указаны данные о фильме.", exception.getMessage(),
                 "Ошибка при добавлении режиссера в БД с фильмом с ид 99.");
     }
 
     @Test
     @Sql(value = {"/dataForDirectorTests.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-    public void findByDirectorIdNormal() {
-        Assertions.assertEquals(filmService.findByDirectorId(Optional.of(1), Optional.of("year")).toString(),
-                "[Film(name=film, description=description, releaseDate=1999-04-30, duration=PT0.1S, id=1, genres=[], mpa=Rating(id=1, name=G), directors=[Director(id=1, name=Director)])]",
+    void findByDirectorIdNormal() {
+        Assertions.assertEquals("[Film(name=film, description=description, releaseDate=1999-04-30, duration=PT0.1S, id=1, genres=[], mpa=Rating(id=1, name=G), directors=[Director(id=1, name=Director)])]",
+                filmService.findByDirectorId(Optional.of(1), Optional.of("year")).toString(),
                 "Ошибка при нормальном поиске фильмов по режиссеру.");
     }
 
     @Test
     @Sql(value = {"/dataForDirectorTests.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-    public void findByDirectorIdNegativeId() {
+    void findByDirectorIdNegativeId() {
         DirectorNotFoundException exception = Assertions.assertThrows(DirectorNotFoundException.class, () ->
                 filmService.findByDirectorId(Optional.of(-1), Optional.of("year")));
-        Assertions.assertEquals(exception.getMessage(), "Режиссер c ID -1 не найден.",
+        Assertions.assertEquals("Режиссер c ID -1 не найден.", exception.getMessage(),
                 "Ошибка при поиске фильмов по режиссеру c bl -1.");
     }
 
 
     @Test
     @Sql(value = {"/dataForDirectorTests.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-    public void findByDirectorIdZeroId() {
+    void findByDirectorIdZeroId() {
         DirectorNotFoundException exception = Assertions.assertThrows(DirectorNotFoundException.class, () ->
                 filmService.findByDirectorId(Optional.of(0), Optional.of("year")));
-        Assertions.assertEquals(exception.getMessage(), "Режиссер c ID 0 не найден.",
+        Assertions.assertEquals("Режиссер c ID 0 не найден.", exception.getMessage(),
                 "Ошибка при поиске фильмов по режиссеру c bl 0.");
     }
 
     @Test
     @Sql(value = {"/dataForDirectorTests.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-    public void findByDirectorIdWrongId() {
+    void findByDirectorIdWrongId() {
         DirectorNotFoundException exception = Assertions.assertThrows(DirectorNotFoundException.class, () ->
                 filmService.findByDirectorId(Optional.of(99), Optional.of("year")));
-        Assertions.assertEquals(exception.getMessage(), "Режиссер c ID 99 не найден.",
+        Assertions.assertEquals("Режиссер c ID 99 не найден.", exception.getMessage(),
                 "Ошибка при поиске фильмов по режиссеру c bl 99.");
     }
 
     @Test
     @Sql(value = {"/dataForDirectorTests.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-    public void findByDirectorIdWithoutSort() {
+    void findByDirectorIdWithoutSort() {
         ValidationException exception = Assertions.assertThrows(ValidationException.class, () ->
-                filmService.findByDirectorId(Optional.of(1), Optional.ofNullable(null)));
-        Assertions.assertEquals(exception.getMessage(), "Не указан параметр сортировки.",
+                filmService.findByDirectorId(Optional.of(1), Optional.empty()));
+        Assertions.assertEquals("Не указан параметр сортировки.", exception.getMessage(),
                 "Ошибка при поиске фильмов по режисеру без указания сортировки.");
     }
 
     @Test
     @Sql(value = {"/dataForDirectorTests.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-    public void findByDirectorIdWithRWongSort() {
+    void findByDirectorIdWithRWongSort() {
         ValidationException exception = Assertions.assertThrows(ValidationException.class, () ->
                 filmService.findByDirectorId(Optional.of(1), Optional.of("nothing")));
-        Assertions.assertEquals(exception.getMessage(), "Недопустимый параметр сортировки.",
+        Assertions.assertEquals("Недопустимый параметр сортировки.", exception.getMessage(),
                 "Ошибка при поиске фильмов по режисеру неправильному указанию типа сортировки.");
     }
 
     @Test
     @Sql(value = {"/dataForDirectorTests.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-    public void findByDirectorIdWithoutId() {
+    void findByDirectorIdWithoutId() {
         ValidationException exception = Assertions.assertThrows(ValidationException.class, () ->
-                filmService.findByDirectorId(Optional.ofNullable(null), Optional.of("year")));
-        Assertions.assertEquals(exception.getMessage(), "Не указан ид режиссера.",
+                filmService.findByDirectorId(Optional.empty(), Optional.of("year")));
+        Assertions.assertEquals("Не указан ид режиссера.", exception.getMessage(),
                 "Ошибка при поиске фильмов по режисеру без указания ид режиссера.");
     }
 }

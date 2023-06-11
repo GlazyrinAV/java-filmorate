@@ -17,78 +17,78 @@ public class ErrorHandler {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse noResultDataAccessException(NoResultDataAccessException exception) {
-        return sendErrorResponse("error", exception.getMessage());
+        return sendErrorResponse(ErrorType.ERROR, exception.getMessage());
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse dataIntegrityViolationException(DataIntegrityViolationException exception) {
-        return sendErrorResponse("data access error", exception.getMessage());
+        return sendErrorResponse(ErrorType.DATA_ACCESS_ERROR, exception.getMessage());
     }
 
     @ExceptionHandler({UserAlreadyExistsException.class, FilmAlreadyExistsException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse userAlreadyExistsException(RuntimeException exception) {
-        return sendErrorResponse("error", exception.getMessage());
+        return sendErrorResponse(ErrorType.ERROR, exception.getMessage());
     }
 
     @ExceptionHandler({UserNotFoundException.class, FilmNotFoundException.class, ReviewNotFoundException.class,
             RatingNotFoundException.class, GenreNotFoundException.class, DirectorNotFoundException.class})
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse entityNotFoundException(RuntimeException exception) {
-        return sendErrorResponse("error", exception.getMessage());
+        return sendErrorResponse(ErrorType.ERROR, exception.getMessage());
     }
 
     @ExceptionHandler({ValidationException.class})
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse validationException(RuntimeException exception) {
-        return sendErrorResponse("error", exception.getMessage());
+        return sendErrorResponse(ErrorType.ERROR, exception.getMessage());
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse illegalArgumentException(IllegalArgumentException exception) {
-        return sendErrorResponse("error", "Получен неподходящий аргумент или аргумент неправильного типа");
+    public ErrorResponse illegalArgumentException(IllegalArgumentException e) {
+        return sendErrorResponse(ErrorType.ERROR, "Получен неподходящий аргумент или аргумент неправильного типа");
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ErrorResponse otherException(RuntimeException exception) {
-        return sendErrorResponse("error", "В работе сервера возникла ошибка.");
+    public ErrorResponse otherException(RuntimeException e) {
+        return sendErrorResponse(ErrorType.ERROR, "В работе сервера возникла ошибка.");
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse methodArgumentNotValidException(MethodArgumentNotValidException exception) {
-        return sendErrorResponse("error", exception.getMessage());
+        return sendErrorResponse(ErrorType.ERROR, exception.getMessage());
     }
 
     @ExceptionHandler({LikeAlreadyExistsException.class, ReviewAlreadyExistsException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse entityAlreadyExistsException(RuntimeException exception) {
-        return sendErrorResponse("error", exception.getMessage());
+        return sendErrorResponse(ErrorType.ERROR, exception.getMessage());
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse friendAlreadyExistException(FriendAlreadyExistException exception) {
-        return sendErrorResponse("error", exception.getMessage());
+        return sendErrorResponse(ErrorType.ERROR, exception.getMessage());
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse likeNotFoundException(LikeNotFoundException exception) {
-        return sendErrorResponse("error", exception.getMessage());
+        return sendErrorResponse(ErrorType.ERROR, exception.getMessage());
     }
 
-    private ErrorResponse sendErrorResponse(String errorType, String description) {
+    private ErrorResponse sendErrorResponse(ErrorType errorType, String description) {
         log.info(description);
         return new ErrorResponse(errorType, description);
     }
 
     @Data
     public static class ErrorResponse {
-        private final String error;
+        private final ErrorType error;
         private final String description;
     }
 }
