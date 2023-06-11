@@ -10,10 +10,10 @@ import lombok.Data;
 @AllArgsConstructor
 public class EventType {
     private final Integer eventTypeId;
-    private final String eventType;
+    private final String eventTypeName;
 
     @JsonValue
-    public String getEventType() {
-        return eventType;
+    public String getEventTypeName() {
+        return eventTypeName;
     }
 }

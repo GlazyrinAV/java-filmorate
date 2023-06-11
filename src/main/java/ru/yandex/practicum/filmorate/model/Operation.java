@@ -12,10 +12,10 @@ import lombok.Data;
 @JsonTypeName("operation")
 public class Operation {
     private final Integer operationId;
-    private final String operation;
+    private final String operationName;
 
     @JsonValue
-    public String getOperation() {
-        return operation;
+    public String getOperationName() {
+        return operationName;
     }
 }

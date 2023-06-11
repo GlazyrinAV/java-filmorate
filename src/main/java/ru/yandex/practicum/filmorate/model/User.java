@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import ru.yandex.practicum.filmorate.customConstraints.whiteSpaceConstraint.WhiteSpaceConstraint;
+import ru.yandex.practicum.filmorate.customconstraints.whitespaceconstraint.WhiteSpaceConstraint;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
