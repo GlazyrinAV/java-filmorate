@@ -90,7 +90,7 @@ public class FilmService {
         Collection<Film> films;
         if (count <= 0) {
             throw new ValidationException("Значение выводимых фильмов не может быть меньше или равно нулю.");
-        } else if (genreId.isPresent() & year.isPresent()) {
+        } else if (genreId.isPresent() && year.isPresent()) {
             films = filmStorage.findPopularByGenreAndYear(count, genreId.get(), year.get());
         } else if (genreId.isPresent()) {
             films = filmStorage.findPopularByGenre(count, genreId.get());
@@ -112,16 +112,14 @@ public class FilmService {
     }
 
     public Collection<Film> findByDirectorId(Optional<Integer> directorId, Optional<String> sortBy) {
-        if (directorId.isEmpty()) {
-            throw new ValidationException("Не указан ид режиссера.");
-        }
-        directorsService.findById(directorId.get());
-        if (sortBy.isEmpty()) {
-            throw new ValidationException("Не указан параметр сортировки.");
-        } else if (!(sortBy.get().equals("year") || sortBy.get().equals("likes"))) {
+        int intDirectorId = directorId.orElseThrow(() -> new ValidationException("Не указан ид режиссера."));
+        String strSortBy = sortBy.orElseThrow(() -> new ValidationException("Не указан параметр сортировки."));
+        directorsService.findById(intDirectorId);
+        if (!(strSortBy.equals("year") || strSortBy.equals("likes"))) {
             throw new ValidationException("Недопустимый параметр сортировки.");
         }
-        Collection<Film> films = filmStorage.findByDirectorId(directorId.get(), sortBy.get());
+
+        Collection<Film> films = filmStorage.findByDirectorId(intDirectorId, strSortBy);
         if (films.isEmpty()) {
             log.info("Фильмы по указанному режиссеру не найдены.");
         } else {
@@ -151,20 +149,18 @@ public class FilmService {
     }
 
     public Collection<Film> findCommonFilms(Optional<Integer> userId, Optional<Integer> friendId) {
-        if (userId.isEmpty() || friendId.isEmpty()) {
-            throw new ValidationException("Не допустимый параметр запроса.");
-        }
-        if (userId == friendId) {
+        int intUserId = userId.orElseThrow(() -> new ValidationException("Недопустимый параметр запроса."));
+        int intFriendId = friendId.orElseThrow(() -> new ValidationException("Недопустимый параметр запроса."));
+        if (intUserId == intFriendId) {
             throw new ValidationException("Не допустимый параметр запроса. Пользователь сравнивается сам с собой.");
         }
-        userService.findById(userId.get());
-        userService.findById(friendId.get());
+        userService.findById(intUserId);
+        userService.findById(intFriendId);
 
-        Collection<Film> films = filmStorage.findCommonFilms(userId.get(), friendId.get());
+        Collection<Film> films = filmStorage.findCommonFilms(intUserId, intFriendId);
         for (Film film : films) {
             saveAdditionalInfoFromDb(film);
         }
         return films;
     }
 }
-
