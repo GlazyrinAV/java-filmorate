@@ -25,7 +25,7 @@ public class UserDbStorage implements UserStorage {
 
     private final JdbcTemplate jdbcTemplate;
 
-    private final HashMap<String, FriendshipStatus> friendshipStatuses;
+    private final HashMap<String, Integer> friendshipStatuses;
 
     @Autowired
     public UserDbStorage(JdbcTemplate jdbcTemplate) {
@@ -93,10 +93,10 @@ public class UserDbStorage implements UserStorage {
                 "friendship_status_id = ? WHERE user_id = ? AND friend_id = ?";
 
         if (findDidFriendMadeFriendRequest(friendId, userId)) {
-            jdbcTemplate.update(sqlQueryForMakingFriend, userId, friendId, friendshipStatuses.get("approved").getStatusId());
-            jdbcTemplate.update(sqlQueryForCheckingFriendshipStatus, friendshipStatuses.get("approved").getStatusId(), friendId, userId);
+            jdbcTemplate.update(sqlQueryForMakingFriend, userId, friendId, friendshipStatuses.get("approved"));
+            jdbcTemplate.update(sqlQueryForCheckingFriendshipStatus, friendshipStatuses.get("approved"), friendId, userId);
         } else {
-            jdbcTemplate.update(sqlQueryForMakingFriend, userId, friendId, friendshipStatuses.get("request").getStatusId());
+            jdbcTemplate.update(sqlQueryForMakingFriend, userId, friendId, friendshipStatuses.get("request"));
         }
     }
 
@@ -145,12 +145,12 @@ public class UserDbStorage implements UserStorage {
         return jdbcTemplate.queryForRowSet(sqlQuery, userId, friendId).next();
     }
 
-    private HashMap<String, FriendshipStatus> findAllFriendshipStatuses() {
-        HashMap<String, FriendshipStatus> statuses = new HashMap<>();
+    private HashMap<String, Integer> findAllFriendshipStatuses() {
+        HashMap<String, Integer> statuses = new HashMap<>();
         String sqlQuery = "SELECT * FROM FRIENDSHIP_STATUS";
         List<FriendshipStatus> list = jdbcTemplate.query(sqlQuery, this::mapRowToFriendshipStatus);
         for (FriendshipStatus status : list) {
-            statuses.put(status.getStatusName(), status);
+            statuses.put(status.getStatusName(), status.getStatusId());
         }
         return statuses;
     }
