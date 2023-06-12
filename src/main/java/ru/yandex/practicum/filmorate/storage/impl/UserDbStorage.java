@@ -9,6 +9,7 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exceptions.exceptions.NoResultDataAccessException;
+import ru.yandex.practicum.filmorate.model.FriendshipStatus;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.dao.UserStorage;
 
@@ -16,9 +17,7 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Collection;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 @Repository
 @Slf4j
@@ -27,9 +26,12 @@ public class UserDbStorage implements UserStorage {
 
     private final JdbcTemplate jdbcTemplate;
 
+    private final HashMap<String, FriendshipStatus> friendshipStatuses;
+
     @Autowired
     public UserDbStorage(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
+        friendshipStatuses = findAllFriendshipStatuses();
     }
 
     @Override
@@ -94,10 +96,10 @@ public class UserDbStorage implements UserStorage {
                 "friendship_status_id = ? WHERE user_id = ? AND friend_id = ?";
 
         if (findDidFriendMadeFriendRequest(friendId, userId)) {
-            jdbcTemplate.update(sqlQueryForMakingFriend, userId, friendId, 2);
-            jdbcTemplate.update(sqlQueryForCheckingFriendshipStatus, 2, friendId, userId);
+            jdbcTemplate.update(sqlQueryForMakingFriend, userId, friendId, friendshipStatuses.get("approved").getStatusId());
+            jdbcTemplate.update(sqlQueryForCheckingFriendshipStatus, friendshipStatuses.get("approved").getStatusId(), friendId, userId);
         } else {
-            jdbcTemplate.update(sqlQueryForMakingFriend, userId, friendId, 1);
+            jdbcTemplate.update(sqlQueryForMakingFriend, userId, friendId, friendshipStatuses.get("request").getStatusId());
         }
     }
 
@@ -144,5 +146,22 @@ public class UserDbStorage implements UserStorage {
         String sqlQuery = "SELECT friendship_status_id FROM list_of_friends" +
                 " WHERE user_id = ? AND friend_id = ?";
         return jdbcTemplate.queryForRowSet(sqlQuery, userId, friendId).next();
+    }
+
+    private HashMap<String, FriendshipStatus> findAllFriendshipStatuses() {
+        HashMap<String, FriendshipStatus> statuses = new HashMap<>();
+        String sqlQuery = "SELECT * FROM FRIENDSHIP_STATUS";
+        List<FriendshipStatus> list = jdbcTemplate.query(sqlQuery, this::mapRowToFriendshipStatus);
+        for (FriendshipStatus status : list) {
+            statuses.put(status.getStatusName(), status);
+        }
+        return statuses;
+    }
+
+    private FriendshipStatus mapRowToFriendshipStatus(ResultSet resultSet, int rowNum) throws SQLException {
+        return FriendshipStatus.builder()
+                .statusId(resultSet.getInt("FRIENDSHIP_STATUS_ID"))
+                .statusName(resultSet.getString("Friendship_status_name"))
+                .build();
     }
 }
