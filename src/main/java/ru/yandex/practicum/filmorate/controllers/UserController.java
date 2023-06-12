@@ -18,7 +18,7 @@ import java.util.Collection;
 public class UserController {
 
     private final UserService userService;
-    
+
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public User saveNew(@Valid @RequestBody User user) {
