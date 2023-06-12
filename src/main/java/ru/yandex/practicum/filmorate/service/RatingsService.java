@@ -1,25 +1,19 @@
 package ru.yandex.practicum.filmorate.service;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exceptions.exceptions.RatingNotFoundException;
 import ru.yandex.practicum.filmorate.model.Rating;
 import ru.yandex.practicum.filmorate.storage.dao.RatingStorage;
 
 import java.util.Collection;
 
 @Service
+@RequiredArgsConstructor
 @Slf4j
 public class RatingsService {
 
     private final RatingStorage ratingStorage;
-
-    @Autowired
-    public RatingsService(RatingStorage ratingStorage) {
-        this.ratingStorage = ratingStorage;
-    }
 
     public Collection<Rating> findAll() {
         Collection<Rating> ratings = ratingStorage.findAll();
@@ -33,11 +27,7 @@ public class RatingsService {
 
     public Rating findById(int ratingId) {
         Rating rating;
-        try {
-            rating = ratingStorage.findById(ratingId);
-        } catch (EmptyResultDataAccessException exception) {
-            throw new RatingNotFoundException("Рейтинг с ID " + ratingId + " не найден.");
-        }
+        rating = ratingStorage.findById(ratingId);
         return rating;
     }
 

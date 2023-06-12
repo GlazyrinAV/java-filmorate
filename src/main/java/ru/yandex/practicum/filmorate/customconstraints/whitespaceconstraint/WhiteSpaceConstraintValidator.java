@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.customConstraints.whiteSpaceConstraint;
+package ru.yandex.practicum.filmorate.customconstraints.whitespaceconstraint;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;

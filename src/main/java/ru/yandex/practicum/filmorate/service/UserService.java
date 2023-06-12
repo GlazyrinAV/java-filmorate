@@ -1,32 +1,22 @@
 package ru.yandex.practicum.filmorate.service;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.exceptions.FriendAlreadyExistException;
-import ru.yandex.practicum.filmorate.exceptions.exceptions.UserNotFoundException;
-import ru.yandex.practicum.filmorate.model.Feed;
-import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.model.*;
 import ru.yandex.practicum.filmorate.storage.dao.FeedStorage;
 import ru.yandex.practicum.filmorate.storage.dao.UserStorage;
 
 import java.util.Collection;
 
 @Service
+@RequiredArgsConstructor
 @Slf4j
 public class UserService {
 
     private final UserStorage userStorage;
     private final FeedStorage feedStorage;
-
-    @Autowired
-    public UserService(@Qualifier("UserDbStorage") UserStorage userStorage,
-                       FeedStorage feedStorage) {
-        this.userStorage = userStorage;
-        this.feedStorage = feedStorage;
-    }
 
     public User saveNew(User user) {
         checkName(user);
@@ -43,11 +33,7 @@ public class UserService {
 
     public User findById(int userId) {
         User user;
-        try {
-            user = userStorage.findById(userId);
-        } catch (EmptyResultDataAccessException exception) {
-            throw new UserNotFoundException("Пользователь c ID " + userId + " не найден.");
-        }
+        user = userStorage.findById(userId);
         return user;
     }
 
@@ -60,7 +46,7 @@ public class UserService {
         } else {
             log.info("Друг добавлен.");
             userStorage.saveFriend(userId, friendId);
-            feedStorage.saveFeed(userId, friendId, 3, 2);
+            feedStorage.saveFeed(userId, friendId, EventType.FRIEND.getEventTypeId(), Operation.ADD.getOperationId());
         }
     }
 
@@ -73,7 +59,7 @@ public class UserService {
         } else {
             log.info("Друг удален.");
             userStorage.removeFriend(userId, friendId);
-            feedStorage.saveFeed(userId, friendId, 3, 1);
+            feedStorage.saveFeed(userId, friendId, EventType.FRIEND.getEventTypeId(), Operation.REMOVE.getOperationId());
         }
     }
 

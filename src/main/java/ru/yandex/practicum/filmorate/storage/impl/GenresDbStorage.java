@@ -1,26 +1,22 @@
 package ru.yandex.practicum.filmorate.storage.impl;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
+import ru.yandex.practicum.filmorate.exceptions.exceptions.GenreNotFoundException;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.storage.dao.GenresStorage;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
 @Repository
+@RequiredArgsConstructor
 public class GenresDbStorage implements GenresStorage {
 
     private final JdbcTemplate jdbcTemplate;
-
-    @Autowired
-    public GenresDbStorage(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
-    }
 
     @Override
     public void saveGenresToDBFromFilm(List<Genre> genres, int filmId) {
@@ -41,11 +37,7 @@ public class GenresDbStorage implements GenresStorage {
     public List<Genre> saveGenresToFilmFromDB(int filmId) {
         String sqlQuery = "SELECT FG.GENRE_ID, G2.GENRE_NAME " +
                 "FROM FILM_GENRES AS FG JOIN GENRES G2 on G2.GENRE_ID = FG.GENRE_ID WHERE FILM_ID = ?";
-        if (!jdbcTemplate.query(sqlQuery, this::mapRowToGenre, filmId).isEmpty()) {
-            return jdbcTemplate.query(sqlQuery, this::mapRowToGenre, filmId);
-        } else {
-            return new ArrayList<>();
-        }
+        return jdbcTemplate.query(sqlQuery, this::mapRowToGenre, filmId);
     }
 
     @Override
@@ -57,7 +49,8 @@ public class GenresDbStorage implements GenresStorage {
     @Override
     public Genre findById(int genreId) {
         String sqlQuery = "SELECT * FROM GENRES WHERE genre_id = ?";
-        return jdbcTemplate.queryForObject(sqlQuery, this::mapRowToGenre, genreId);
+        return jdbcTemplate.query(sqlQuery, this::mapRowToGenre, genreId).stream().findFirst()
+                .orElseThrow(() -> new GenreNotFoundException("Жанр с ID " + genreId + " не найден."));
     }
 
     private Genre mapRowToGenre(ResultSet resultSet, int rowNum) throws SQLException {

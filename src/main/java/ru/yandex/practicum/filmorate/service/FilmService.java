@@ -1,20 +1,22 @@
 package ru.yandex.practicum.filmorate.service;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.exceptions.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.exceptions.ValidationException;
+import ru.yandex.practicum.filmorate.model.EventType;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Operation;
 import ru.yandex.practicum.filmorate.storage.dao.FeedStorage;
 import ru.yandex.practicum.filmorate.storage.dao.FilmStorage;
 
 import java.util.Collection;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 @Slf4j
 public class FilmService {
 
@@ -24,18 +26,6 @@ public class FilmService {
     private final GenresService genresService;
     private final RatingsService ratingsService;
     private final FeedStorage feedStorage;
-
-    @Autowired
-    public FilmService(@Qualifier("FilmDbStorage") FilmStorage filmStorage, UserService userService,
-                       GenresService genresService, RatingsService ratingsService, DirectorsService directorsService,
-                       FeedStorage feedStorage) {
-        this.filmStorage = filmStorage;
-        this.directorsService = directorsService;
-        this.userService = userService;
-        this.genresService = genresService;
-        this.ratingsService = ratingsService;
-        this.feedStorage = feedStorage;
-    }
 
     public Film saveNew(Film film) {
         int filmId = filmStorage.saveNew(film);
@@ -52,20 +42,12 @@ public class FilmService {
     }
 
     public Collection<Film> findAll() {
-        Collection<Film> films = filmStorage.findAll();
-        for (Film film : films) {
-            saveAdditionalInfoFromDb(film);
-        }
-        return films;
+        return filmStorage.findAll().stream().peek(this::saveAdditionalInfoFromDb).collect(Collectors.toList());
     }
 
     public Film findById(int filmId) {
         Film film;
-        try {
-            film = filmStorage.findById(filmId);
-        } catch (EmptyResultDataAccessException exception) {
-            throw new FilmNotFoundException("Фильм c ID " + filmId + " не найден.");
-        }
+        film = filmStorage.findById(filmId);
         saveAdditionalInfoFromDb(film);
         return film;
     }
@@ -74,10 +56,8 @@ public class FilmService {
         userService.findById(userId);
         findById(filmId);
         log.info("К фильму добавлен лайк.");
-        if (isUserDidNotPutLikeToFilm(filmId, userId)) {
-            filmStorage.makeLike(filmId, userId);
-        }
-        feedStorage.saveFeed(userId, filmId, 1, 2);
+        filmStorage.makeLike(filmId, userId);
+        feedStorage.saveFeed(userId, filmId, EventType.LIKE.getEventTypeId(), Operation.ADD.getOperationId());
     }
 
     public void removeLike(int filmId, int userId) {
@@ -85,14 +65,14 @@ public class FilmService {
         findById(filmId);
         log.info("У фильма удален лайк.");
         filmStorage.removeLike(filmId, userId);
-        feedStorage.saveFeed(userId, filmId, 1, 1);
+        feedStorage.saveFeed(userId, filmId, EventType.LIKE.getEventTypeId(), Operation.REMOVE.getOperationId());
     }
 
     public Collection<Film> findPopular(int count, Optional<Integer> genreId, Optional<Integer> year) {
         Collection<Film> films;
         if (count <= 0) {
             throw new ValidationException("Значение выводимых фильмов не может быть меньше или равно нулю.");
-        } else if (genreId.isPresent() & year.isPresent()) {
+        } else if (genreId.isPresent() && year.isPresent()) {
             films = filmStorage.findPopularByGenreAndYear(count, genreId.get(), year.get());
         } else if (genreId.isPresent()) {
             films = filmStorage.findPopularByGenre(count, genreId.get());
@@ -101,11 +81,9 @@ public class FilmService {
         } else {
             films = filmStorage.findPopular(count);
         }
-        for (Film film : films) {
-            saveAdditionalInfoFromDb(film);
-        }
+
         log.info("Популярные фильмы найдены.");
-        return films;
+        return films.stream().peek(this::saveAdditionalInfoFromDb).collect(Collectors.toList());
     }
 
     public Collection<Integer> findLikes(int filmId) {
@@ -113,21 +91,16 @@ public class FilmService {
         return filmStorage.findLikes(filmId);
     }
 
-    public Collection<Film> findByDirectorId(int directorId, String sortBy) {
-        directorsService.findById(directorId);
-        if (!(sortBy.equals("year") || sortBy.equals("likes"))) {
-            throw new ValidationException("Недопустимый параметр запроса.");
+    public Collection<Film> findByDirectorId(Optional<Integer> directorId, Optional<String> sortBy) {
+        int intDirectorId = directorId.orElseThrow(() -> new ValidationException("Не указан ид режиссера."));
+        String strSortBy = sortBy.orElseThrow(() -> new ValidationException("Не указан параметр сортировки."));
+        directorsService.findById(intDirectorId);
+        if (!(strSortBy.equals("year") || strSortBy.equals("likes"))) {
+            throw new ValidationException("Недопустимый параметр сортировки.");
         }
-        Collection<Film> films = filmStorage.findByDirectorId(directorId, sortBy);
-        if (films.isEmpty()) {
-            log.info("Фильмы по указанному режиссеру не найдены.");
-        } else {
-            log.info("Фильмы по указанному режиссеру найдены.");
-            for (Film film : films) {
-                saveAdditionalInfoFromDb(film);
-            }
-        }
-        return films;
+
+        return filmStorage.findByDirectorId(intDirectorId, strSortBy).stream().peek(this::saveAdditionalInfoFromDb)
+                .collect(Collectors.toList());
     }
 
     private void saveAdditionalInfoFromDb(Film film) {
@@ -147,21 +120,17 @@ public class FilmService {
         filmStorage.removeFilm(filmId);
     }
 
-    public Collection<Film> findCommonFilms(int userId, int friendId) {
-
-        userService.findById(userId);
-        userService.findById(friendId);
-
-        if (userId == friendId) {
-            throw new ValidationException("Не допустимый параметр запроса. Пользователь сравнивается сам с собой");
+    public Collection<Film> findCommonFilms(Optional<Integer> userId, Optional<Integer> friendId) {
+        int intUserId = userId.orElseThrow(() -> new ValidationException("Недопустимый параметр запроса."));
+        int intFriendId = friendId.orElseThrow(() -> new ValidationException("Недопустимый параметр запроса."));
+        if (intUserId == intFriendId) {
+            throw new ValidationException("Не допустимый параметр запроса. Пользователь сравнивается сам с собой.");
         }
+        userService.findById(intUserId);
+        userService.findById(intFriendId);
 
-        Collection<Film> films = filmStorage.findCommonFilms(userId, friendId);
-        for (Film film : films) {
-            saveAdditionalInfoFromDb(film);
-        }
-        return films;
-
+        return filmStorage.findCommonFilms(intUserId, intFriendId).stream().peek(this::saveAdditionalInfoFromDb)
+                .collect(Collectors.toList());
     }
 
     public Collection<Film> getRecommendation(int id) {
@@ -172,11 +141,9 @@ public class FilmService {
         } else {
             log.info("Рекомендации по указанном пользователю найдены.");
         }
-        for (Film film : films) {
-            saveAdditionalInfoFromDb(film);
-        }
 
-        return films;
+        return films.stream().peek(this::saveAdditionalInfoFromDb)
+                .collect(Collectors.toList());
     }
 
     public Collection<Film> searchByFilmAndDirector(String query, String by) {
@@ -205,9 +172,4 @@ public class FilmService {
         }
         return films;
     }
-
-    private boolean isUserDidNotPutLikeToFilm(int filmId, int userId) {
-        return !findLikes(filmId).contains(userId);
-    }
 }
-

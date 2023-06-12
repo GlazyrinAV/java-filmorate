@@ -1,13 +1,14 @@
 package ru.yandex.practicum.filmorate.storage.impl;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
+import ru.yandex.practicum.filmorate.exceptions.exceptions.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.dao.FilmStorage;
 
@@ -21,18 +22,12 @@ import java.util.Objects;
 import java.util.Optional;
 
 @Repository
+@RequiredArgsConstructor
 @Slf4j
 @Qualifier("FilmDbStorage")
 public class FilmDbStorage implements FilmStorage {
 
     private final JdbcTemplate jdbcTemplate;
-
-
-    @Autowired
-    public FilmDbStorage(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
-
-    }
 
     @Override
     public Integer saveNew(Film film) {
@@ -91,7 +86,8 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     public Film findById(int filmId) {
         String sqlQuery = "SELECT * FROM films where film_id = ?";
-        return jdbcTemplate.queryForObject(sqlQuery, this::mapRowToFilm, filmId);
+        return jdbcTemplate.query(sqlQuery, this::mapRowToFilm, filmId).stream().findFirst()
+                .orElseThrow(() -> new FilmNotFoundException("Фильм c ID " + filmId + " не найден."));
     }
 
     @Override
@@ -146,7 +142,7 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public void makeLike(int filmId, int userId) {
-        String sqlQuery = "INSERT INTO film_likes (film_id, user_id) VALUES (?, ?)";
+        String sqlQuery = "MERGE INTO film_likes (film_id, user_id) VALUES (?, ?)";
         try {
             jdbcTemplate.update(sqlQuery, filmId, userId);
         } catch (DataIntegrityViolationException exception) {
@@ -183,6 +179,12 @@ public class FilmDbStorage implements FilmStorage {
                     "WHERE FILMS.FILM_ID IN (SELECT FILM_ID FROM FILM_DIRECTOR WHERE DIRECTOR_ID = ?)\n" +
                     "group by FILMS.FILM_ID ORDER BY LIKES DESC";
         }
+        Integer resultCheck = jdbcTemplate.query(sqlQuery, (rs, rowNum) ->
+                rs.getInt("FILM_ID"), directorId).stream().findFirst().orElse(null);
+        if (resultCheck == null){
+            return new ArrayList<>();
+        }
+
         return jdbcTemplate.query(sqlQuery, this::mapRowToFilm, directorId);
     }
 
@@ -192,7 +194,7 @@ public class FilmDbStorage implements FilmStorage {
                 .name(resultSet.getString("name"))
                 .description(resultSet.getString("description"))
                 .releaseDate(resultSet.getDate("release_date").toLocalDate())
-                .duration(resultSet.getLong("duration"))
+                .duration((resultSet.getLong("duration")))
                 .build();
     }
 

@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.customConstraints.releaseDateConstraint;
+package ru.yandex.practicum.filmorate.customconstraints.releasedateconstraint;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;

@@ -1,7 +1,7 @@
 package ru.yandex.practicum.filmorate.controllers;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Review;
@@ -12,16 +12,12 @@ import java.util.Collection;
 import java.util.Optional;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/reviews")
 @Slf4j
 public class ReviewController {
 
     private final ReviewService reviewService;
-
-    @Autowired
-    public ReviewController(ReviewService reviewService) {
-        this.reviewService = reviewService;
-    }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
@@ -60,13 +56,13 @@ public class ReviewController {
 
     @PutMapping("/{id}/{like}/{userId}")
     @ResponseStatus(HttpStatus.OK)
-    public void saveLike(@PathVariable int id, @PathVariable int userId, @PathVariable String like) {
+    public void saveLike(@PathVariable int id, @PathVariable int userId, @PathVariable Optional<String> like) {
         reviewService.saveLike(userId, id, like);
     }
 
     @DeleteMapping("/{id}/{like}/{userId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void removeLike(@PathVariable int id, @PathVariable int userId, @PathVariable String like) {
+    public void removeLike(@PathVariable int id, @PathVariable int userId, @PathVariable Optional<String> like) {
         reviewService.removeLike(userId, id, like);
     }
 
