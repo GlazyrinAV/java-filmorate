@@ -36,4 +36,10 @@ public interface FilmStorage {
 
     Collection<Film> getRecommendation(int id);
 
+    Collection<Film> searchByFilmAndDirector(String query);
+
+    Collection<Film> searchByTitle(String query);
+
+    Collection<Film> searchByDirector(String query);
+
 }

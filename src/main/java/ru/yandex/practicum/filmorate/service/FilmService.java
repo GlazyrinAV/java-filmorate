@@ -176,5 +176,32 @@ public class FilmService {
 
         return films;
     }
+
+    public Collection<Film> searchByFilmAndDirector(String query, String by) {
+        Collection<Film> films = null;
+        switch (by) {
+            case "director":
+                films = filmStorage.searchByDirector(query);
+                break;
+            case "title":
+                films = filmStorage.searchByTitle(query);
+                break;
+            case "director,title":
+            case "title,director":
+                films = filmStorage.searchByFilmAndDirector(query);
+                break;
+            default:
+                throw new FilmNotFoundException("Недопустимый параметр запроса. Поиск по" + by + "еще не реализован.");
+        }
+        if (films.isEmpty()) {
+            log.info("Фильмы не найдены.");
+        } else {
+            log.info("Фильмы по поиску найдены.");
+            for (Film film : films) {
+                saveAdditionalInfoFromDb(film);
+            }
+        }
+        return films;
+    }
 }
 
