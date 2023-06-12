@@ -6,6 +6,8 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.exceptions.LikeAlreadyExistsException;
 import ru.yandex.practicum.filmorate.exceptions.exceptions.ReviewAlreadyExistsException;
 import ru.yandex.practicum.filmorate.exceptions.exceptions.ValidationException;
+import ru.yandex.practicum.filmorate.model.EventType;
+import ru.yandex.practicum.filmorate.model.Operation;
 import ru.yandex.practicum.filmorate.model.Review;
 import ru.yandex.practicum.filmorate.storage.dao.FeedStorage;
 import ru.yandex.practicum.filmorate.storage.dao.ReviewStorage;
@@ -33,7 +35,8 @@ public class ReviewService {
         } else {
             log.info("Отзыв добавлен.");
             int id = reviewStorage.saveNew(review);
-            feedStorage.saveFeed(review.getUserId(), id, 2, 2);
+            feedStorage.saveFeed(review.getUserId(), id, EventType.REVIEW.getEventTypeId(),
+                    Operation.ADD.getOperationId());
             return reviewStorage.findById(id);
         }
     }
@@ -43,7 +46,8 @@ public class ReviewService {
         int id = reviewStorage.update(review);
         log.info("Отзыв обновлен.");
         Review updatedReviews = reviewStorage.findById(id);
-        feedStorage.saveFeed(updatedReviews.getUserId(), id, 2, 3);
+        feedStorage.saveFeed(updatedReviews.getUserId(), id, EventType.REVIEW.getEventTypeId(),
+                Operation.UPDATE.getOperationId());
         return updatedReviews;
     }
 
@@ -51,7 +55,8 @@ public class ReviewService {
         Review reviewToDelete = findById(reviewId);
         log.info("Отзыв удален.");
         reviewStorage.remove(reviewId);
-        feedStorage.saveFeed(reviewToDelete.getUserId(), reviewId, 2, 1);
+        feedStorage.saveFeed(reviewToDelete.getUserId(), reviewId, EventType.REVIEW.getEventTypeId(),
+                Operation.REMOVE.getOperationId());
     }
 
     public Review findById(int reviewId) {

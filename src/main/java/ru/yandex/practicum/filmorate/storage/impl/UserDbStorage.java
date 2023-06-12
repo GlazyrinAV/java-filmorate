@@ -82,7 +82,6 @@ public class UserDbStorage implements UserStorage {
         String sqlQuery = "SELECT * FROM users where user_id = ?";
         return jdbcTemplate.query(sqlQuery, this::mapRowToUser, userId).stream().findFirst()
                 .orElseThrow(() -> new UserNotFoundException("Пользователь c ID " + userId + " не найден."));
-
     }
 
     @Override

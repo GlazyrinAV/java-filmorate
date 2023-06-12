@@ -1,19 +1,13 @@
 package ru.yandex.practicum.filmorate.model;
 
-import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 
-@Data
-@Builder
+@Getter
 @AllArgsConstructor
-public class EventType {
-    private final Integer eventTypeId;
-    private final String eventTypeName;
-
-    @JsonValue
-    public String getEventTypeName() {
-        return eventTypeName;
-    }
+public enum EventType {
+    LIKE(1),
+    REVIEW(2),
+    FRIEND(3);
+    final int eventTypeId;
 }

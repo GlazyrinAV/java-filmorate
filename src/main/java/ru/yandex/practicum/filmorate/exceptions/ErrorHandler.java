@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import ru.yandex.practicum.filmorate.exceptions.exceptions.*;
+import ru.yandex.practicum.filmorate.model.ErrorType;
 
 @RestControllerAdvice
 @Slf4j
