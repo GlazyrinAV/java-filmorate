@@ -1,6 +1,6 @@
 package ru.yandex.practicum.filmorate.storage.impl;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exceptions.exceptions.GenreNotFoundException;
@@ -13,14 +13,10 @@ import java.util.Collection;
 import java.util.List;
 
 @Repository
+@RequiredArgsConstructor
 public class GenresDbStorage implements GenresStorage {
 
     private final JdbcTemplate jdbcTemplate;
-
-    @Autowired
-    public GenresDbStorage(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
-    }
 
     @Override
     public void saveGenresToDBFromFilm(List<Genre> genres, int filmId) {

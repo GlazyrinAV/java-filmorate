@@ -1,7 +1,7 @@
 package ru.yandex.practicum.filmorate.service;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.exceptions.LikeAlreadyExistsException;
 import ru.yandex.practicum.filmorate.exceptions.exceptions.ReviewAlreadyExistsException;
@@ -16,21 +16,13 @@ import java.util.Comparator;
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 @Slf4j
 public class ReviewService {
     private final ReviewStorage reviewStorage;
     private final FilmService filmService;
     private final UserService userService;
     private final FeedStorage feedStorage;
-
-    @Autowired
-    public ReviewService(ReviewStorage reviewStorage, FilmService filmService, UserService userService,
-                         FeedStorage feedStorage) {
-        this.reviewStorage = reviewStorage;
-        this.filmService = filmService;
-        this.userService = userService;
-        this.feedStorage = feedStorage;
-    }
 
     public Review saveNew(Review review) {
         filmService.findById(review.getFilmId());

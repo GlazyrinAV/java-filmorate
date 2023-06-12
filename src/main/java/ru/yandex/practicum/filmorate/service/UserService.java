@@ -1,8 +1,7 @@
 package ru.yandex.practicum.filmorate.service;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.exceptions.FriendAlreadyExistException;
 import ru.yandex.practicum.filmorate.model.Feed;
@@ -13,18 +12,12 @@ import ru.yandex.practicum.filmorate.storage.dao.UserStorage;
 import java.util.Collection;
 
 @Service
+@RequiredArgsConstructor
 @Slf4j
 public class UserService {
 
     private final UserStorage userStorage;
     private final FeedStorage feedStorage;
-
-    @Autowired
-    public UserService(@Qualifier("UserDbStorage") UserStorage userStorage,
-                       FeedStorage feedStorage) {
-        this.userStorage = userStorage;
-        this.feedStorage = feedStorage;
-    }
 
     public User saveNew(User user) {
         checkName(user);

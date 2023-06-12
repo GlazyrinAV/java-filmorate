@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.controllers;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -9,15 +10,12 @@ import ru.yandex.practicum.filmorate.service.RatingsService;
 import java.util.Collection;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/mpa")
 @Slf4j
 public class RatingsController {
 
     private final RatingsService ratingsService;
-
-    public RatingsController(RatingsService ratingsService) {
-        this.ratingsService = ratingsService;
-    }
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
