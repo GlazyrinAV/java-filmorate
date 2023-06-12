@@ -40,10 +40,8 @@ public class FeedDbStorage implements FeedStorage {
                 .timestamp(rs.getTimestamp("feeds.timestamp"))
                 .userId(rs.getInt("feeds.user_id"))
                 .entityId(rs.getInt("feeds.entity_id"))
-                .eventType(new EventType(rs.getInt("event_type.event_type_id"),
-                        rs.getString("event_type.event_type")))
-                .operation(new Operation(rs.getInt("operation_for_feeds.operation_id"),
-                        rs.getString("operation_for_feeds.operation")))
+                .eventType(EventType.valueOf(rs.getString("event_type.event_type")))
+                .operation(Operation.valueOf(rs.getString("operation_for_feeds.operation")))
                 .build();
     }
 }
