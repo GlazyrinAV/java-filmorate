@@ -150,7 +150,7 @@ public class FilmDbStorage implements FilmStorage {
         try {
             jdbcTemplate.update(sqlQuery, filmId, userId);
         } catch (DataIntegrityViolationException exception) {
-
+            throw new DataIntegrityViolationException("В запросе неправильно указаны данные для добавдения лайка.");
         }
     }
 

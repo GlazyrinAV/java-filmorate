@@ -74,7 +74,9 @@ public class FilmService {
         userService.findById(userId);
         findById(filmId);
         log.info("К фильму добавлен лайк.");
-        filmStorage.makeLike(filmId, userId);
+        if (isUserDidNotPutLikeToFilm(filmId, userId)) {
+            filmStorage.makeLike(filmId, userId);
+        }
         feedStorage.saveFeed(userId, filmId, 1, 2);
     }
 
@@ -202,6 +204,10 @@ public class FilmService {
             }
         }
         return films;
+    }
+
+    private boolean isUserDidNotPutLikeToFilm(int filmId, int userId) {
+        return !findLikes(filmId).contains(userId);
     }
 }
 
