@@ -28,6 +28,6 @@ public class GenresController {
     @GetMapping("/{genreId}")
     @ResponseStatus(HttpStatus.OK)
     public Genre findById(@PathVariable int genreId) {
-        return genresService.findGenreById(genreId);
+        return genresService.findById(genreId);
     }
 }

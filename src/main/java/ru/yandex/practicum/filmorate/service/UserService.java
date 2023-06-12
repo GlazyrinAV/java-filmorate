@@ -3,10 +3,8 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.exceptions.FriendAlreadyExistException;
-import ru.yandex.practicum.filmorate.exceptions.exceptions.UserNotFoundException;
 import ru.yandex.practicum.filmorate.model.Feed;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.dao.FeedStorage;
@@ -43,11 +41,7 @@ public class UserService {
 
     public User findById(int userId) {
         User user;
-        try {
-            user = userStorage.findById(userId);
-        } catch (EmptyResultDataAccessException exception) {
-            throw new UserNotFoundException("Пользователь c ID " + userId + " не найден.");
-        }
+        user = userStorage.findById(userId);
         return user;
     }
 

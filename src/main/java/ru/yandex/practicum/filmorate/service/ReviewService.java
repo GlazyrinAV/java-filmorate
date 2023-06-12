@@ -2,11 +2,9 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.exceptions.LikeAlreadyExistsException;
 import ru.yandex.practicum.filmorate.exceptions.exceptions.ReviewAlreadyExistsException;
-import ru.yandex.practicum.filmorate.exceptions.exceptions.ReviewNotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Review;
 import ru.yandex.practicum.filmorate.storage.dao.FeedStorage;
@@ -66,11 +64,7 @@ public class ReviewService {
 
     public Review findById(int reviewId) {
         Review review;
-        try {
-            review = reviewStorage.findById(reviewId);
-        } catch (EmptyResultDataAccessException exception) {
-            throw new ReviewNotFoundException("Отзыв c ID " + reviewId + " не найден.");
-        }
+        review = reviewStorage.findById(reviewId);
         log.info("Отзыв найден.");
         return review;
     }

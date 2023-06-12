@@ -7,6 +7,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
+import ru.yandex.practicum.filmorate.exceptions.exceptions.DirectorNotFoundException;
 import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.storage.dao.DirectorStorage;
 
@@ -63,7 +64,8 @@ public class DirectorDbStorage implements DirectorStorage {
     @Override
     public Director findById(int id) {
         String sqlQuery = "SELECT * FROM DIRECTORS WHERE DIRECTOR_ID = ?";
-        return jdbcTemplate.queryForObject(sqlQuery, this::mapRowToDirector, id);
+        return  jdbcTemplate.query(sqlQuery, this::mapRowToDirector, id).stream().findFirst()
+                .orElseThrow(()->new DirectorNotFoundException("Режиссер c ID " + id + " не найден."));
     }
 
     @Override

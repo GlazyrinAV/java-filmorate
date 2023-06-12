@@ -8,6 +8,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
+import ru.yandex.practicum.filmorate.exceptions.exceptions.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.dao.FilmStorage;
 
@@ -15,7 +16,6 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Objects;
@@ -92,7 +92,8 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     public Film findById(int filmId) {
         String sqlQuery = "SELECT * FROM films where film_id = ?";
-        return jdbcTemplate.queryForObject(sqlQuery, this::mapRowToFilm, filmId);
+        return jdbcTemplate.query(sqlQuery, this::mapRowToFilm, filmId).stream().findFirst()
+                .orElseThrow(() -> new FilmNotFoundException("Фильм c ID " + filmId + " не найден."));
     }
 
     @Override

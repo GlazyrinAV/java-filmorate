@@ -3,12 +3,11 @@ package ru.yandex.practicum.filmorate.storage.impl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
-import ru.yandex.practicum.filmorate.exceptions.exceptions.NoResultDataAccessException;
+import ru.yandex.practicum.filmorate.exceptions.exceptions.UserNotFoundException;
 import ru.yandex.practicum.filmorate.model.FriendshipStatus;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.dao.UserStorage;
@@ -81,11 +80,9 @@ public class UserDbStorage implements UserStorage {
     @Override
     public User findById(int userId) {
         String sqlQuery = "SELECT * FROM users where user_id = ?";
-        try {
-            return jdbcTemplate.queryForObject(sqlQuery, this::mapRowToUser, userId);
-        } catch (EmptyResultDataAccessException exception) {
-            throw new NoResultDataAccessException("Запрос на поиск пользователя получил пустой ответ.", 1);
-        }
+        return jdbcTemplate.query(sqlQuery, this::mapRowToUser, userId).stream().findFirst()
+                .orElseThrow(() -> new UserNotFoundException("Пользователь c ID " + userId + " не найден."));
+
     }
 
     @Override

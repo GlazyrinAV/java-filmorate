@@ -3,9 +3,7 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exceptions.exceptions.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.dao.FeedStorage;
@@ -61,11 +59,7 @@ public class FilmService {
 
     public Film findById(int filmId) {
         Film film;
-        try {
-            film = filmStorage.findById(filmId);
-        } catch (EmptyResultDataAccessException exception) {
-            throw new FilmNotFoundException("Фильм c ID " + filmId + " не найден.");
-        }
+        film = filmStorage.findById(filmId);
         saveAdditionalInfoFromDb(film);
         return film;
     }
