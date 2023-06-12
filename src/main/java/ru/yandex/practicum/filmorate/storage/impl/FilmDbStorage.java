@@ -15,7 +15,6 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Objects;
@@ -47,7 +46,7 @@ public class FilmDbStorage implements FilmStorage {
                 stmt.setString(1, film.getName());
                 stmt.setString(2, film.getDescription());
                 stmt.setDate(3, Date.valueOf(film.getReleaseDate()));
-                stmt.setLong(4, film.getDuration().toMillis());
+                stmt.setLong(4, film.getDuration());
                 stmt.setInt(5, film.getMpa().getId());
                 return stmt;
             }, keyHolder);
@@ -74,7 +73,7 @@ public class FilmDbStorage implements FilmStorage {
                     film.getName(),
                     film.getDescription(),
                     Date.valueOf(film.getReleaseDate()),
-                    film.getDuration().toMillis(),
+                    film.getDuration(),
                     film.getMpa().getId(),
                     film.getId());
         } catch (DataIntegrityViolationException exception) {
@@ -193,7 +192,7 @@ public class FilmDbStorage implements FilmStorage {
                 .name(resultSet.getString("name"))
                 .description(resultSet.getString("description"))
                 .releaseDate(resultSet.getDate("release_date").toLocalDate())
-                .duration(Duration.ofMillis(resultSet.getLong("duration")))
+                .duration(resultSet.getLong("duration"))
                 .build();
     }
 
