@@ -1,20 +1,19 @@
 package ru.yandex.practicum.filmorate.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import ru.yandex.practicum.filmorate.customConstraints.releaseDateConstraint.ReleaseDateConstraint;
+import ru.yandex.practicum.filmorate.customConstraints.DurationConstraint;
+import ru.yandex.practicum.filmorate.customConstraints.ReleaseDateConstraint;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Positive;
 import javax.validation.constraints.Size;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.util.List;
 
 @Data
-@AllArgsConstructor
 @EqualsAndHashCode(exclude = "id")
 @Builder
 public class Film {
@@ -29,8 +28,8 @@ public class Film {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private final LocalDate releaseDate;
 
-    @Positive
-    private final Long duration;
+    @DurationConstraint
+    private final Duration duration;
 
     private Integer id;
 
@@ -38,5 +37,13 @@ public class Film {
 
     private Rating mpa;
 
-    private List<Director> directors;
+    public Film(String name, String description, LocalDate releaseDate, Duration duration, Integer id, List<Genre> genres, Rating mpa) {
+        this.name = name;
+        this.description = description;
+        this.releaseDate = releaseDate;
+        this.duration = duration;
+        this.id = id;
+        this.genres = genres;
+        this.mpa = mpa;
+    }
 }

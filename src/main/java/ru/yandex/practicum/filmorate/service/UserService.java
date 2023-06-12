@@ -1,16 +1,12 @@
 package ru.yandex.practicum.filmorate.service;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exceptions.exceptions.FriendAlreadyExistException;
-import ru.yandex.practicum.filmorate.exceptions.exceptions.UserNotFoundException;
-import ru.yandex.practicum.filmorate.model.Feed;
+import ru.yandex.practicum.filmorate.exceptions.UserNotFoundException;
+import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.dao.FeedStorage;
-import ru.yandex.practicum.filmorate.storage.dao.UserStorage;
+import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.util.Collection;
 
@@ -18,90 +14,93 @@ import java.util.Collection;
 @Slf4j
 public class UserService {
 
-    private final UserStorage userStorage;
-    private final FeedStorage feedStorage;
+    private final UserStorage storage;
 
-    @Autowired
-    public UserService(@Qualifier("UserDbStorage") UserStorage userStorage,
-                       FeedStorage feedStorage) {
-        this.userStorage = userStorage;
-        this.feedStorage = feedStorage;
+    public UserService(@Qualifier("UserDbStorage") UserStorage storage) {
+        this.storage = storage;
     }
 
-    public User saveNew(User user) {
-        checkName(user);
-        return findById(userStorage.saveNew(user));
+    public User addNew(User user) {
+        return storage.addNew(user);
     }
 
     public User update(User user) {
-        return findById(userStorage.update(user));
+        return storage.update(user);
     }
 
     public Collection<User> findAll() {
-        return userStorage.findAll();
+        return storage.findAll();
     }
 
-    public User findById(int userId) {
-        User user;
-        try {
-            user = userStorage.findById(userId);
-        } catch (EmptyResultDataAccessException exception) {
-            throw new UserNotFoundException("Пользователь c ID " + userId + " не найден.");
+    public User findById(int  userId) {
+        if (userId <= 0) {
+            log.info("Указан ID меньше или равный нулю.");
+            throw new ValidationException("ID не может быть меньше или равно нулю.");
+        } else {
+            return storage.findById(userId);
         }
-        return user;
     }
 
-    public void saveFriend(int userId, int friendId) {
-        findById(userId);
-        findById(friendId);
-        if (userStorage.findFriends(userId).contains(userStorage.findById(friendId))) {
-            throw new FriendAlreadyExistException("Пользователь с ID " + userId +
-                    " уже добавил в друзья пользователя c ID " + friendId);
+    public void addFriend(int userId, int friendId) {
+        if (userId <= 0 || friendId <= 0) {
+            log.info("Указан ID меньше или равный нулю.");
+            throw new ValidationException("ID не может быть меньше или равно нулю.");
+        } else if (!isExists(userId)) {
+            log.info("Пользователь c ID " + userId + " не найден.");
+            throw new UserNotFoundException("Пользователь c ID " + userId + " не найден.");
+        } else if (!isExists(friendId)) {
+            log.info("Пользователь c ID " + friendId + " не найден.");
+            throw new UserNotFoundException("Пользователь c ID " + friendId + " не найден.");
         } else {
             log.info("Друг добавлен.");
-            userStorage.saveFriend(userId, friendId);
-            feedStorage.saveFeed(userId, friendId, 3, 2);
+            storage.addFriend(userId, friendId);
         }
     }
 
     public void removeFriend(int userId, int friendId) {
-        findById(userId);
-        findById(friendId);
-        if (!userStorage.findFriends(userId).contains(findById(friendId))) {
-            throw new FriendAlreadyExistException("Пользователь с ID " + userId +
-                    " не имеет в друзьях пользователя c ID " + friendId);
+        if (userId <= 0 || friendId <= 0) {
+            log.info("Указан ID меньше или равный нулю.");
+            throw new ValidationException("ID не может быть меньше или равно нулю.");
+        } else if (!isExists(userId)) {
+            log.info("Пользователь c ID " + userId + " не найден.");
+            throw new UserNotFoundException("Пользователь c ID " + userId + " не найден.");
+        } else if (!isExists(friendId)) {
+            log.info("Пользователь c ID " + friendId + " не найден.");
+            throw new UserNotFoundException("Пользователь c ID " + friendId + " не найден.");
         } else {
             log.info("Друг удален.");
-            userStorage.removeFriend(userId, friendId);
-            feedStorage.saveFeed(userId, friendId, 3, 1);
+            storage.removeFriend(userId, friendId);
         }
     }
 
     public Collection<User> findFriends(int userId) {
-        findById(userId);
-        return userStorage.findFriends(userId);
+        if (userId <= 0) {
+            log.info("Указан ID меньше или равный нулю.");
+            throw new ValidationException("ID не может быть меньше или равно нулю.");
+        } else if (!isExists(userId)) {
+            log.info("Пользователь c ID " + userId + " не найден.");
+            throw new UserNotFoundException("Пользователь c ID " + userId + " не найден.");
+        } else {
+            return storage.findFriends(userId);
+        }
     }
 
     public Collection<User> findCommonFriends(int userId, int otherUserId) {
-        findById(userId);
-        findById(otherUserId);
-        return userStorage.findCommonFriends(userId, otherUserId);
-    }
-
-    public Collection<Feed> findFeed(int userId) {
-        findById(userId);
-        return feedStorage.findFeed(userId);
-    }
-
-    public void removeUser(int userId) {
-        findById(userId);
-        log.info("Пользователь удален.");
-        userStorage.removeUser(userId);
-    }
-
-    private void checkName(User user) {
-        if (user.getName().isBlank()) {
-            user.setName(user.getLogin());
+        if (userId <= 0 || otherUserId <= 0) {
+            log.info("Указан ID меньше или равный нулю.");
+            throw new ValidationException("ID не может быть меньше или равно нулю.");
+        } else if (!isExists(userId)) {
+            log.info("Пользователь c ID " + userId + " не найден.");
+            throw new UserNotFoundException("Пользователь c ID " + userId + " не найден.");
+        } else if (!isExists(otherUserId)) {
+            log.info("Пользователь c ID " + otherUserId + " не найден.");
+            throw new UserNotFoundException("Пользователь c ID " + otherUserId + " не найден.");
+        } else {
+            return storage.findCommonFriends(userId, otherUserId);
         }
+    }
+
+    protected Boolean isExists(int userID) {
+        return storage.isExists(userID);
     }
 }
