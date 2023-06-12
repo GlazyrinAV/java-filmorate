@@ -179,13 +179,13 @@ public class FilmService {
 
     public Collection<Film> searchByFilmAndDirector(String query, String by) {
         Collection<Film> films = filmStorage.searchByFilmAndDirector(query, by);
-        for (Film film : films) {
-            saveAdditionalInfoFromDb(film);
-        }
         if (films.isEmpty()) {
             log.info("Фильмы не найдены.");
         } else {
             log.info("Фильмы по поиску найдены.");
+            for (Film film : films) {
+                saveAdditionalInfoFromDb(film);
+            }
         }
         return films;
     }

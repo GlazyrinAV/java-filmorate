@@ -234,14 +234,12 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     public Collection<Film> searchByFilmAndDirector(String query, String by) {
         String searchByTitle = "SELECT * FROM FILMS AS F " +
-                " LEFT JOIN FILM_GENRES AS FG ON F.FILM_ID = FG.FILM_ID \n" +
                 " LEFT JOIN FILM_LIKES AS FL ON F.FILM_ID = FL.FILM_ID \n" +
                 " WHERE UPPER(F.NAME) LIKE UPPER(CONCAT('%', ?, '%'))" +
                 " GROUP BY F.FILM_ID";
         String searchByDir = "SELECT * FROM FILMS f\n" +
                 "LEFT OUTER JOIN FILM_DIRECTOR fd ON f.FILM_ID = fd.FILM_ID\n" +
                 "LEFT OUTER JOIN DIRECTORS d ON fd.DIRECTOR_ID = d.DIRECTOR_ID\n" +
-                " LEFT JOIN FILM_GENRES AS FG ON F.FILM_ID = FG.FILM_ID \n" +
                 " LEFT JOIN FILM_LIKES AS FL ON F.FILM_ID = FL.FILM_ID \n" +
                 " WHERE UPPER(D.DIRECTOR_NAME) LIKE UPPER(CONCAT('%', ?, '%'))" +
                 " GROUP BY F.FILM_ID";
@@ -250,7 +248,6 @@ public class FilmDbStorage implements FilmStorage {
                 "    SELECT F.*, D.DIRECTOR_NAME FROM FILMS F\n" +
                 "    LEFT OUTER JOIN FILM_DIRECTOR FD ON F.FILM_ID = FD.FILM_ID\n" +
                 "    LEFT OUTER JOIN DIRECTORS D ON FD.DIRECTOR_ID = D.DIRECTOR_ID\n" +
-                "    LEFT JOIN FILM_GENRES FG ON F.FILM_ID = FG.FILM_ID\n" +
                 "    LEFT JOIN FILM_LIKES FL ON F.FILM_ID = FL.FILM_ID\n" +
                 "    WHERE UPPER(F.NAME) LIKE UPPER(CONCAT('%', ?, '%'))\n" +
                 "    GROUP BY F.FILM_ID\n" +
@@ -260,7 +257,6 @@ public class FilmDbStorage implements FilmStorage {
                 "    SELECT F.*, D.DIRECTOR_NAME FROM FILMS F\n" +
                 "    LEFT OUTER JOIN FILM_DIRECTOR FD ON F.FILM_ID = FD.FILM_ID\n" +
                 "    LEFT OUTER JOIN DIRECTORS D ON FD.DIRECTOR_ID = D.DIRECTOR_ID\n" +
-                "    LEFT JOIN FILM_GENRES FG ON F.FILM_ID = FG.FILM_ID\n" +
                 "    LEFT JOIN FILM_LIKES FL ON F.FILM_ID = FL.FILM_ID\n" +
                 "    WHERE UPPER(D.DIRECTOR_NAME) LIKE UPPER(CONCAT('%', ?, '%'))\n" +
                 "    GROUP BY F.FILM_ID\n" +
