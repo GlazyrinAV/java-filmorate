@@ -230,4 +230,58 @@ public class FilmDbStorage implements FilmStorage {
 
         return jdbcTemplate.query(sqlQuery2, this::mapRowToFilm, idRecommendationUser, id);
     }
+
+    @Override
+    public Collection<Film> searchByFilmAndDirector(String query, String by) {
+        String searchByTitle = "SELECT * FROM FILMS AS F " +
+                " LEFT JOIN FILM_GENRES AS FG ON F.FILM_ID = FG.FILM_ID \n" +
+                " LEFT JOIN FILM_LIKES AS FL ON F.FILM_ID = FL.FILM_ID \n" +
+                " WHERE UPPER(F.NAME) LIKE UPPER(CONCAT('%', ?, '%'))" +
+                " GROUP BY F.FILM_ID";
+        String searchByDir = "SELECT * FROM FILMS f\n" +
+                "LEFT OUTER JOIN FILM_DIRECTOR fd ON f.FILM_ID = fd.FILM_ID\n" +
+                "LEFT OUTER JOIN DIRECTORS d ON fd.DIRECTOR_ID = d.DIRECTOR_ID\n" +
+                " LEFT JOIN FILM_GENRES AS FG ON F.FILM_ID = FG.FILM_ID \n" +
+                " LEFT JOIN FILM_LIKES AS FL ON F.FILM_ID = FL.FILM_ID \n" +
+                " WHERE UPPER(D.DIRECTOR_NAME) LIKE UPPER(CONCAT('%', ?, '%'))" +
+                " GROUP BY F.FILM_ID";
+
+        String searchQuery = "SELECT * FROM (\n" +
+                "    SELECT F.*, D.DIRECTOR_NAME FROM FILMS F\n" +
+                "    LEFT OUTER JOIN FILM_DIRECTOR FD ON F.FILM_ID = FD.FILM_ID\n" +
+                "    LEFT OUTER JOIN DIRECTORS D ON FD.DIRECTOR_ID = D.DIRECTOR_ID\n" +
+                "    LEFT JOIN FILM_GENRES FG ON F.FILM_ID = FG.FILM_ID\n" +
+                "    LEFT JOIN FILM_LIKES FL ON F.FILM_ID = FL.FILM_ID\n" +
+                "    WHERE UPPER(F.NAME) LIKE UPPER(CONCAT('%', ?, '%'))\n" +
+                "    GROUP BY F.FILM_ID\n" +
+                "\n" +
+                "    UNION ALL\n" +
+                "\n" +
+                "    SELECT F.*, D.DIRECTOR_NAME FROM FILMS F\n" +
+                "    LEFT OUTER JOIN FILM_DIRECTOR FD ON F.FILM_ID = FD.FILM_ID\n" +
+                "    LEFT OUTER JOIN DIRECTORS D ON FD.DIRECTOR_ID = D.DIRECTOR_ID\n" +
+                "    LEFT JOIN FILM_GENRES FG ON F.FILM_ID = FG.FILM_ID\n" +
+                "    LEFT JOIN FILM_LIKES FL ON F.FILM_ID = FL.FILM_ID\n" +
+                "    WHERE UPPER(D.DIRECTOR_NAME) LIKE UPPER(CONCAT('%', ?, '%'))\n" +
+                "    GROUP BY F.FILM_ID\n" +
+                ") AS FILMS\n" +
+                "ORDER BY FILM_ID DESC";
+
+        Collection<Film> result = null;
+        switch (by) {
+            case "director":
+                result = jdbcTemplate.query(searchByDir, this::mapRowToFilm, query);
+                break;
+            case "title":
+                result = jdbcTemplate.query(searchByTitle, this::mapRowToFilm, query);
+                break;
+            case "director,title":
+            case "title,director":
+                result = jdbcTemplate.query(searchQuery, this::mapRowToFilm, query, query);
+                break;
+            default:
+                throw new FilmNotFoundException("Недопустимый параметр запроса. Поиск по" + by + "еще не реализован.");
+        }
+        return result;
+    }
 }
