@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.exceptions.ValidationException;
+import ru.yandex.practicum.filmorate.model.Constants;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.dao.FeedStorage;
 import ru.yandex.practicum.filmorate.storage.dao.FilmStorage;
@@ -54,7 +55,7 @@ public class FilmService {
         findById(filmId);
         log.info("К фильму добавлен лайк.");
         filmStorage.makeLike(filmId, userId);
-        feedStorage.saveFeed(userId, filmId, 1, 2);
+        feedStorage.saveFeed(userId, filmId, Constants.eventTypes.get("LIKE"), Constants.operations.get("ADD"));
     }
 
     public void removeLike(int filmId, int userId) {
@@ -62,7 +63,7 @@ public class FilmService {
         findById(filmId);
         log.info("У фильма удален лайк.");
         filmStorage.removeLike(filmId, userId);
-        feedStorage.saveFeed(userId, filmId, 1, 1);
+        feedStorage.saveFeed(userId, filmId, Constants.eventTypes.get("LIKE"), Constants.operations.get("REMOVE"));
     }
 
     public Collection<Film> findPopular(int count, Optional<Integer> genreId, Optional<Integer> year) {

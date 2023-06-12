@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.exceptions.FriendAlreadyExistException;
+import ru.yandex.practicum.filmorate.model.Constants;
 import ru.yandex.practicum.filmorate.model.Feed;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.dao.FeedStorage;
@@ -47,7 +48,8 @@ public class UserService {
         } else {
             log.info("Друг добавлен.");
             userStorage.saveFriend(userId, friendId);
-            feedStorage.saveFeed(userId, friendId, 3, 2);
+            feedStorage.saveFeed(userId, friendId,
+                    Constants.eventTypes.get("FRIEND"), Constants.operations.get("ADD"));
         }
     }
 
@@ -60,7 +62,8 @@ public class UserService {
         } else {
             log.info("Друг удален.");
             userStorage.removeFriend(userId, friendId);
-            feedStorage.saveFeed(userId, friendId, 3, 1);
+            feedStorage.saveFeed(userId, friendId,
+                    Constants.eventTypes.get("FRIEND"), Constants.operations.get("REMOVE"));
         }
     }
 
