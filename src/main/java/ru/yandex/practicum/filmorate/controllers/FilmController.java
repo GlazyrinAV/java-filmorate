@@ -8,6 +8,7 @@ import ru.yandex.practicum.filmorate.service.FilmService;
 
 import javax.validation.Valid;
 import java.util.Collection;
+import java.util.Optional;
 
 @RestController
 @Slf4j
@@ -21,50 +22,76 @@ public class FilmController {
 
     @PostMapping("/films")
     @ResponseStatus(HttpStatus.CREATED)
-    public Film addNewFilm(@Valid @RequestBody Film film) {
-        log.info("Получен запрос на создание фильма.");
-        return filmService.addNew(film);
+    public Film saveNew(@Valid @RequestBody Film film) {
+        return filmService.saveNew(film);
     }
 
     @PutMapping("/films")
     @ResponseStatus(HttpStatus.OK)
-    public Film updateFilm(@Valid @RequestBody Film film) {
-        log.info("Получен запрос на обновление фильма.");
+    public Film update(@Valid @RequestBody Film film) {
         return filmService.update(film);
     }
 
     @GetMapping("/films")
     @ResponseStatus(HttpStatus.OK)
-    public Collection<Film> getAllFilms() {
-        log.info("Получен запрос на получение списка фильмов.");
+    public Collection<Film> findAll() {
         return filmService.findAll();
     }
 
     @GetMapping("/films/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public Film findFilmById(@PathVariable int id) {
-        log.info("Получен запрос на поиск фильма с ID" + id + ".");
+    public Film findById(@PathVariable int id) {
         return filmService.findById(id);
     }
 
     @PutMapping("/films/{id}/like/{userId}")
     @ResponseStatus(HttpStatus.OK)
-    public void addNewLike(@PathVariable int id, @PathVariable int userId) {
-        log.info("Получен запрос на добавление лайка к фильму ");
-        filmService.addLike(id, userId);
+    public void makeNewLike(@PathVariable int id, @PathVariable int userId) {
+        filmService.makeLike(id, userId);
     }
 
     @DeleteMapping("/films/{id}/like/{userId}")
     @ResponseStatus(HttpStatus.OK)
     public void removeLike(@PathVariable int id, @PathVariable int userId) {
-        log.info("Получен запрос на удаление лайка к фильму ");
         filmService.removeLike(id, userId);
     }
 
     @GetMapping("/films/popular")
     @ResponseStatus(HttpStatus.OK)
-    public Collection<Film> findPopularFilms(@RequestParam(defaultValue = "10") int count) {
-        log.info("Получен запрос на получение первых " + count + " популярных фильмов.");
-        return filmService.getPopular(count);
+    public Collection<Film> findPopularFilms(@RequestParam(defaultValue = "10") int count,
+                                             @RequestParam Optional<Integer> genreId,
+                                             @RequestParam Optional<Integer> year) {
+        return filmService.findPopular(count, genreId, year);
+    }
+
+    @DeleteMapping("/films/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public void removeFilm(@PathVariable int id) {
+        filmService.removeFilm(id);
+    }
+
+    @GetMapping("/films/director/{directorId}")
+    @ResponseStatus(HttpStatus.OK)
+    public Collection<Film> findByDirectorId(@PathVariable int directorId, @RequestParam String sortBy) {
+        return filmService.findByDirectorId(directorId, sortBy);
+    }
+
+    @GetMapping("/films/common")
+    @ResponseStatus(HttpStatus.OK)
+    public Collection<Film> findCommonFilms(@RequestParam int userId, @RequestParam int friendId) {
+        return filmService.findCommonFilms(userId, friendId);
+    }
+
+    @GetMapping("/users/{id}/recommendations")
+    @ResponseStatus(HttpStatus.OK)
+    public Collection<Film> getRecommendation(@PathVariable int id) {
+        return filmService.getRecommendation(id);
+    }
+
+    @GetMapping("/films/search")
+    @ResponseStatus(HttpStatus.OK)
+    public Collection<Film> searchByFilmAndDirector(@RequestParam(required = false) String query,
+                                                    @RequestParam(required = false) String by) {
+        return filmService.searchByFilmAndDirector(query, by);
     }
 }

@@ -1,10 +1,12 @@
 package ru.yandex.practicum.filmorate.service;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.exceptions.exceptions.RatingNotFoundException;
 import ru.yandex.practicum.filmorate.model.Rating;
-import ru.yandex.practicum.filmorate.storage.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.dao.RatingStorage;
 
 import java.util.Collection;
 
@@ -12,17 +14,34 @@ import java.util.Collection;
 @Slf4j
 public class RatingsService {
 
-    private final FilmStorage filmStorage;
+    private final RatingStorage ratingStorage;
 
-    public RatingsService(@Qualifier("FilmDbStorage") FilmStorage filmStorage) {
-        this.filmStorage = filmStorage;
+    @Autowired
+    public RatingsService(RatingStorage ratingStorage) {
+        this.ratingStorage = ratingStorage;
     }
 
-    public Collection<Rating> findAllFilmRatings() {
-        return filmStorage.findAllRatings();
+    public Collection<Rating> findAll() {
+        Collection<Rating> ratings = ratingStorage.findAll();
+        if (ratings.isEmpty()) {
+            log.info("Рейтингы отсутствуют.");
+        } else {
+            log.info("Рейтинги найдены.");
+        }
+        return ratings;
     }
 
-    public Rating findRatingById(int ratingId) {
-        return filmStorage.findRatingById(ratingId);
+    public Rating findById(int ratingId) {
+        Rating rating;
+        try {
+            rating = ratingStorage.findById(ratingId);
+        } catch (EmptyResultDataAccessException exception) {
+            throw new RatingNotFoundException("Рейтинг с ID " + ratingId + " не найден.");
+        }
+        return rating;
+    }
+
+    public Rating saveRatingToFilmFromDB(int filmId) {
+        return ratingStorage.saveRatingToFilmFromDB(filmId);
     }
 }
