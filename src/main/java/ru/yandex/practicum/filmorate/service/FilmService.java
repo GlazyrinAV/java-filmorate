@@ -178,7 +178,21 @@ public class FilmService {
     }
 
     public Collection<Film> searchByFilmAndDirector(String query, String by) {
-        Collection<Film> films = filmStorage.searchByFilmAndDirector(query, by);
+        Collection<Film> films = null;
+        switch (by) {
+            case "director":
+                films = filmStorage.searchByDirector(query);
+                break;
+            case "title":
+                films = filmStorage.searchByTitle(query);
+                break;
+            case "director,title":
+            case "title,director":
+                films = filmStorage.searchByFilmAndDirector(query);
+                break;
+            default:
+                throw new FilmNotFoundException("Недопустимый параметр запроса. Поиск по" + by + "еще не реализован.");
+        }
         if (films.isEmpty()) {
             log.info("Фильмы не найдены.");
         } else {

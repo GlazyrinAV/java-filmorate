@@ -8,7 +8,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
-import ru.yandex.practicum.filmorate.exceptions.exceptions.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.dao.FilmStorage;
 
@@ -232,11 +231,17 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Override
-    public Collection<Film> searchByFilmAndDirector(String query, String by) {
+    public Collection<Film> searchByTitle(String query) {
         String searchByTitle = "SELECT * FROM FILMS AS F " +
                 " LEFT JOIN FILM_LIKES AS FL ON F.FILM_ID = FL.FILM_ID \n" +
                 " WHERE UPPER(F.NAME) LIKE UPPER(CONCAT('%', ?, '%'))" +
                 " GROUP BY F.FILM_ID";
+
+        return jdbcTemplate.query(searchByTitle, this::mapRowToFilm, query);
+    }
+
+    @Override
+    public Collection<Film> searchByDirector(String query) {
         String searchByDir = "SELECT * FROM FILMS f\n" +
                 "LEFT OUTER JOIN FILM_DIRECTOR fd ON f.FILM_ID = fd.FILM_ID\n" +
                 "LEFT OUTER JOIN DIRECTORS d ON fd.DIRECTOR_ID = d.DIRECTOR_ID\n" +
@@ -244,6 +249,11 @@ public class FilmDbStorage implements FilmStorage {
                 " WHERE UPPER(D.DIRECTOR_NAME) LIKE UPPER(CONCAT('%', ?, '%'))" +
                 " GROUP BY F.FILM_ID";
 
+        return jdbcTemplate.query(searchByDir, this::mapRowToFilm, query);
+    }
+
+    @Override
+    public Collection<Film> searchByFilmAndDirector(String query) {
         String searchQuery = "SELECT * FROM (\n" +
                 "    SELECT F.*, D.DIRECTOR_NAME FROM FILMS F\n" +
                 "    LEFT OUTER JOIN FILM_DIRECTOR FD ON F.FILM_ID = FD.FILM_ID\n" +
@@ -263,21 +273,6 @@ public class FilmDbStorage implements FilmStorage {
                 ") AS FILMS\n" +
                 "ORDER BY FILM_ID DESC";
 
-        Collection<Film> result = null;
-        switch (by) {
-            case "director":
-                result = jdbcTemplate.query(searchByDir, this::mapRowToFilm, query);
-                break;
-            case "title":
-                result = jdbcTemplate.query(searchByTitle, this::mapRowToFilm, query);
-                break;
-            case "director,title":
-            case "title,director":
-                result = jdbcTemplate.query(searchQuery, this::mapRowToFilm, query, query);
-                break;
-            default:
-                throw new FilmNotFoundException("Недопустимый параметр запроса. Поиск по" + by + "еще не реализован.");
-        }
-        return result;
+        return jdbcTemplate.query(searchQuery, this::mapRowToFilm, query, query);
     }
 }
