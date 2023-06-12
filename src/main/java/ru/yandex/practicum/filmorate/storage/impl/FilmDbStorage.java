@@ -185,6 +185,12 @@ public class FilmDbStorage implements FilmStorage {
                     "WHERE FILMS.FILM_ID IN (SELECT FILM_ID FROM FILM_DIRECTOR WHERE DIRECTOR_ID = ?)\n" +
                     "group by FILMS.FILM_ID ORDER BY LIKES DESC";
         }
+        Integer resultCheck = jdbcTemplate.query(sqlQuery, (rs, rowNum) ->
+                rs.getInt("FILM_ID"), directorId).stream().findFirst().orElse(null);
+        if (resultCheck == null){
+            return new ArrayList<>();
+        }
+
         return jdbcTemplate.query(sqlQuery, this::mapRowToFilm, directorId);
     }
 

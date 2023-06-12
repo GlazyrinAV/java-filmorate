@@ -14,7 +14,10 @@ import ru.yandex.practicum.filmorate.storage.dao.DirectorStorage;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 @Repository
 @Slf4j
@@ -64,8 +67,8 @@ public class DirectorDbStorage implements DirectorStorage {
     @Override
     public Director findById(int id) {
         String sqlQuery = "SELECT * FROM DIRECTORS WHERE DIRECTOR_ID = ?";
-        return  jdbcTemplate.query(sqlQuery, this::mapRowToDirector, id).stream().findFirst()
-                .orElseThrow(()->new DirectorNotFoundException("Режиссер c ID " + id + " не найден."));
+        return jdbcTemplate.query(sqlQuery, this::mapRowToDirector, id).stream().findFirst()
+                .orElseThrow(() -> new DirectorNotFoundException("Режиссер c ID " + id + " не найден."));
     }
 
     @Override
@@ -78,11 +81,7 @@ public class DirectorDbStorage implements DirectorStorage {
     public List<Director> saveDirectorsToFilmFromDB(int filmId) {
         String sqlQuery = "SELECT FD.DIRECTOR_ID, D2.DIRECTOR_NAME " +
                 "FROM FILM_DIRECTOR AS FD JOIN DIRECTORS D2 on D2.DIRECTOR_ID = FD.DIRECTOR_ID WHERE FILM_ID = ?";
-        if (!jdbcTemplate.query(sqlQuery, this::mapRowToDirector, filmId).isEmpty()) {
-            return jdbcTemplate.query(sqlQuery, this::mapRowToDirector, filmId);
-        } else {
-            return new ArrayList<>();
-        }
+        return jdbcTemplate.query(sqlQuery, this::mapRowToDirector, filmId);
     }
 
     @Override

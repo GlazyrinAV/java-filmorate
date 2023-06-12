@@ -9,7 +9,6 @@ import ru.yandex.practicum.filmorate.storage.dao.GenresStorage;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -42,11 +41,7 @@ public class GenresDbStorage implements GenresStorage {
     public List<Genre> saveGenresToFilmFromDB(int filmId) {
         String sqlQuery = "SELECT FG.GENRE_ID, G2.GENRE_NAME " +
                 "FROM FILM_GENRES AS FG JOIN GENRES G2 on G2.GENRE_ID = FG.GENRE_ID WHERE FILM_ID = ?";
-        if (!jdbcTemplate.query(sqlQuery, this::mapRowToGenre, filmId).isEmpty()) {
-            return jdbcTemplate.query(sqlQuery, this::mapRowToGenre, filmId);
-        } else {
-            return new ArrayList<>();
-        }
+        return jdbcTemplate.query(sqlQuery, this::mapRowToGenre, filmId);
     }
 
     @Override

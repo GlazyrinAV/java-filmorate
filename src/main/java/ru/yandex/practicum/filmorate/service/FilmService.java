@@ -11,6 +11,7 @@ import ru.yandex.practicum.filmorate.storage.dao.FilmStorage;
 
 import java.util.Collection;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -50,11 +51,7 @@ public class FilmService {
     }
 
     public Collection<Film> findAll() {
-        Collection<Film> films = filmStorage.findAll();
-        for (Film film : films) {
-            saveAdditionalInfoFromDb(film);
-        }
-        return films;
+        return filmStorage.findAll().stream().peek(this::saveAdditionalInfoFromDb).collect(Collectors.toList());
     }
 
     public Film findById(int filmId) {
@@ -93,11 +90,9 @@ public class FilmService {
         } else {
             films = filmStorage.findPopular(count);
         }
-        for (Film film : films) {
-            saveAdditionalInfoFromDb(film);
-        }
+
         log.info("Популярные фильмы найдены.");
-        return films;
+        return films.stream().peek(this::saveAdditionalInfoFromDb).collect(Collectors.toList());
     }
 
     public Collection<Integer> findLikes(int filmId) {
@@ -113,16 +108,8 @@ public class FilmService {
             throw new ValidationException("Недопустимый параметр сортировки.");
         }
 
-        Collection<Film> films = filmStorage.findByDirectorId(intDirectorId, strSortBy);
-        if (films.isEmpty()) {
-            log.info("Фильмы по указанному режиссеру не найдены.");
-        } else {
-            log.info("Фильмы по указанному режиссеру найдены.");
-            for (Film film : films) {
-                saveAdditionalInfoFromDb(film);
-            }
-        }
-        return films;
+        return filmStorage.findByDirectorId(intDirectorId, strSortBy).stream().peek(this::saveAdditionalInfoFromDb)
+                .collect(Collectors.toList());
     }
 
     private void saveAdditionalInfoFromDb(Film film) {
@@ -151,11 +138,8 @@ public class FilmService {
         userService.findById(intUserId);
         userService.findById(intFriendId);
 
-        Collection<Film> films = filmStorage.findCommonFilms(intUserId, intFriendId);
-        for (Film film : films) {
-            saveAdditionalInfoFromDb(film);
-        }
-        return films;
+        return filmStorage.findCommonFilms(intUserId, intFriendId).stream().peek(this::saveAdditionalInfoFromDb)
+                .collect(Collectors.toList());
     }
 
     public Collection<Film> getRecommendation(int id) {
@@ -166,10 +150,8 @@ public class FilmService {
         } else {
             log.info("Рекомендации по указанном пользователю найдены.");
         }
-        for (Film film : films) {
-            saveAdditionalInfoFromDb(film);
-        }
 
-        return films;
+        return films.stream().peek(this::saveAdditionalInfoFromDb)
+                .collect(Collectors.toList());
     }
 }
