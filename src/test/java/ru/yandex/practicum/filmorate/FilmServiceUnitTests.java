@@ -311,7 +311,7 @@ class FilmServiceUnitTests {
     public void findPopularNormalWithNoCount() {
         Film film = new Film("Name", "Description", LocalDate.of(1990, Month.APRIL, 13), 100L, 1, List.of(new Genre(1, "Комедия")), new Rating(1, "G"), new ArrayList<>());
         filmService.saveNew(film);
-        Film film2 = new Film("Name2", "Description2", LocalDate.of(1990, Month.APRIL, 13), 100L, null, List.of(new Genre(1, "Комедия")), new Rating(1, "G"), new ArrayList<>());
+        Film film2 = new Film("Name2", "Description2", LocalDate.of(1990, Month.APRIL, 13), 100L, 2, List.of(new Genre(1, "Комедия")), new Rating(1, "G"), new ArrayList<>());
         filmService.saveNew(film2);
         User user = new User("abc@acb.ru", "login", "name", LocalDate.of(1986, Month.APRIL, 13), null);
         userService.saveNew(user);

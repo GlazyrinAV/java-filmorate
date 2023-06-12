@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.exceptions.exceptions.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.dao.FeedStorage;
@@ -53,9 +54,7 @@ public class FilmService {
         userService.findById(userId);
         findById(filmId);
         log.info("К фильму добавлен лайк.");
-        if (isUserDidNotPutLikeToFilm(filmId, userId)) {
-            filmStorage.makeLike(filmId, userId);
-        }
+        filmStorage.makeLike(filmId, userId);
         feedStorage.saveFeed(userId, filmId, 1, 2);
     }
 
@@ -170,9 +169,5 @@ public class FilmService {
             }
         }
         return films;
-    }
-
-    private boolean isUserDidNotPutLikeToFilm(int filmId, int userId) {
-        return !findLikes(filmId).contains(userId);
     }
 }
