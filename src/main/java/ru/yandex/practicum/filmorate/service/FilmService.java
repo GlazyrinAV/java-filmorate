@@ -176,5 +176,13 @@ public class FilmService {
 
         return films;
     }
+
+    public Collection<Film> searchByFilmAndDirector(String query, String by) {
+        Collection<Film> films = filmStorage.searchByFilmAndDirector(query, by);
+        for (Film film : films) {
+            saveAdditionalInfoFromDb(film);
+        }
+        return films;
+    }
 }
 
