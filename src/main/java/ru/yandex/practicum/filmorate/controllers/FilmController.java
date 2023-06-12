@@ -86,4 +86,10 @@ public class FilmController {
         return filmService.getRecommendation(id);
     }
 
+    @GetMapping("/films/search")
+    @ResponseStatus(HttpStatus.OK)
+    public Collection<Film> searchByFilmAndDirector(@RequestParam(required = false) String query,
+                                                    @RequestParam(required = false) String by) {
+        return filmService.searchByFilmAndDirector(query, by);
+    }
 }

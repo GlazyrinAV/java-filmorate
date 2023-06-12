@@ -53,7 +53,9 @@ public class FilmService {
         userService.findById(userId);
         findById(filmId);
         log.info("К фильму добавлен лайк.");
-        filmStorage.makeLike(filmId, userId);
+        if (isUserDidNotPutLikeToFilm(filmId, userId)) {
+            filmStorage.makeLike(filmId, userId);
+        }
         feedStorage.saveFeed(userId, filmId, 1, 2);
     }
 
@@ -141,5 +143,36 @@ public class FilmService {
 
         return films.stream().peek(this::saveAdditionalInfoFromDb)
                 .collect(Collectors.toList());
+    }
+
+    public Collection<Film> searchByFilmAndDirector(String query, String by) {
+        Collection<Film> films = null;
+        switch (by) {
+            case "director":
+                films = filmStorage.searchByDirector(query);
+                break;
+            case "title":
+                films = filmStorage.searchByTitle(query);
+                break;
+            case "director,title":
+            case "title,director":
+                films = filmStorage.searchByFilmAndDirector(query);
+                break;
+            default:
+                throw new FilmNotFoundException("Недопустимый параметр запроса. Поиск по" + by + "еще не реализован.");
+        }
+        if (films.isEmpty()) {
+            log.info("Фильмы не найдены.");
+        } else {
+            log.info("Фильмы по поиску найдены.");
+            for (Film film : films) {
+                saveAdditionalInfoFromDb(film);
+            }
+        }
+        return films;
+    }
+
+    private boolean isUserDidNotPutLikeToFilm(int filmId, int userId) {
+        return !findLikes(filmId).contains(userId);
     }
 }
