@@ -232,47 +232,41 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public Collection<Film> searchByTitle(String query) {
-        String searchByTitle = "SELECT * FROM FILMS AS F " +
-                " LEFT JOIN FILM_LIKES AS FL ON F.FILM_ID = FL.FILM_ID \n" +
-                " WHERE UPPER(F.NAME) LIKE UPPER(CONCAT('%', ?, '%'))" +
-                " GROUP BY F.FILM_ID";
+        String searchByTitle = "SELECT F.*, COUNT(FL.FILM_ID) AS LIKES_COUNT " +
+                "FROM FILMS AS F " +
+                "LEFT OUTER JOIN FILM_LIKES AS FL ON F.FILM_ID = FL.FILM_ID " +
+                "WHERE UPPER(F.NAME) LIKE UPPER(CONCAT('%', ?, '%')) " +
+                "GROUP BY F.FILM_ID " +
+                "ORDER BY F.FILM_ID DESC";
 
         return jdbcTemplate.query(searchByTitle, this::mapRowToFilm, query);
     }
 
     @Override
     public Collection<Film> searchByDirector(String query) {
-        String searchByDir = "SELECT * FROM FILMS f\n" +
-                "LEFT OUTER JOIN FILM_DIRECTOR fd ON f.FILM_ID = fd.FILM_ID\n" +
-                "LEFT OUTER JOIN DIRECTORS d ON fd.DIRECTOR_ID = d.DIRECTOR_ID\n" +
-                " LEFT JOIN FILM_LIKES AS FL ON F.FILM_ID = FL.FILM_ID \n" +
-                " WHERE UPPER(D.DIRECTOR_NAME) LIKE UPPER(CONCAT('%', ?, '%'))" +
-                " GROUP BY F.FILM_ID";
+        String searchByDir = "SELECT F.*, COUNT(FL.FILM_ID) AS LIKES_COUNT " +
+                "FROM FILMS F " +
+                "LEFT OUTER JOIN FILM_DIRECTOR FD ON F.FILM_ID = FD.FILM_ID " +
+                "LEFT OUTER JOIN DIRECTORS D ON FD.DIRECTOR_ID = D.DIRECTOR_ID " +
+                "LEFT OUTER JOIN FILM_LIKES FL ON F.FILM_ID = FL.FILM_ID " +
+                "WHERE UPPER(D.DIRECTOR_NAME) LIKE UPPER(CONCAT('%', ?, '%')) " +
+                "GROUP BY F.FILM_ID " +
+                "ORDER BY F.FILM_ID DESC";
 
         return jdbcTemplate.query(searchByDir, this::mapRowToFilm, query);
     }
 
     @Override
     public Collection<Film> searchByFilmAndDirector(String query) {
-        String searchQuery = "SELECT * FROM (\n" +
-                "    SELECT F.*, D.DIRECTOR_NAME FROM FILMS F\n" +
-                "    LEFT OUTER JOIN FILM_DIRECTOR FD ON F.FILM_ID = FD.FILM_ID\n" +
-                "    LEFT OUTER JOIN DIRECTORS D ON FD.DIRECTOR_ID = D.DIRECTOR_ID\n" +
-                "    LEFT JOIN FILM_LIKES FL ON F.FILM_ID = FL.FILM_ID\n" +
-                "    WHERE UPPER(F.NAME) LIKE UPPER(CONCAT('%', ?, '%'))\n" +
-                "    GROUP BY F.FILM_ID\n" +
-                "\n" +
-                "    UNION ALL\n" +
-                "\n" +
-                "    SELECT F.*, D.DIRECTOR_NAME FROM FILMS F\n" +
-                "    LEFT OUTER JOIN FILM_DIRECTOR FD ON F.FILM_ID = FD.FILM_ID\n" +
-                "    LEFT OUTER JOIN DIRECTORS D ON FD.DIRECTOR_ID = D.DIRECTOR_ID\n" +
-                "    LEFT JOIN FILM_LIKES FL ON F.FILM_ID = FL.FILM_ID\n" +
-                "    WHERE UPPER(D.DIRECTOR_NAME) LIKE UPPER(CONCAT('%', ?, '%'))\n" +
-                "    GROUP BY F.FILM_ID\n" +
-                ") AS FILMS\n" +
-                "ORDER BY FILM_ID DESC";
+        String search = "SELECT F.*, D.DIRECTOR_NAME, COUNT(FL.FILM_ID) AS LIKES_COUNT " +
+                "FROM FILMS AS F " +
+                "LEFT OUTER JOIN FILM_DIRECTOR AS FD ON F.FILM_ID = FD.FILM_ID " +
+                "LEFT OUTER JOIN DIRECTORS AS D ON FD.DIRECTOR_ID = D.DIRECTOR_ID " +
+                "LEFT OUTER JOIN FILM_LIKES AS FL ON F.FILM_ID = FL.FILM_ID " +
+                "WHERE UPPER(F.NAME) LIKE UPPER(CONCAT('%', ?, '%')) OR UPPER(D.DIRECTOR_NAME) LIKE UPPER(CONCAT('%', ?, '%')) " +
+                "GROUP BY F.FILM_ID, D.DIRECTOR_NAME " +
+                "ORDER BY F.FILM_ID DESC";
 
-        return jdbcTemplate.query(searchQuery, this::mapRowToFilm, query, query);
+        return jdbcTemplate.query(search, this::mapRowToFilm, query, query);
     }
 }
