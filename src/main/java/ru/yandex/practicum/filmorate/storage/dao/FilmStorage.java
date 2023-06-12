@@ -36,4 +36,6 @@ public interface FilmStorage {
 
     Collection<Film> getRecommendation(int id);
 
+    Collection<Film> searchByFilmAndDirector(String query, String by);
+
 }
