@@ -91,15 +91,14 @@ public class FilmService {
         return filmStorage.findLikes(filmId);
     }
 
-    public Collection<Film> findByDirectorId(Optional<Integer> directorId, Optional<String> sortBy) {
-        int intDirectorId = directorId.orElseThrow(() -> new ValidationException("Не указан ид режиссера."));
+    public Collection<Film> findByDirectorId(Integer directorId, Optional<String> sortBy) {
         String strSortBy = sortBy.orElseThrow(() -> new ValidationException("Не указан параметр сортировки."));
-        directorsService.findById(intDirectorId);
+        directorsService.findById(directorId);
         if (!(strSortBy.equals("year") || strSortBy.equals("likes"))) {
             throw new ValidationException("Недопустимый параметр сортировки.");
         }
 
-        return filmStorage.findByDirectorId(intDirectorId, strSortBy).stream().peek(this::saveAdditionalInfoFromDb)
+        return filmStorage.findByDirectorId(directorId, strSortBy).stream().peek(this::saveAdditionalInfoFromDb)
                 .collect(Collectors.toList());
     }
 
