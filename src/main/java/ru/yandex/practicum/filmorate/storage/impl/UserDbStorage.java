@@ -16,7 +16,11 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.Collection;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Repository
 @Slf4j
@@ -25,7 +29,7 @@ public class UserDbStorage implements UserStorage {
 
     private final JdbcTemplate jdbcTemplate;
 
-    private final HashMap<String, Integer> friendshipStatuses;
+    private final Map<String, Integer> friendshipStatuses;
 
     @Autowired
     public UserDbStorage(JdbcTemplate jdbcTemplate) {
@@ -144,14 +148,9 @@ public class UserDbStorage implements UserStorage {
         return jdbcTemplate.queryForRowSet(sqlQuery, userId, friendId).next();
     }
 
-    private HashMap<String, Integer> findAllFriendshipStatuses() {
-        HashMap<String, Integer> statuses = new HashMap<>();
-        String sqlQuery = "SELECT * FROM FRIENDSHIP_STATUS";
-        List<FriendshipStatus> list = jdbcTemplate.query(sqlQuery, this::mapRowToFriendshipStatus);
-        for (FriendshipStatus status : list) {
-            statuses.put(status.getStatusName(), status.getStatusId());
-        }
-        return statuses;
+    private Map<String, Integer> findAllFriendshipStatuses() {
+        return jdbcTemplate.query("SELECT * FROM FRIENDSHIP_STATUS", this::mapRowToFriendshipStatus).stream()
+                .collect(Collectors.toMap(FriendshipStatus::getStatusName, FriendshipStatus::getStatusId));
     }
 
     private FriendshipStatus mapRowToFriendshipStatus(ResultSet resultSet, int rowNum) throws SQLException {
