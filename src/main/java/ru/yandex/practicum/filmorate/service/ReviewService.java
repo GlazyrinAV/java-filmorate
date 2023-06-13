@@ -29,7 +29,7 @@ public class ReviewService {
     public Review saveNew(Review review) {
         filmService.findById(review.getFilmId());
         userService.findById(review.getUserId());
-        if (Boolean.TRUE.equals(isExists(review))) {
+        if (isExists(review)) {
             log.info("Такой отзыв уже существует.");
             throw new ReviewAlreadyExistsException("Такой отзыв уже существует.");
         } else {
@@ -132,7 +132,7 @@ public class ReviewService {
         reviewStorage.removeLike(userId, reviewId);
     }
 
-    public Boolean isExists(Review review) {
+    public boolean isExists(Review review) {
         return reviewStorage.isExists(review);
     }
 }
