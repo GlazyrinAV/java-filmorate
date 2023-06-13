@@ -1,9 +1,11 @@
 package ru.yandex.practicum.filmorate.controllers;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.SortType;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
 import javax.validation.Valid;
@@ -11,14 +13,11 @@ import java.util.Collection;
 import java.util.Optional;
 
 @RestController
+@RequiredArgsConstructor
 @Slf4j
 public class FilmController {
 
     private final FilmService filmService;
-
-    public FilmController(FilmService filmService) {
-        this.filmService = filmService;
-    }
 
     @PostMapping("/films")
     @ResponseStatus(HttpStatus.CREATED)
@@ -72,13 +71,13 @@ public class FilmController {
 
     @GetMapping("/films/director/{directorId}")
     @ResponseStatus(HttpStatus.OK)
-    public Collection<Film> findByDirectorId(@PathVariable int directorId, @RequestParam String sortBy) {
+    public Collection<Film> findByDirectorId(@PathVariable Integer directorId, @RequestParam("sortBy") SortType sortBy) {
         return filmService.findByDirectorId(directorId, sortBy);
     }
 
     @GetMapping("/films/common")
     @ResponseStatus(HttpStatus.OK)
-    public Collection<Film> findCommonFilms(@RequestParam int userId, @RequestParam int friendId) {
+    public Collection<Film> findCommonFilms(@RequestParam Optional<Integer> userId, @RequestParam Optional<Integer> friendId) {
         return filmService.findCommonFilms(userId, friendId);
     }
 

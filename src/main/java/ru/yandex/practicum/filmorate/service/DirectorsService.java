@@ -1,10 +1,8 @@
 package ru.yandex.practicum.filmorate.service;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exceptions.exceptions.DirectorNotFoundException;
 import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.storage.dao.DirectorStorage;
 
@@ -13,15 +11,11 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 @Slf4j
 public class DirectorsService {
 
     private final DirectorStorage directorStorage;
-
-    @Autowired
-    public DirectorsService(DirectorStorage directorStorage) {
-        this.directorStorage = directorStorage;
-    }
 
     public Director saveNew(Director director) {
         int id = directorStorage.saveNew(director);
@@ -43,11 +37,7 @@ public class DirectorsService {
 
     public Director findById(int id) {
         Director director;
-        try {
-            director = directorStorage.findById(id);
-        } catch (EmptyResultDataAccessException exception) {
-            throw new DirectorNotFoundException("Режиссер c ID " + id + " не найден.");
-        }
+        director = directorStorage.findById(id);
         log.info("Режиссер найден.");
         return director;
     }

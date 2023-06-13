@@ -4,10 +4,10 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-import ru.yandex.practicum.filmorate.customConstraints.releaseDateConstraint.ReleaseDateConstraint;
+import ru.yandex.practicum.filmorate.customconstraints.releasedateconstraint.ReleaseDateConstraint;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
@@ -15,7 +15,6 @@ import java.util.List;
 
 @Data
 @AllArgsConstructor
-@EqualsAndHashCode(exclude = "id")
 @Builder
 public class Film {
 
@@ -30,6 +29,7 @@ public class Film {
     private final LocalDate releaseDate;
 
     @Positive
+    @NotNull
     private final Long duration;
 
     private Integer id;

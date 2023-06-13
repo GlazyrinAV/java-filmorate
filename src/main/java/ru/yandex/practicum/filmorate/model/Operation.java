@@ -1,21 +1,13 @@
 package ru.yandex.practicum.filmorate.model;
 
-import com.fasterxml.jackson.annotation.JsonTypeName;
-import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 
-@Data
-@Builder
+@Getter
 @AllArgsConstructor
-@JsonTypeName("operation")
-public class Operation {
-    private final Integer operationId;
-    private final String operation;
-
-    @JsonValue
-    public String getOperation() {
-        return operation;
-    }
+public enum Operation {
+    REMOVE(1),
+    ADD(2),
+    UPDATE(3);
+    final int operationId;
 }

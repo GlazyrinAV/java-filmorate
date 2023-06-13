@@ -1,30 +1,30 @@
 package ru.yandex.practicum.filmorate.storage.impl;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
+import ru.yandex.practicum.filmorate.exceptions.exceptions.DirectorNotFoundException;
 import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.storage.dao.DirectorStorage;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 @Repository
+@RequiredArgsConstructor
 @Slf4j
 public class DirectorDbStorage implements DirectorStorage {
 
     private final JdbcTemplate jdbcTemplate;
-
-    @Autowired
-    public DirectorDbStorage(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
-    }
 
     @Override
     public Integer saveNew(Director director) {
@@ -63,7 +63,8 @@ public class DirectorDbStorage implements DirectorStorage {
     @Override
     public Director findById(int id) {
         String sqlQuery = "SELECT * FROM DIRECTORS WHERE DIRECTOR_ID = ?";
-        return jdbcTemplate.queryForObject(sqlQuery, this::mapRowToDirector, id);
+        return jdbcTemplate.query(sqlQuery, this::mapRowToDirector, id).stream().findFirst()
+                .orElseThrow(() -> new DirectorNotFoundException("Режиссер c ID " + id + " не найден."));
     }
 
     @Override
@@ -76,11 +77,7 @@ public class DirectorDbStorage implements DirectorStorage {
     public List<Director> saveDirectorsToFilmFromDB(int filmId) {
         String sqlQuery = "SELECT FD.DIRECTOR_ID, D2.DIRECTOR_NAME " +
                 "FROM FILM_DIRECTOR AS FD JOIN DIRECTORS D2 on D2.DIRECTOR_ID = FD.DIRECTOR_ID WHERE FILM_ID = ?";
-        if (!jdbcTemplate.query(sqlQuery, this::mapRowToDirector, filmId).isEmpty()) {
-            return jdbcTemplate.query(sqlQuery, this::mapRowToDirector, filmId);
-        } else {
-            return new ArrayList<>();
-        }
+        return jdbcTemplate.query(sqlQuery, this::mapRowToDirector, filmId);
     }
 
     @Override

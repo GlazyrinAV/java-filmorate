@@ -3,13 +3,18 @@ package ru.yandex.practicum.filmorate.model;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
+
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Positive;
 
 @Data
 @AllArgsConstructor
-@EqualsAndHashCode(exclude = "id")
 @Builder
 public class Rating {
+
+    @Positive
     private final Integer id;
+
+    @NotBlank
     private final String name;
 }

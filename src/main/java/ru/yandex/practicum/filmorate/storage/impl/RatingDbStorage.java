@@ -1,8 +1,9 @@
 package ru.yandex.practicum.filmorate.storage.impl;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
+import ru.yandex.practicum.filmorate.exceptions.exceptions.RatingNotFoundException;
 import ru.yandex.practicum.filmorate.model.Rating;
 import ru.yandex.practicum.filmorate.storage.dao.RatingStorage;
 
@@ -11,14 +12,10 @@ import java.sql.SQLException;
 import java.util.List;
 
 @Repository
+@RequiredArgsConstructor
 public class RatingDbStorage implements RatingStorage {
 
     private final JdbcTemplate jdbcTemplate;
-
-    @Autowired
-    public RatingDbStorage(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
-    }
 
     @Override
     public List<Rating> findAll() {
@@ -29,7 +26,8 @@ public class RatingDbStorage implements RatingStorage {
     @Override
     public Rating findById(int ratingId) {
         String sqlQuery = "SELECT * FROM RATINGS WHERE rating_id = ?";
-        return jdbcTemplate.queryForObject(sqlQuery, this::mapRowToRating, ratingId);
+        return jdbcTemplate.query(sqlQuery, this::mapRowToRating, ratingId).stream().findFirst()
+                .orElseThrow(() -> new RatingNotFoundException("Рейтинг с ID " + ratingId + " не найден."));
     }
 
     @Override

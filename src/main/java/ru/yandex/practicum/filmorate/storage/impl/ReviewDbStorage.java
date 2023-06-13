@@ -1,11 +1,12 @@
 package ru.yandex.practicum.filmorate.storage.impl;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
+import ru.yandex.practicum.filmorate.exceptions.exceptions.ReviewNotFoundException;
 import ru.yandex.practicum.filmorate.model.Review;
 import ru.yandex.practicum.filmorate.storage.dao.ReviewStorage;
 
@@ -17,13 +18,9 @@ import java.util.Objects;
 import java.util.Optional;
 
 @Repository
+@RequiredArgsConstructor
 public class ReviewDbStorage implements ReviewStorage {
     private final JdbcTemplate jdbcTemplate;
-
-    @Autowired
-    public ReviewDbStorage(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
-    }
 
     @Override
     public Integer saveNew(Review review) {
@@ -79,7 +76,8 @@ public class ReviewDbStorage implements ReviewStorage {
     @Override
     public Review findById(int reviewId) {
         String sqlQuery = "SELECT * FROM REVIEWS WHERE review_id = ?";
-        return jdbcTemplate.queryForObject(sqlQuery, this::mapRowToReview, reviewId);
+        return jdbcTemplate.query(sqlQuery, this::mapRowToReview, reviewId).stream().findFirst()
+                .orElseThrow(() -> new ReviewNotFoundException("Отзыв c ID " + reviewId + " не найден."));
     }
 
     @Override
