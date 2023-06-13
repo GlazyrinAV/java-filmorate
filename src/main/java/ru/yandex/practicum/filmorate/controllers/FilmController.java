@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.SortType;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
 import javax.validation.Valid;
@@ -70,7 +71,7 @@ public class FilmController {
 
     @GetMapping("/films/director/{directorId}")
     @ResponseStatus(HttpStatus.OK)
-    public Collection<Film> findByDirectorId(@PathVariable Integer directorId, @RequestParam Optional<String> sortBy) {
+    public Collection<Film> findByDirectorId(@PathVariable Integer directorId, @RequestParam("sortBy") SortType sortBy) {
         return filmService.findByDirectorId(directorId, sortBy);
     }
 

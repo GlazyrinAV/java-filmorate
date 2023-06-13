@@ -8,6 +8,7 @@ import ru.yandex.practicum.filmorate.exceptions.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.EventType;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Operation;
+import ru.yandex.practicum.filmorate.model.SortType;
 import ru.yandex.practicum.filmorate.storage.dao.FeedStorage;
 import ru.yandex.practicum.filmorate.storage.dao.FilmStorage;
 
@@ -91,14 +92,13 @@ public class FilmService {
         return filmStorage.findLikes(filmId);
     }
 
-    public Collection<Film> findByDirectorId(Integer directorId, Optional<String> sortBy) {
-        String strSortBy = sortBy.orElseThrow(() -> new ValidationException("Не указан параметр сортировки."));
+    public Collection<Film> findByDirectorId(Integer directorId, SortType sortBy) {
         directorsService.findById(directorId);
-        if (!(strSortBy.equals("year") || strSortBy.equals("likes"))) {
+        if (!(sortBy.equals(SortType.year) || sortBy.equals(SortType.likes))) {
             throw new ValidationException("Недопустимый параметр сортировки.");
         }
 
-        return filmStorage.findByDirectorId(directorId, strSortBy).stream().peek(this::saveAdditionalInfoFromDb)
+        return filmStorage.findByDirectorId(directorId, sortBy).stream().peek(this::saveAdditionalInfoFromDb)
                 .collect(Collectors.toList());
     }
 
