@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Score;
 import ru.yandex.practicum.filmorate.model.SortType;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
@@ -43,16 +44,16 @@ public class FilmController {
         return filmService.findById(id);
     }
 
-    @PutMapping("/films/{id}/rating/{userId}/{rating}")
+    @PutMapping("/score")
     @ResponseStatus(HttpStatus.OK)
-    public void makeNewLike(@PathVariable int id, @PathVariable int userId, @PathVariable int rating) {
-        filmService.saveRating(id, userId, rating);
+    public void saveScore(@Valid @RequestBody Score score) {
+        filmService.saveScore(score);
     }
 
     @DeleteMapping("/films/{id}/rating/{userId}")
     @ResponseStatus(HttpStatus.OK)
-    public void removeLike(@PathVariable int id, @PathVariable int userId) {
-        filmService.removeRating(id, userId);
+    public void removeScore(@PathVariable int id, @PathVariable int userId) {
+        filmService.removeScore(id, userId);
     }
 
     @GetMapping("/films/popular")
