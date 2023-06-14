@@ -1,14 +1,14 @@
 package ru.yandex.practicum.filmorate.storage.dao;
 
-import ru.yandex.practicum.filmorate.model.Rating;
+import ru.yandex.practicum.filmorate.model.Mpa;
 
 import java.util.List;
 
 public interface RatingStorage {
 
-    List<Rating> findAll();
+    List<Mpa> findAll();
 
-    Rating findById(int ratingId);
+    Mpa findById(int ratingId);
 
-    Rating saveRatingToFilmFromDB(int filmId);
+    Mpa saveRatingToFilmFromDB(int filmId);
 }

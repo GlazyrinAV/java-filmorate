@@ -40,12 +40,12 @@ class FilmServiceUnitTests {
 
     static Stream<Film> filmWithWrongParameters() {
         return Stream.of(
-                new Film("", "adipisicing", LocalDate.of(1967, Month.APRIL, 25), 100L, null, List.of(new Genre(1, null)), new Rating(1, null), new ArrayList<>(), null),
-                new Film("name", "adipisicing", LocalDate.of(1800, Month.APRIL, 25), 100L, null, List.of(new Genre(1, null)), new Rating(1, null), new ArrayList<>(), null),
-                new Film("name", "adipisicing", LocalDate.of(1967, Month.APRIL, 25), -100L, null, List.of(new Genre(1, null)), new Rating(1, null), new ArrayList<>(), null),
+                new Film("", "adipisicing", LocalDate.of(1967, Month.APRIL, 25), 100L, null, List.of(new Genre(1, null)), new Mpa(1, null), new ArrayList<>(), null),
+                new Film("name", "adipisicing", LocalDate.of(1800, Month.APRIL, 25), 100L, null, List.of(new Genre(1, null)), new Mpa(1, null), new ArrayList<>(), null),
+                new Film("name", "adipisicing", LocalDate.of(1967, Month.APRIL, 25), -100L, null, List.of(new Genre(1, null)), new Mpa(1, null), new ArrayList<>(), null),
                 new Film("name", "nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn" +
                         "nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn",
-                        LocalDate.of(1967, Month.APRIL, 25), 100L, null, List.of(new Genre(1, null)), new Rating(1, null), List.of(new Director(1, null)), null)
+                        LocalDate.of(1967, Month.APRIL, 25), 100L, null, List.of(new Genre(1, null)), new Mpa(1, null), List.of(new Director(1, null)), null)
         );
     }
 
@@ -59,7 +59,7 @@ class FilmServiceUnitTests {
 
     @Test
     public void createFilmNormal() {
-        Film film = new Film("Name", "Description", LocalDate.now(), 100L, null, List.of(new Genre(1, null)), new Rating(1, null), new ArrayList<>(), null);
+        Film film = new Film("Name", "Description", LocalDate.now(), 100L, null, List.of(new Genre(1, null)), new Mpa(1, null), new ArrayList<>(), null);
         Set<ConstraintViolation<Film>> violations = validator.validate(film);
         violations.stream().map(ConstraintViolation::getMessage)
                 .forEach(System.out::println);
@@ -106,7 +106,7 @@ class FilmServiceUnitTests {
 
     @Test
     public void addNewFilmNormal() {
-        Film film = new Film("Name", "Description", LocalDate.of(1990, Month.APRIL, 13), 100L, 1, List.of(new Genre(1, "Комедия")), new Rating(1, "G"), new ArrayList<>(), null);
+        Film film = new Film("Name", "Description", LocalDate.of(1990, Month.APRIL, 13), 100L, 1, List.of(new Genre(1, "Комедия")), new Mpa(1, "G"), new ArrayList<>(), null);
         Set<ConstraintViolation<Film>> violations = validator.validate(film);
         Assertions.assertEquals(violations.size(), 0, "Ошибка при добавлении в хранилище нормального фильма.");
     }
