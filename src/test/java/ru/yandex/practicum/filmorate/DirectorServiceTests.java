@@ -303,7 +303,8 @@ class DirectorServiceTests {
     @Test
     @Sql(value = {"/dataForDirectorTests.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     void findByDirectorIdNormal() {
-        Assertions.assertEquals("[Film(name=film, description=description, releaseDate=1999-04-30, duration=100, id=1, genres=[], mpa=Rating(id=1, name=G), directors=[Director(id=1, name=Director)])]",
+        Assertions.assertEquals("[Film(name=film, description=description, releaseDate=1999-04-30, duration=100, id=1, " +
+                        "genres=[], mpa=Mpa(id=1, name=G), directors=[Director(id=1, name=Director)], score=null)]",
                 filmService.findByDirectorId(1, SortType.year).toString(),
                 "Ошибка при нормальном поиске фильмов по режиссеру.");
     }

@@ -177,7 +177,7 @@ class FilmServiceUnitTests {
     @Test
     public void removeScoreNormal() {
         filmService.removeScore(2, 2);
-        Assertions.assertEquals(0, (double) filmService.findScore(2),
+        Assertions.assertEquals(0, filmService.findScore(2),
                 "Ошибка при нормальном удалении лайка.");
 
         List<Feed> feeds = new ArrayList<>(feedStorage.findFeed(1));

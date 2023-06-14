@@ -141,27 +141,6 @@ public class FilmDbStorage implements FilmStorage {
         return jdbcTemplate.query(sql, this::mapRowToFilm, year, count);
     }
 
-    @Override
-    public void saveScore(int filmId, int userId, int score) {
-        String sqlQuery = "MERGE INTO FILM_SCORE (film_id, user_id, SCORE) VALUES (?, ?, ?)";
-        try {
-            jdbcTemplate.update(sqlQuery, filmId, userId, score);
-        } catch (DataIntegrityViolationException exception) {
-            throw new DataIntegrityViolationException("В запросе неправильно указаны данные для добавдения лайка.");
-        }
-    }
-
-    @Override
-    public void removeScore(int filmId, int userId) {
-        String sqlQuery = "DELETE FROM FILM_SCORE WHERE film_id = ? AND user_id = ?";
-        jdbcTemplate.update(sqlQuery, filmId, userId);
-    }
-
-    @Override
-    public Double findScore(int filmId) {
-        String sqlQuery = "SELECT AVG(SCORE) FROM FILM_SCORE WHERE film_id = ?";
-        return jdbcTemplate.queryForObject(sqlQuery, Double.class, filmId);
-    }
 
     @Override
     public void removeFilm(int filmId) {
@@ -265,7 +244,6 @@ public class FilmDbStorage implements FilmStorage {
                 .description(resultSet.getString("description"))
                 .releaseDate(resultSet.getDate("release_date").toLocalDate())
                 .duration((resultSet.getLong("duration")))
-                .score(findScore(resultSet.getInt("film_id")))
                 .build();
     }
 }

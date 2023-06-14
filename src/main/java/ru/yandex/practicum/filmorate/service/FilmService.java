@@ -24,6 +24,7 @@ public class FilmService {
     private final GenresService genresService;
     private final MpaService mpaService;
     private final FeedStorage feedStorage;
+    private final ScoreService scoreService;
 
     public Film saveNew(Film film) {
         int filmId = filmStorage.saveNew(film);
@@ -54,7 +55,7 @@ public class FilmService {
         userService.findById(score.getUserId());
         findById(score.getFilmId());
         log.info("К фильму добавлен лайк.");
-        filmStorage.saveScore(score.getFilmId(), score.getUserId(), score.getScore());
+        scoreService.saveScore(score.getFilmId(), score.getUserId(), score.getScore());
         feedStorage.saveFeed(score.getUserId(), score.getFilmId(), EventType.LIKE.getEventTypeId(), Operation.ADD.getOperationId());
     }
 
@@ -62,7 +63,7 @@ public class FilmService {
         userService.findById(userId);
         findById(filmId);
         log.info("У фильма удален лайк.");
-        filmStorage.removeScore(filmId, userId);
+        scoreService.removeScore(filmId, userId);
         feedStorage.saveFeed(userId, filmId, EventType.LIKE.getEventTypeId(), Operation.REMOVE.getOperationId());
     }
 
@@ -86,7 +87,7 @@ public class FilmService {
 
     public Double findScore(int filmId) {
         log.info("Лайки к фильму найдены.");
-        return filmStorage.findScore(filmId);
+        return scoreService.findScore(filmId);
     }
 
     public Collection<Film> findByDirectorId(Integer directorId, SortType sortBy) {
@@ -103,6 +104,7 @@ public class FilmService {
         film.setGenres(genresService.saveGenresToFilmFromDB(film.getId()));
         film.setMpa(mpaService.saveRatingToFilmFromDB(film.getId()));
         film.setDirectors(directorsService.saveDirectorsToFilmFromDB(film.getId()));
+        film.setScore(scoreService.findScore(film.getId()));
     }
 
     private void saveAdditionalInfoToDb(Film film, int filmId) {

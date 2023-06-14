@@ -42,5 +42,5 @@ public class Film {
 
     private List<Director> directors;
 
-    private Double score;
+    private Double score = 0.0;
 }
