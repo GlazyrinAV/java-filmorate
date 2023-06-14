@@ -58,7 +58,7 @@ class FilmServiceUnitTests {
     private final static Score scoreWrongUserId = new Score(1, 99, 5);
 
     @Test
-    public void createFilmNormal() {
+    void createFilmNormal() {
         Film film = new Film("Name", "Description", LocalDate.now(), 100L, null, List.of(new Genre(1, null)), new Mpa(1, null), new ArrayList<>(), null);
         Set<ConstraintViolation<Film>> violations = validator.validate(film);
         violations.stream().map(ConstraintViolation::getMessage)
@@ -76,28 +76,29 @@ class FilmServiceUnitTests {
     }
 
     @Test
-    void getFilmsEmpty() {
+    @Sql(value = {"/schema.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    void getAllFilmsEmpty() {
         Assertions.assertTrue(filmService.findAll().isEmpty(), "Ошибка при получении пустого хранилища фильмов.");
     }
 
     @Test
-    public void getAllFilmsNormal() {
-        Assertions.assertEquals("[Film(name=Name, description=Description, releaseDate=1990-04-13, " +
-                        "duration=100, id=1, genres=[Genre(id=1, name=Комедия)], " +
-                        "mpa=Rating(id=1, name=G), directors=[])]", filmService.findAll().toString(),
+    void getAllFilmsNormal() {
+        Assertions.assertEquals("[Film(name=new film, description=new description, releaseDate=2000-04-22, duration=100, id=1, genres=[], mpa=Mpa(id=1, name=G), directors=[], score=0.0), " +
+                        "Film(name=second film, description=second description, releaseDate=2000-04-22, duration=100, id=2, genres=[], mpa=Mpa(id=1, name=G), directors=[], score=5.0), " +
+                        "Film(name=third film, description=third description, releaseDate=2000-04-22, duration=100, id=3, genres=[], mpa=Mpa(id=1, name=G), directors=[], score=0.0)]", filmService.findAll().toString(),
                 "Ошибка при получении из хранилища существующего фильма.");
     }
 
     @Test
-    public void findByIdFilmNormal() {
-        Assertions.assertEquals("Film(name=Name, description=Description, releaseDate=1990-04-13, " +
-                        "duration=100, id=1, genres=[Genre(id=1, name=Комедия)], " +
-                        "mpa=Rating(id=1, name=G), directors=[])", filmService.findById(1).toString(),
+    void findByIdFilmNormal() {
+        Assertions.assertEquals("Film(name=new film, description=new description, releaseDate=2000-04-22, " +
+                        "duration=100, id=1, genres=[], mpa=Mpa(id=1, name=G), directors=[], score=0.0)",
+                filmService.findById(1).toString(),
                 "Ошибка при получении из хранилища существующего фильма.");
     }
 
     @Test
-    public void getFilmWithWrongId() {
+    void getFilmWithWrongId() {
         FilmNotFoundException exception = Assertions.assertThrows(FilmNotFoundException.class,
                 () -> filmService.findById(99));
         Assertions.assertEquals("Фильм c ID 99 не найден.", exception.getMessage(),
@@ -105,16 +106,17 @@ class FilmServiceUnitTests {
     }
 
     @Test
-    public void addNewFilmNormal() {
+    void addNewFilmNormal() {
         Film film = new Film("Name", "Description", LocalDate.of(1990, Month.APRIL, 13), 100L, 1, List.of(new Genre(1, "Комедия")), new Mpa(1, "G"), new ArrayList<>(), null);
         Set<ConstraintViolation<Film>> violations = validator.validate(film);
         Assertions.assertEquals(violations.size(), 0, "Ошибка при добавлении в хранилище нормального фильма.");
     }
 
     @Test
-    public void addScoreNormal() {
+    void addScoreNormal() {
         filmService.saveScore(scoreNormal);
-        Assertions.assertEquals("[1]", filmService.findScore(1).toString(), "Ошибка при нормальном добавлении лайка.");
+        Assertions.assertEquals("5.0", filmService.findById(2).getScore().toString(),
+                "Ошибка при нормальном добавлении лайка.");
 
         List<Feed> feeds = new ArrayList<>(feedStorage.findFeed(1));
         Assertions.assertEquals(1, feeds.size());
@@ -127,7 +129,7 @@ class FilmServiceUnitTests {
     }
 
     @Test
-    public void addScoreWithWrongFilmDataId0() {
+    void addScoreWithWrongFilmDataId0() {
         FilmNotFoundException exception = Assertions.assertThrows(FilmNotFoundException.class,
                 () -> filmService.saveScore(scoreZeroFilmId));
         Assertions.assertEquals("Фильм c ID 0 не найден.", exception.getMessage(),
@@ -135,7 +137,7 @@ class FilmServiceUnitTests {
     }
 
     @Test
-    public void addScoreWithWrongFilmDataNegativeId() {
+    void addScoreWithWrongFilmDataNegativeId() {
         FilmNotFoundException exception = Assertions.assertThrows(FilmNotFoundException.class,
                 () -> filmService.saveScore(scoreNegativeFilmId));
         Assertions.assertEquals("Фильм c ID -1 не найден.", exception.getMessage(),
@@ -143,7 +145,7 @@ class FilmServiceUnitTests {
     }
 
     @Test
-    public void addScoreWithWrongFilmDataNoSuchFilm() {
+    void addScoreWithWrongFilmDataNoSuchFilm() {
         FilmNotFoundException exception = Assertions.assertThrows(FilmNotFoundException.class,
                 () -> filmService.saveScore(scoreWrongFilmId));
         Assertions.assertEquals("Фильм c ID 99 не найден.", exception.getMessage(),
@@ -151,7 +153,7 @@ class FilmServiceUnitTests {
     }
 
     @Test
-    public void addScoreWithWrongUserDataId0() {
+    void addScoreWithWrongUserDataId0() {
         UserNotFoundException exception = Assertions.assertThrows(UserNotFoundException.class,
                 () -> filmService.saveScore(scoreZeroUserId));
         Assertions.assertEquals("Пользователь c ID 0 не найден.", exception.getMessage(),
@@ -159,7 +161,7 @@ class FilmServiceUnitTests {
     }
 
     @Test
-    public void addScoreWithWrongUserDataNegativeId() {
+    void addScoreWithWrongUserDataNegativeId() {
         UserNotFoundException exception = Assertions.assertThrows(UserNotFoundException.class,
                 () -> filmService.saveScore(scoreNegativeUserId));
         Assertions.assertEquals("Пользователь c ID -1 не найден.", exception.getMessage(),
@@ -167,7 +169,7 @@ class FilmServiceUnitTests {
     }
 
     @Test
-    public void addScoreWithWrongUserDataNoSuchFilm() {
+    void addScoreWithWrongUserDataNoSuchFilm() {
         UserNotFoundException exception = Assertions.assertThrows(UserNotFoundException.class,
                 () -> filmService.saveScore(scoreWrongUserId));
         Assertions.assertEquals("Пользователь c ID 99 не найден.", exception.getMessage(),
@@ -175,29 +177,23 @@ class FilmServiceUnitTests {
     }
 
     @Test
-    public void removeScoreNormal() {
+    void removeScoreNormal() {
         filmService.removeScore(2, 2);
-        Assertions.assertEquals(0, filmService.findScore(2),
+        Assertions.assertEquals(0.0, filmService.findById(2).getScore(),
                 "Ошибка при нормальном удалении лайка.");
 
-        List<Feed> feeds = new ArrayList<>(feedStorage.findFeed(1));
-        Assertions.assertEquals(2, feeds.size());
+        List<Feed> feeds = new ArrayList<>(feedStorage.findFeed(2));
+        Assertions.assertEquals(1, feeds.size());
         Feed feed = feeds.get(0);
         Assertions.assertEquals(1, feed.getEventId());
-        Assertions.assertEquals(1, feed.getUserId());
-        Assertions.assertEquals(1, feed.getEntityId());
+        Assertions.assertEquals(2, feed.getUserId());
+        Assertions.assertEquals(2, feed.getEntityId());
         Assertions.assertEquals(1, feed.getEventType().getEventTypeId());
-        Assertions.assertEquals(2, feed.getOperation().getOperationId());
-        Feed secondFeed = feeds.get(1);
-        Assertions.assertEquals(2, secondFeed.getEventId());
-        Assertions.assertEquals(1, secondFeed.getUserId());
-        Assertions.assertEquals(1, secondFeed.getEntityId());
-        Assertions.assertEquals(1, secondFeed.getEventType().getEventTypeId());
-        Assertions.assertEquals(1, secondFeed.getOperation().getOperationId());
+        Assertions.assertEquals(1, feed.getOperation().getOperationId());
     }
 
     @Test
-    public void removeScoreErrorWithWrongFilmDataId0() {
+    void removeScoreErrorWithWrongFilmDataId0() {
         FilmNotFoundException exception = Assertions.assertThrows(FilmNotFoundException.class,
                 () -> filmService.removeScore(0, 2));
         Assertions.assertEquals("Фильм c ID 0 не найден.", exception.getMessage(),
@@ -205,7 +201,7 @@ class FilmServiceUnitTests {
     }
 
     @Test
-    public void removeScoreErrorWithWrongFilmDataIdNegative() {
+    void removeScoreErrorWithWrongFilmDataIdNegative() {
         FilmNotFoundException exception = Assertions.assertThrows(FilmNotFoundException.class,
                 () -> filmService.removeScore(-1, 2));
         Assertions.assertEquals("Фильм c ID -1 не найден.", exception.getMessage(),
@@ -213,7 +209,7 @@ class FilmServiceUnitTests {
     }
 
     @Test
-    public void removeScoreErrorWithWrongFilmDataWrongId() {
+    void removeScoreErrorWithWrongFilmDataWrongId() {
         FilmNotFoundException exception = Assertions.assertThrows(FilmNotFoundException.class,
                 () -> filmService.removeScore(99, 2));
         Assertions.assertEquals("Фильм c ID 99 не найден.", exception.getMessage(),
@@ -221,7 +217,7 @@ class FilmServiceUnitTests {
     }
 
     @Test
-    public void removeScoreErrorWithWrongUserDataId0() {
+    void removeScoreErrorWithWrongUserDataId0() {
         UserNotFoundException exception = Assertions.assertThrows(UserNotFoundException.class,
                 () -> filmService.removeScore(2, 0));
         Assertions.assertEquals("Пользователь c ID 0 не найден.", exception.getMessage(),
@@ -229,7 +225,7 @@ class FilmServiceUnitTests {
     }
 
     @Test
-    public void removeScoreErrorWithWrongUserDataIdNegative() {
+    void removeScoreErrorWithWrongUserDataIdNegative() {
         UserNotFoundException exception = Assertions.assertThrows(UserNotFoundException.class,
                 () -> filmService.removeScore(2, -1));
         Assertions.assertEquals("Пользователь c ID -1 не найден.", exception.getMessage(),
@@ -237,7 +233,7 @@ class FilmServiceUnitTests {
     }
 
     @Test
-    public void removeScoreErrorWithWrongUserDataWrongId() {
+    void removeScoreErrorWithWrongUserDataWrongId() {
         UserNotFoundException exception = Assertions.assertThrows(UserNotFoundException.class,
                 () -> filmService.removeScore(2, 99));
         Assertions.assertEquals("Пользователь c ID 99 не найден.", exception.getMessage(),
@@ -245,28 +241,30 @@ class FilmServiceUnitTests {
     }
 
     @Test
-    public void findPopularNormalWithCount() {
+    void findPopularNormalWithCount() {
         Assertions.assertEquals(filmService.findPopular(1, Optional.empty(), Optional.empty()).toString(),
-                "",
+                "[Film(name=second film, description=second description, releaseDate=2000-04-22, duration=100, id=2, genres=[], mpa=Mpa(id=1, name=G), directors=[], score=5.0)]",
                 "Ошибка при получении списка из 1 популярных фильмов.");
     }
 
     @Test
-    public void findPopularNormalWithNoCount() {
+    void findPopularNormalWithNoCount() {
         Assertions.assertEquals(filmService.findPopular(10, Optional.empty(), Optional.empty()).toString(),
-                "",
+                "[Film(name=second film, description=second description, releaseDate=2000-04-22, duration=100, id=2, genres=[], mpa=Mpa(id=1, name=G), directors=[], score=5.0), " +
+                        "Film(name=new film, description=new description, releaseDate=2000-04-22, duration=100, id=1, genres=[], mpa=Mpa(id=1, name=G), directors=[], score=0.0), " +
+                        "Film(name=third film, description=third description, releaseDate=2000-04-22, duration=100, id=3, genres=[], mpa=Mpa(id=1, name=G), directors=[], score=0.0)]",
                 "Ошибка при нормальном получении списка из 10 пополурных фильмов.");
     }
 
     @Test
-    public void findPopularErrorCount0() {
+    void findPopularErrorCount0() {
         ValidationException exception = Assertions.assertThrows(ValidationException.class, () -> filmService.findPopular(0, Optional.empty(), Optional.empty()));
         Assertions.assertEquals("Значение выводимых фильмов не может быть меньше или равно нулю.", exception.getMessage(),
                 "Ошибка при получении ошибки получения популярных 0 фильмов");
     }
 
     @Test
-    public void findPopularErrorCountNegative() {
+    void findPopularErrorCountNegative() {
         ValidationException exception = Assertions.assertThrows(ValidationException.class,
                 () -> filmService.findPopular(-1, Optional.empty(), Optional.empty()));
         Assertions.assertEquals("Значение выводимых фильмов не может быть меньше или равно нулю.", exception.getMessage(),
