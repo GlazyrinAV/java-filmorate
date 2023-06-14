@@ -32,7 +32,7 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public Integer saveNew(Film film) {
-        String sqlQuery = "INSERT INTO films (name, description, release_date, duration, rating_id) " +
+        String sqlQuery = "INSERT INTO films (name, description, release_date, duration, MPA_ID) " +
                 "VALUES (?, ?, ?, ?, ?)";
 
         KeyHolder keyHolder = new GeneratedKeyHolder();
@@ -62,7 +62,7 @@ public class FilmDbStorage implements FilmStorage {
                 "description = ?," +
                 "release_date = ?," +
                 "duration = ?," +
-                "rating_id = ?" +
+                "MPA_ID = ?" +
                 "WHERE film_id = ?";
         try {
             jdbcTemplate.update(sqlQuery,
