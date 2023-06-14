@@ -176,7 +176,7 @@ public class FilmDbStorage implements FilmStorage {
             sqlQuery = "SELECT * FROM FILMS WHERE FILM_ID IN (SELECT FILM_ID FROM FILM_DIRECTOR WHERE DIRECTOR_ID = ?) " +
                     "ORDER BY EXTRACT(YEAR FROM RELEASE_DATE)";
         } else {
-            sqlQuery = "SELECT FILMS.*, SUM(FL.USER_ID) AS LIKES FROM FILMS LEFT JOIN FILM_RATING FL on FILMS.FILM_ID = FL.FILM_ID " +
+            sqlQuery = "SELECT FILMS.*, AVG(RATING) AS LIKES FROM FILMS LEFT JOIN FILM_RATING FL on FILMS.FILM_ID = FL.FILM_ID " +
                     "WHERE FILMS.FILM_ID IN (SELECT FILM_ID FROM FILM_DIRECTOR WHERE DIRECTOR_ID = ?)\n" +
                     "group by FILMS.FILM_ID ORDER BY LIKES DESC";
         }
@@ -265,6 +265,7 @@ public class FilmDbStorage implements FilmStorage {
                 .description(resultSet.getString("description"))
                 .releaseDate(resultSet.getDate("release_date").toLocalDate())
                 .duration((resultSet.getLong("duration")))
+                .rating(findRating(resultSet.getInt("film_id")))
                 .build();
     }
 }
