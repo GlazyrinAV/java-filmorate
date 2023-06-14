@@ -41,18 +41,18 @@ class FilmServiceUnitTests {
 
     static Stream<Film> filmWithWrongParameters() {
         return Stream.of(
-                new Film("", "adipisicing", LocalDate.of(1967, Month.APRIL, 25), 100L, null, List.of(new Genre(1, null)), new Rating(1, null), new ArrayList<>()),
-                new Film("name", "adipisicing", LocalDate.of(1800, Month.APRIL, 25), 100L, null, List.of(new Genre(1, null)), new Rating(1, null), new ArrayList<>()),
-                new Film("name", "adipisicing", LocalDate.of(1967, Month.APRIL, 25), -100L, null, List.of(new Genre(1, null)), new Rating(1, null), new ArrayList<>()),
+                new Film("", "adipisicing", LocalDate.of(1967, Month.APRIL, 25), 100L, null, List.of(new Genre(1, null)), new Mpa(1, null), new ArrayList<>()),
+                new Film("name", "adipisicing", LocalDate.of(1800, Month.APRIL, 25), 100L, null, List.of(new Genre(1, null)), new Mpa(1, null), new ArrayList<>()),
+                new Film("name", "adipisicing", LocalDate.of(1967, Month.APRIL, 25), -100L, null, List.of(new Genre(1, null)), new Mpa(1, null), new ArrayList<>()),
                 new Film("name", "nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn" +
                         "nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn",
-                        LocalDate.of(1967, Month.APRIL, 25), 100L, null, List.of(new Genre(1, null)), new Rating(1, null), List.of(new Director(1, null)))
+                        LocalDate.of(1967, Month.APRIL, 25), 100L, null, List.of(new Genre(1, null)), new Mpa(1, null), List.of(new Director(1, null)))
         );
     }
 
     @Test
     public void createFilmNormal() {
-        Film film = new Film("Name", "Description", LocalDate.now(), 100L, null, List.of(new Genre(1, null)), new Rating(1, null), new ArrayList<>());
+        Film film = new Film("Name", "Description", LocalDate.now(), 100L, null, List.of(new Genre(1, null)), new Mpa(1, null), new ArrayList<>());
         Set<ConstraintViolation<Film>> violations = validator.validate(film);
         violations.stream().map(ConstraintViolation::getMessage)
                 .forEach(System.out::println);
@@ -75,7 +75,7 @@ class FilmServiceUnitTests {
 
     @Test
     public void getFilmsNormal() {
-        Film film = new Film("Name", "Description", LocalDate.of(1990, Month.APRIL, 13), 100L, null, List.of(new Genre(1, null)), new Rating(1, null), new ArrayList<>());
+        Film film = new Film("Name", "Description", LocalDate.of(1990, Month.APRIL, 13), 100L, null, List.of(new Genre(1, null)), new Mpa(1, null), new ArrayList<>());
         Set<ConstraintViolation<Film>> violations = validator.validate(film);
         filmService.saveNew(film);
         Assertions.assertEquals("[Film(name=Name, description=Description, releaseDate=1990-04-13, " +
@@ -86,7 +86,7 @@ class FilmServiceUnitTests {
 
     @Test
     public void findFilmNormal() {
-        Film film = new Film("Name", "Description", LocalDate.of(1990, Month.APRIL, 13), 100L, null, List.of(new Genre(1, null)), new Rating(1, null), new ArrayList<>());
+        Film film = new Film("Name", "Description", LocalDate.of(1990, Month.APRIL, 13), 100L, null, List.of(new Genre(1, null)), new Mpa(1, null), new ArrayList<>());
         Set<ConstraintViolation<Film>> violations = validator.validate(film);
         filmService.saveNew(film);
         Assertions.assertEquals("Film(name=Name, description=Description, releaseDate=1990-04-13, " +
@@ -97,7 +97,7 @@ class FilmServiceUnitTests {
 
     @Test
     public void getFilmWithWrongId() {
-        Film film = new Film("Name", "Description", LocalDate.of(1990, Month.APRIL, 13), 100L, null, List.of(new Genre(1, null)), new Rating(1, null), new ArrayList<>());
+        Film film = new Film("Name", "Description", LocalDate.of(1990, Month.APRIL, 13), 100L, null, List.of(new Genre(1, null)), new Mpa(1, null), new ArrayList<>());
         Set<ConstraintViolation<Film>> violations = validator.validate(film);
         filmService.saveNew(film);
         FilmNotFoundException exception = Assertions.assertThrows(FilmNotFoundException.class, () -> filmService.findById(99));
@@ -107,14 +107,14 @@ class FilmServiceUnitTests {
 
     @Test
     public void addNewFilmNormal() {
-        Film film = new Film("Name", "Description", LocalDate.of(1990, Month.APRIL, 13), 100L, 1, List.of(new Genre(1, "Комедия")), new Rating(1, "G"), new ArrayList<>());
+        Film film = new Film("Name", "Description", LocalDate.of(1990, Month.APRIL, 13), 100L, 1, List.of(new Genre(1, "Комедия")), new Mpa(1, "G"), new ArrayList<>());
         Set<ConstraintViolation<Film>> violations = validator.validate(film);
         Assertions.assertEquals(filmService.saveNew(film), film, "Ошибка при добавлении в хранилище нормального фильма.");
     }
 
     @Test
     public void addLikeNormal() {
-        Film film = new Film("Name", "Description", LocalDate.of(1990, Month.APRIL, 13), 100L, null, List.of(new Genre(1, "Комедия")), new Rating(1, "G"), new ArrayList<>());
+        Film film = new Film("Name", "Description", LocalDate.of(1990, Month.APRIL, 13), 100L, null, List.of(new Genre(1, "Комедия")), new Mpa(1, "G"), new ArrayList<>());
         filmService.saveNew(film);
         User user = new User("abc@acb.ru", "login", "name", LocalDate.of(1986, Month.APRIL, 13), 1);
         userService.saveNew(user);
@@ -133,7 +133,7 @@ class FilmServiceUnitTests {
 
     @Test
     public void addLikeWithWrongFilmDataId0() {
-        Film film = new Film("Name", "Description", LocalDate.of(1990, Month.APRIL, 13), 100L, null, List.of(new Genre(1, null)), new Rating(1, null), new ArrayList<>());
+        Film film = new Film("Name", "Description", LocalDate.of(1990, Month.APRIL, 13), 100L, null, List.of(new Genre(1, null)), new Mpa(1, null), new ArrayList<>());
         filmService.saveNew(film);
         User user = new User("abc@acb.ru", "login", "name", LocalDate.of(1986, Month.APRIL, 13), 1);
         userService.saveNew(user);
@@ -144,7 +144,7 @@ class FilmServiceUnitTests {
 
     @Test
     public void addLikeWithWrongFilmDataNegativeId() {
-        Film film = new Film("Name", "Description", LocalDate.of(1990, Month.APRIL, 13), 100L, null, List.of(new Genre(1, null)), new Rating(1, null), new ArrayList<>());
+        Film film = new Film("Name", "Description", LocalDate.of(1990, Month.APRIL, 13), 100L, null, List.of(new Genre(1, null)), new Mpa(1, null), new ArrayList<>());
         filmService.saveNew(film);
         User user = new User("abc@acb.ru", "login", "name", LocalDate.of(1986, Month.APRIL, 13), 1);
         userService.saveNew(user);
@@ -155,7 +155,7 @@ class FilmServiceUnitTests {
 
     @Test
     public void addLikeWithWrongFilmDataNoSuchFilm() {
-        Film film = new Film("Name", "Description", LocalDate.of(1990, Month.APRIL, 13), 100L, null, List.of(new Genre(1, null)), new Rating(1, null), new ArrayList<>());
+        Film film = new Film("Name", "Description", LocalDate.of(1990, Month.APRIL, 13), 100L, null, List.of(new Genre(1, null)), new Mpa(1, null), new ArrayList<>());
         filmService.saveNew(film);
         User user = new User("abc@acb.ru", "login", "name", LocalDate.of(1986, Month.APRIL, 13), 1);
         userService.saveNew(user);
@@ -166,7 +166,7 @@ class FilmServiceUnitTests {
 
     @Test
     public void addLikeWithWrongUserDataId0() {
-        Film film = new Film("Name", "Description", LocalDate.of(1990, Month.APRIL, 13), 100L, null, List.of(new Genre(1, null)), new Rating(1, null), new ArrayList<>());
+        Film film = new Film("Name", "Description", LocalDate.of(1990, Month.APRIL, 13), 100L, null, List.of(new Genre(1, null)), new Mpa(1, null), new ArrayList<>());
         filmService.saveNew(film);
         User user = new User("abc@acb.ru", "login", "name", LocalDate.of(1986, Month.APRIL, 13), 1);
         userService.saveNew(user);
@@ -177,7 +177,7 @@ class FilmServiceUnitTests {
 
     @Test
     public void addLikeWithWrongUserDataNegativeId() {
-        Film film = new Film("Name", "Description", LocalDate.of(1990, Month.APRIL, 13), 100L, null, List.of(new Genre(1, null)), new Rating(1, null), new ArrayList<>());
+        Film film = new Film("Name", "Description", LocalDate.of(1990, Month.APRIL, 13), 100L, null, List.of(new Genre(1, null)), new Mpa(1, null), new ArrayList<>());
         User user = new User("abc@acb.ru", "login", "name", LocalDate.of(1986, Month.APRIL, 13), 1);
         userService.saveNew(user);
         UserNotFoundException exception = Assertions.assertThrows(UserNotFoundException.class, () -> filmService.saveScore(1, -1));
@@ -187,7 +187,7 @@ class FilmServiceUnitTests {
 
     @Test
     public void addLikeWithWrongUserDataNoSuchFilm() {
-        Film film = new Film("Name", "Description", LocalDate.of(1990, Month.APRIL, 13), 100L, null, List.of(new Genre(1, null)), new Rating(1, null), new ArrayList<>());
+        Film film = new Film("Name", "Description", LocalDate.of(1990, Month.APRIL, 13), 100L, null, List.of(new Genre(1, null)), new Mpa(1, null), new ArrayList<>());
         filmService.saveNew(film);
         User user = new User("abc@acb.ru", "login", "name", LocalDate.of(1986, Month.APRIL, 13), 1);
         userService.saveNew(user);
@@ -198,7 +198,7 @@ class FilmServiceUnitTests {
 
     @Test
     public void removeLikeNormal() {
-        Film film = new Film("Name", "Description", LocalDate.of(1990, Month.APRIL, 13), 100L, null, List.of(new Genre(1, null)), new Rating(1, null), new ArrayList<>());
+        Film film = new Film("Name", "Description", LocalDate.of(1990, Month.APRIL, 13), 100L, null, List.of(new Genre(1, null)), new Mpa(1, null), new ArrayList<>());
         filmService.saveNew(film);
         User user = new User("abc@acb.ru", "login", "name", LocalDate.of(1986, Month.APRIL, 13), 1);
         userService.saveNew(user);
@@ -224,7 +224,7 @@ class FilmServiceUnitTests {
 
     @Test
     public void removeLikeErrorWithWrongFilmDataId0() {
-        Film film = new Film("Name", "Description", LocalDate.of(1990, Month.APRIL, 13), 100L, null, List.of(new Genre(1, null)), new Rating(1, null), new ArrayList<>());
+        Film film = new Film("Name", "Description", LocalDate.of(1990, Month.APRIL, 13), 100L, null, List.of(new Genre(1, null)), new Mpa(1, null), new ArrayList<>());
         filmService.saveNew(film);
         User user = new User("abc@acb.ru", "login", "name", LocalDate.of(1986, Month.APRIL, 13), 1);
         userService.saveNew(user);
@@ -236,7 +236,7 @@ class FilmServiceUnitTests {
 
     @Test
     public void removeLikeErrorWithWrongFilmDataIdNegative() {
-        Film film = new Film("Name", "Description", LocalDate.of(1990, Month.APRIL, 13), 100L, null, List.of(new Genre(1, null)), new Rating(1, null), new ArrayList<>());
+        Film film = new Film("Name", "Description", LocalDate.of(1990, Month.APRIL, 13), 100L, null, List.of(new Genre(1, null)), new Mpa(1, null), new ArrayList<>());
         filmService.saveNew(film);
         User user = new User("abc@acb.ru", "login", "name", LocalDate.of(1986, Month.APRIL, 13), 1);
         userService.saveNew(user);
@@ -248,7 +248,7 @@ class FilmServiceUnitTests {
 
     @Test
     public void removeLikeErrorWithWrongFilmDataWrongId() {
-        Film film = new Film("Name", "Description", LocalDate.of(1990, Month.APRIL, 13), 100L, null, List.of(new Genre(1, null)), new Rating(1, null), new ArrayList<>());
+        Film film = new Film("Name", "Description", LocalDate.of(1990, Month.APRIL, 13), 100L, null, List.of(new Genre(1, null)), new Mpa(1, null), new ArrayList<>());
         filmService.saveNew(film);
         User user = new User("abc@acb.ru", "login", "name", LocalDate.of(1986, Month.APRIL, 13), 1);
         userService.saveNew(user);
@@ -260,7 +260,7 @@ class FilmServiceUnitTests {
 
     @Test
     public void removeLikeErrorWithWrongUserDataId0() {
-        Film film = new Film("Name", "Description", LocalDate.of(1990, Month.APRIL, 13), 100L, null, List.of(new Genre(1, null)), new Rating(1, null), new ArrayList<>());
+        Film film = new Film("Name", "Description", LocalDate.of(1990, Month.APRIL, 13), 100L, null, List.of(new Genre(1, null)), new Mpa(1, null), new ArrayList<>());
         filmService.saveNew(film);
         User user = new User("abc@acb.ru", "login", "name", LocalDate.of(1986, Month.APRIL, 13), 1);
         userService.saveNew(user);
@@ -272,7 +272,7 @@ class FilmServiceUnitTests {
 
     @Test
     public void removeLikeErrorWithWrongUserDataIdNegative() {
-        Film film = new Film("Name", "Description", LocalDate.of(1990, Month.APRIL, 13), 100L, null, List.of(new Genre(1, null)), new Rating(1, null), new ArrayList<>());
+        Film film = new Film("Name", "Description", LocalDate.of(1990, Month.APRIL, 13), 100L, null, List.of(new Genre(1, null)), new Mpa(1, null), new ArrayList<>());
         filmService.saveNew(film);
         User user = new User("abc@acb.ru", "login", "name", LocalDate.of(1986, Month.APRIL, 13), 1);
         userService.saveNew(user);
@@ -284,7 +284,7 @@ class FilmServiceUnitTests {
 
     @Test
     public void removeLikeErrorWithWrongUserDataWrongId() {
-        Film film = new Film("Name", "Description", LocalDate.of(1990, Month.APRIL, 13), 100L, null, List.of(new Genre(1, null)), new Rating(1, null), new ArrayList<>());
+        Film film = new Film("Name", "Description", LocalDate.of(1990, Month.APRIL, 13), 100L, null, List.of(new Genre(1, null)), new Mpa(1, null), new ArrayList<>());
         filmService.saveNew(film);
         User user = new User("abc@acb.ru", "login", "name", LocalDate.of(1986, Month.APRIL, 13), null);
         userService.saveNew(user);
@@ -296,9 +296,9 @@ class FilmServiceUnitTests {
 
     @Test
     public void findPopularNormalWithCount() {
-        Film film = new Film("Name", "Description", LocalDate.of(1990, Month.APRIL, 13), 100L, 1, List.of(new Genre(1, "Комедия")), new Rating(1, "G"), new ArrayList<>());
+        Film film = new Film("Name", "Description", LocalDate.of(1990, Month.APRIL, 13), 100L, 1, List.of(new Genre(1, "Комедия")), new Mpa(1, "G"), new ArrayList<>());
         filmService.saveNew(film);
-        Film film2 = new Film("Name2", "Description2", LocalDate.of(1990, Month.APRIL, 13), 100L, null, List.of(new Genre(1, null)), new Rating(1, null), new ArrayList<>());
+        Film film2 = new Film("Name2", "Description2", LocalDate.of(1990, Month.APRIL, 13), 100L, null, List.of(new Genre(1, null)), new Mpa(1, null), new ArrayList<>());
         filmService.saveNew(film2);
         User user = new User("abc@acb.ru", "login", "name", LocalDate.of(1986, Month.APRIL, 13), 1);
         userService.saveNew(user);
@@ -309,9 +309,9 @@ class FilmServiceUnitTests {
 
     @Test
     public void findPopularNormalWithNoCount() {
-        Film film = new Film("Name", "Description", LocalDate.of(1990, Month.APRIL, 13), 100L, 1, List.of(new Genre(1, "Комедия")), new Rating(1, "G"), new ArrayList<>());
+        Film film = new Film("Name", "Description", LocalDate.of(1990, Month.APRIL, 13), 100L, 1, List.of(new Genre(1, "Комедия")), new Mpa(1, "G"), new ArrayList<>());
         filmService.saveNew(film);
-        Film film2 = new Film("Name2", "Description2", LocalDate.of(1990, Month.APRIL, 13), 100L, 2, List.of(new Genre(1, "Комедия")), new Rating(1, "G"), new ArrayList<>());
+        Film film2 = new Film("Name2", "Description2", LocalDate.of(1990, Month.APRIL, 13), 100L, 2, List.of(new Genre(1, "Комедия")), new Mpa(1, "G"), new ArrayList<>());
         filmService.saveNew(film2);
         User user = new User("abc@acb.ru", "login", "name", LocalDate.of(1986, Month.APRIL, 13), null);
         userService.saveNew(user);
@@ -322,9 +322,9 @@ class FilmServiceUnitTests {
 
     @Test
     public void findPopularErrorCount0() {
-        Film film = new Film("Name", "Description", LocalDate.of(1990, Month.APRIL, 13), 100L, null, List.of(new Genre(1, null)), new Rating(1, null), new ArrayList<>());
+        Film film = new Film("Name", "Description", LocalDate.of(1990, Month.APRIL, 13), 100L, null, List.of(new Genre(1, null)), new Mpa(1, null), new ArrayList<>());
         filmService.saveNew(film);
-        Film film2 = new Film("Name2", "Description2", LocalDate.of(1990, Month.APRIL, 13), 100L, null, List.of(new Genre(1, null)), new Rating(1, null), new ArrayList<>());
+        Film film2 = new Film("Name2", "Description2", LocalDate.of(1990, Month.APRIL, 13), 100L, null, List.of(new Genre(1, null)), new Mpa(1, null), new ArrayList<>());
         filmService.saveNew(film2);
         User user = new User("abc@acb.ru", "login", "name", LocalDate.of(1986, Month.APRIL, 13), 1);
         userService.saveNew(user);
@@ -336,9 +336,9 @@ class FilmServiceUnitTests {
 
     @Test
     public void findPopularErrorCountNegative() {
-        Film film = new Film("Name", "Description", LocalDate.of(1990, Month.APRIL, 13), 100L, null, List.of(new Genre(1, null)), new Rating(1, null), new ArrayList<>());
+        Film film = new Film("Name", "Description", LocalDate.of(1990, Month.APRIL, 13), 100L, null, List.of(new Genre(1, null)), new Mpa(1, null), new ArrayList<>());
         filmService.saveNew(film);
-        Film film2 = new Film("Name2", "Description2", LocalDate.of(1990, Month.APRIL, 13), 100L, null, List.of(new Genre(1, null)), new Rating(1, null), new ArrayList<>());
+        Film film2 = new Film("Name2", "Description2", LocalDate.of(1990, Month.APRIL, 13), 100L, null, List.of(new Genre(1, null)), new Mpa(1, null), new ArrayList<>());
         filmService.saveNew(film2);
         User user = new User("abc@acb.ru", "login", "name", LocalDate.of(1986, Month.APRIL, 13), 1);
         userService.saveNew(user);
