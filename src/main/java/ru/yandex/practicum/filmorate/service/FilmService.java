@@ -22,7 +22,7 @@ public class FilmService {
     private final DirectorsService directorsService;
     private final UserService userService;
     private final GenresService genresService;
-    private final RatingsService ratingsService;
+    private final MpaService mpaService;
     private final FeedStorage feedStorage;
 
     public Film saveNew(Film film) {
@@ -101,7 +101,7 @@ public class FilmService {
 
     private void saveAdditionalInfoFromDb(Film film) {
         film.setGenres(genresService.saveGenresToFilmFromDB(film.getId()));
-        film.setMpa(ratingsService.saveRatingToFilmFromDB(film.getId()));
+        film.setMpa(mpaService.saveRatingToFilmFromDB(film.getId()));
         film.setDirectors(directorsService.saveDirectorsToFilmFromDB(film.getId()));
     }
 

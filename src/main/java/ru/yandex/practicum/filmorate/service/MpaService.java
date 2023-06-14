@@ -4,19 +4,19 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.Mpa;
-import ru.yandex.practicum.filmorate.storage.dao.RatingStorage;
+import ru.yandex.practicum.filmorate.storage.dao.MpaStorage;
 
 import java.util.Collection;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class RatingsService {
+public class MpaService {
 
-    private final RatingStorage ratingStorage;
+    private final MpaStorage mpaStorage;
 
     public Collection<Mpa> findAll() {
-        Collection<Mpa> ratings = ratingStorage.findAll();
+        Collection<Mpa> ratings = mpaStorage.findAll();
         if (ratings.isEmpty()) {
             log.info("Рейтингы отсутствуют.");
         } else {
@@ -27,11 +27,11 @@ public class RatingsService {
 
     public Mpa findById(int ratingId) {
         Mpa rating;
-        rating = ratingStorage.findById(ratingId);
+        rating = mpaStorage.findById(ratingId);
         return rating;
     }
 
     public Mpa saveRatingToFilmFromDB(int filmId) {
-        return ratingStorage.saveRatingToFilmFromDB(filmId);
+        return mpaStorage.saveRatingToFilmFromDB(filmId);
     }
 }

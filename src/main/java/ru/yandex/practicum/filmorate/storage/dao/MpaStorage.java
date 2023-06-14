@@ -4,7 +4,7 @@ import ru.yandex.practicum.filmorate.model.Mpa;
 
 import java.util.List;
 
-public interface RatingStorage {
+public interface MpaStorage {
 
     List<Mpa> findAll();
 
