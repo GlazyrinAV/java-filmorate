@@ -53,15 +53,15 @@ public class FilmService {
         return film;
     }
 
-    public void makeLike(int filmId, int userId) {
+    public void saveRating(int filmId, int userId, int rating) {
         userService.findById(userId);
         findById(filmId);
         log.info("К фильму добавлен лайк.");
-        filmStorage.saveRating(filmId, userId);
+        filmStorage.saveRating(filmId, userId, rating);
         feedStorage.saveFeed(userId, filmId, EventType.LIKE.getEventTypeId(), Operation.ADD.getOperationId());
     }
 
-    public void removeLike(int filmId, int userId) {
+    public void removeRating(int filmId, int userId) {
         userService.findById(userId);
         findById(filmId);
         log.info("У фильма удален лайк.");
@@ -87,7 +87,7 @@ public class FilmService {
         return films.stream().peek(this::saveAdditionalInfoFromDb).collect(Collectors.toList());
     }
 
-    public Collection<Integer> findLikes(int filmId) {
+    public Double findRating(int filmId) {
         log.info("Лайки к фильму найдены.");
         return filmStorage.findRating(filmId);
     }

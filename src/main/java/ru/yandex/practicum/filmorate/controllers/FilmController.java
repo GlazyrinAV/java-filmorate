@@ -43,16 +43,16 @@ public class FilmController {
         return filmService.findById(id);
     }
 
-    @PutMapping("/films/{id}/like/{userId}")
+    @PutMapping("/films/{id}/rating/{userId}/{rating}")
     @ResponseStatus(HttpStatus.OK)
-    public void makeNewLike(@PathVariable int id, @PathVariable int userId) {
-        filmService.makeLike(id, userId);
+    public void makeNewLike(@PathVariable int id, @PathVariable int userId, @PathVariable int rating) {
+        filmService.saveRating(id, userId, rating);
     }
 
-    @DeleteMapping("/films/{id}/like/{userId}")
+    @DeleteMapping("/films/{id}/rating/{userId}")
     @ResponseStatus(HttpStatus.OK)
     public void removeLike(@PathVariable int id, @PathVariable int userId) {
-        filmService.removeLike(id, userId);
+        filmService.removeRating(id, userId);
     }
 
     @GetMapping("/films/popular")

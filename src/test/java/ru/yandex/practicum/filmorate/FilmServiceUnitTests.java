@@ -118,8 +118,8 @@ class FilmServiceUnitTests {
         filmService.saveNew(film);
         User user = new User("abc@acb.ru", "login", "name", LocalDate.of(1986, Month.APRIL, 13), 1);
         userService.saveNew(user);
-        filmService.makeLike(1, 1);
-        Assertions.assertEquals("[1]", filmService.findLikes(1).toString(), "Ошибка при нормальном добавлении лайка.");
+        filmService.saveRating(1, 1);
+        Assertions.assertEquals("[1]", filmService.findRating(1).toString(), "Ошибка при нормальном добавлении лайка.");
 
         List<Feed> feeds = new ArrayList<>(feedStorage.findFeed(1));
         Assertions.assertEquals(1, feeds.size());
@@ -137,7 +137,7 @@ class FilmServiceUnitTests {
         filmService.saveNew(film);
         User user = new User("abc@acb.ru", "login", "name", LocalDate.of(1986, Month.APRIL, 13), 1);
         userService.saveNew(user);
-        FilmNotFoundException exception = Assertions.assertThrows(FilmNotFoundException.class, () -> filmService.makeLike(0, 1));
+        FilmNotFoundException exception = Assertions.assertThrows(FilmNotFoundException.class, () -> filmService.saveRating(0, 1));
         Assertions.assertEquals("Фильм c ID 0 не найден.", exception.getMessage(),
                 "Ошибка при добавлении лайка к фильму с ID0.");
     }
@@ -148,7 +148,7 @@ class FilmServiceUnitTests {
         filmService.saveNew(film);
         User user = new User("abc@acb.ru", "login", "name", LocalDate.of(1986, Month.APRIL, 13), 1);
         userService.saveNew(user);
-        FilmNotFoundException exception = Assertions.assertThrows(FilmNotFoundException.class, () -> filmService.makeLike(-1, 1));
+        FilmNotFoundException exception = Assertions.assertThrows(FilmNotFoundException.class, () -> filmService.saveRating(-1, 1));
         Assertions.assertEquals("Фильм c ID -1 не найден.", exception.getMessage(),
                 "Ошибка при добавлении лайка к фильму с ID-1.");
     }
@@ -159,7 +159,7 @@ class FilmServiceUnitTests {
         filmService.saveNew(film);
         User user = new User("abc@acb.ru", "login", "name", LocalDate.of(1986, Month.APRIL, 13), 1);
         userService.saveNew(user);
-        FilmNotFoundException exception = Assertions.assertThrows(FilmNotFoundException.class, () -> filmService.makeLike(99, 1));
+        FilmNotFoundException exception = Assertions.assertThrows(FilmNotFoundException.class, () -> filmService.saveRating(99, 1));
         Assertions.assertEquals("Фильм c ID 99 не найден.", exception.getMessage(),
                 "Ошибка при добавлении лайка к фильму с ID99.");
     }
@@ -170,7 +170,7 @@ class FilmServiceUnitTests {
         filmService.saveNew(film);
         User user = new User("abc@acb.ru", "login", "name", LocalDate.of(1986, Month.APRIL, 13), 1);
         userService.saveNew(user);
-        UserNotFoundException exception = Assertions.assertThrows(UserNotFoundException.class, () -> filmService.makeLike(1, 0));
+        UserNotFoundException exception = Assertions.assertThrows(UserNotFoundException.class, () -> filmService.saveRating(1, 0));
         Assertions.assertEquals("Пользователь c ID 0 не найден.", exception.getMessage(),
                 "Ошибка при добавлении лайка к фильму с юзером ID0.");
     }
@@ -180,7 +180,7 @@ class FilmServiceUnitTests {
         Film film = new Film("Name", "Description", LocalDate.of(1990, Month.APRIL, 13), 100L, null, List.of(new Genre(1, null)), new Rating(1, null), new ArrayList<>());
         User user = new User("abc@acb.ru", "login", "name", LocalDate.of(1986, Month.APRIL, 13), 1);
         userService.saveNew(user);
-        UserNotFoundException exception = Assertions.assertThrows(UserNotFoundException.class, () -> filmService.makeLike(1, -1));
+        UserNotFoundException exception = Assertions.assertThrows(UserNotFoundException.class, () -> filmService.saveRating(1, -1));
         Assertions.assertEquals("Пользователь c ID -1 не найден.", exception.getMessage(),
                 "Ошибка при добавлении лайка к фильму с юзером ID-1.");
     }
@@ -191,7 +191,7 @@ class FilmServiceUnitTests {
         filmService.saveNew(film);
         User user = new User("abc@acb.ru", "login", "name", LocalDate.of(1986, Month.APRIL, 13), 1);
         userService.saveNew(user);
-        UserNotFoundException exception = Assertions.assertThrows(UserNotFoundException.class, () -> filmService.makeLike(1, 99));
+        UserNotFoundException exception = Assertions.assertThrows(UserNotFoundException.class, () -> filmService.saveRating(1, 99));
         Assertions.assertEquals("Пользователь c ID 99 не найден.", exception.getMessage(),
                 "Ошибка при добавлении лайка к фильму с юзером ID99.");
     }
@@ -202,9 +202,9 @@ class FilmServiceUnitTests {
         filmService.saveNew(film);
         User user = new User("abc@acb.ru", "login", "name", LocalDate.of(1986, Month.APRIL, 13), 1);
         userService.saveNew(user);
-        filmService.makeLike(1, 1);
-        filmService.removeLike(1, 1);
-        Assertions.assertTrue(filmService.findLikes(1).isEmpty(), "Ошибка при нормальном удалении лайка.");
+        filmService.saveRating(1, 1);
+        filmService.removeRating(1, 1);
+        Assertions.assertTrue(filmService.findRating(1).isEmpty(), "Ошибка при нормальном удалении лайка.");
 
         List<Feed> feeds = new ArrayList<>(feedStorage.findFeed(1));
         Assertions.assertEquals(2, feeds.size());
@@ -228,8 +228,8 @@ class FilmServiceUnitTests {
         filmService.saveNew(film);
         User user = new User("abc@acb.ru", "login", "name", LocalDate.of(1986, Month.APRIL, 13), 1);
         userService.saveNew(user);
-        filmService.makeLike(1, 1);
-        FilmNotFoundException exception = Assertions.assertThrows(FilmNotFoundException.class, () -> filmService.removeLike(0, 1));
+        filmService.saveRating(1, 1);
+        FilmNotFoundException exception = Assertions.assertThrows(FilmNotFoundException.class, () -> filmService.removeRating(0, 1));
         Assertions.assertEquals("Фильм c ID 0 не найден.", exception.getMessage(),
                 "Ошибка при удалении лайка к фильму с ID0.");
     }
@@ -240,8 +240,8 @@ class FilmServiceUnitTests {
         filmService.saveNew(film);
         User user = new User("abc@acb.ru", "login", "name", LocalDate.of(1986, Month.APRIL, 13), 1);
         userService.saveNew(user);
-        filmService.makeLike(1, 1);
-        FilmNotFoundException exception = Assertions.assertThrows(FilmNotFoundException.class, () -> filmService.removeLike(-1, 1));
+        filmService.saveRating(1, 1);
+        FilmNotFoundException exception = Assertions.assertThrows(FilmNotFoundException.class, () -> filmService.removeRating(-1, 1));
         Assertions.assertEquals("Фильм c ID -1 не найден.", exception.getMessage(),
                 "Ошибка при удалении лайка к фильму с ID-1.");
     }
@@ -252,8 +252,8 @@ class FilmServiceUnitTests {
         filmService.saveNew(film);
         User user = new User("abc@acb.ru", "login", "name", LocalDate.of(1986, Month.APRIL, 13), 1);
         userService.saveNew(user);
-        filmService.makeLike(1, 1);
-        FilmNotFoundException exception = Assertions.assertThrows(FilmNotFoundException.class, () -> filmService.removeLike(99, 1));
+        filmService.saveRating(1, 1);
+        FilmNotFoundException exception = Assertions.assertThrows(FilmNotFoundException.class, () -> filmService.removeRating(99, 1));
         Assertions.assertEquals("Фильм c ID 99 не найден.", exception.getMessage(),
                 "Ошибка при удалении лайка к фильму с ID99.");
     }
@@ -264,8 +264,8 @@ class FilmServiceUnitTests {
         filmService.saveNew(film);
         User user = new User("abc@acb.ru", "login", "name", LocalDate.of(1986, Month.APRIL, 13), 1);
         userService.saveNew(user);
-        filmService.makeLike(1, 1);
-        UserNotFoundException exception = Assertions.assertThrows(UserNotFoundException.class, () -> filmService.removeLike(1, 0));
+        filmService.saveRating(1, 1);
+        UserNotFoundException exception = Assertions.assertThrows(UserNotFoundException.class, () -> filmService.removeRating(1, 0));
         Assertions.assertEquals("Пользователь c ID 0 не найден.", exception.getMessage(),
                 "Ошибка при удалении лайка к фильму с юзером ID0.");
     }
@@ -276,8 +276,8 @@ class FilmServiceUnitTests {
         filmService.saveNew(film);
         User user = new User("abc@acb.ru", "login", "name", LocalDate.of(1986, Month.APRIL, 13), 1);
         userService.saveNew(user);
-        filmService.makeLike(1, 1);
-        UserNotFoundException exception = Assertions.assertThrows(UserNotFoundException.class, () -> filmService.removeLike(1, -1));
+        filmService.saveRating(1, 1);
+        UserNotFoundException exception = Assertions.assertThrows(UserNotFoundException.class, () -> filmService.removeRating(1, -1));
         Assertions.assertEquals("Пользователь c ID -1 не найден.", exception.getMessage(),
                 "Ошибка при удалении лайка к фильму с юзером ID-1.");
     }
@@ -288,8 +288,8 @@ class FilmServiceUnitTests {
         filmService.saveNew(film);
         User user = new User("abc@acb.ru", "login", "name", LocalDate.of(1986, Month.APRIL, 13), null);
         userService.saveNew(user);
-        filmService.makeLike(1, 1);
-        UserNotFoundException exception = Assertions.assertThrows(UserNotFoundException.class, () -> filmService.removeLike(1, 99));
+        filmService.saveRating(1, 1);
+        UserNotFoundException exception = Assertions.assertThrows(UserNotFoundException.class, () -> filmService.removeRating(1, 99));
         Assertions.assertEquals("Пользователь c ID 99 не найден.", exception.getMessage(),
                 "Ошибка при удалении лайка к фильму с юзером ID99.");
     }
@@ -302,7 +302,7 @@ class FilmServiceUnitTests {
         filmService.saveNew(film2);
         User user = new User("abc@acb.ru", "login", "name", LocalDate.of(1986, Month.APRIL, 13), 1);
         userService.saveNew(user);
-        filmService.makeLike(1, 1);
+        filmService.saveRating(1, 1);
         Assertions.assertEquals(filmService.findPopular(1, Optional.empty(), Optional.empty()), new ArrayList<>(List.of(film)),
                 "Ошибка при получении списка из 1 популярных фильмов.");
     }
@@ -315,7 +315,7 @@ class FilmServiceUnitTests {
         filmService.saveNew(film2);
         User user = new User("abc@acb.ru", "login", "name", LocalDate.of(1986, Month.APRIL, 13), null);
         userService.saveNew(user);
-        filmService.makeLike(1, 1);
+        filmService.saveRating(1, 1);
         Assertions.assertEquals(filmService.findPopular(10, Optional.empty(), Optional.empty()), new ArrayList<>(List.of(film, film2)),
                 "Ошибка при нормальном получении списка из 10 пополурных фильмов.");
     }
@@ -328,7 +328,7 @@ class FilmServiceUnitTests {
         filmService.saveNew(film2);
         User user = new User("abc@acb.ru", "login", "name", LocalDate.of(1986, Month.APRIL, 13), 1);
         userService.saveNew(user);
-        filmService.makeLike(1, 1);
+        filmService.saveRating(1, 1);
         ValidationException exception = Assertions.assertThrows(ValidationException.class, () -> filmService.findPopular(0, Optional.empty(), Optional.empty()));
         Assertions.assertEquals("Значение выводимых фильмов не может быть меньше или равно нулю.", exception.getMessage(),
                 "Ошибка при получении ошибки получения популярных 0 фильмов");
@@ -342,7 +342,7 @@ class FilmServiceUnitTests {
         filmService.saveNew(film2);
         User user = new User("abc@acb.ru", "login", "name", LocalDate.of(1986, Month.APRIL, 13), 1);
         userService.saveNew(user);
-        filmService.makeLike(1, 1);
+        filmService.saveRating(1, 1);
         ValidationException exception = Assertions.assertThrows(ValidationException.class, () -> filmService.findPopular(-1, Optional.empty(), Optional.empty()));
         Assertions.assertEquals("Значение выводимых фильмов не может быть меньше или равно нулю.", exception.getMessage(),
                 "Ошибка при получении ошибки получения популярных -1 фильмов");

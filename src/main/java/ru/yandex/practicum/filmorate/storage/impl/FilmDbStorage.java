@@ -142,10 +142,10 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Override
-    public void saveRating(int filmId, int userId) {
-        String sqlQuery = "MERGE INTO FILM_RATING (film_id, user_id) VALUES (?, ?)";
+    public void saveRating(int filmId, int userId, int rating) {
+        String sqlQuery = "MERGE INTO FILM_RATING (film_id, user_id, RATING) VALUES (?, ?, ?)";
         try {
-            jdbcTemplate.update(sqlQuery, filmId, userId);
+            jdbcTemplate.update(sqlQuery, filmId, userId, rating);
         } catch (DataIntegrityViolationException exception) {
             throw new DataIntegrityViolationException("В запросе неправильно указаны данные для добавдения лайка.");
         }
@@ -158,9 +158,9 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Override
-    public Collection<Integer> findRating(int filmId) {
-        String sqlQuery = "SELECT user_id FROM FILM_RATING WHERE film_id = ?";
-        return jdbcTemplate.query(sqlQuery, this::mapRowToUserId, filmId);
+    public Double findRating(int filmId) {
+        String sqlQuery = "SELECT AVG(RATING) FROM FILM_RATING WHERE film_id = ?";
+        return jdbcTemplate.queryForObject(sqlQuery, Double.class, filmId);
     }
 
     @Override
@@ -187,20 +187,6 @@ public class FilmDbStorage implements FilmStorage {
         }
 
         return jdbcTemplate.query(sqlQuery, this::mapRowToFilm, directorId);
-    }
-
-    private Film mapRowToFilm(ResultSet resultSet, int rowNum) throws SQLException {
-        return Film.builder()
-                .id(resultSet.getInt("film_id"))
-                .name(resultSet.getString("name"))
-                .description(resultSet.getString("description"))
-                .releaseDate(resultSet.getDate("release_date").toLocalDate())
-                .duration((resultSet.getLong("duration")))
-                .build();
-    }
-
-    private Integer mapRowToUserId(ResultSet resultSet, int rowNum) throws SQLException {
-        return resultSet.getInt("user_id");
     }
 
     @Override
@@ -270,5 +256,15 @@ public class FilmDbStorage implements FilmStorage {
                 "ORDER BY F.FILM_ID DESC";
 
         return jdbcTemplate.query(search, this::mapRowToFilm, query, query);
+    }
+
+    private Film mapRowToFilm(ResultSet resultSet, int rowNum) throws SQLException {
+        return Film.builder()
+                .id(resultSet.getInt("film_id"))
+                .name(resultSet.getString("name"))
+                .description(resultSet.getString("description"))
+                .releaseDate(resultSet.getDate("release_date").toLocalDate())
+                .duration((resultSet.getLong("duration")))
+                .build();
     }
 }
