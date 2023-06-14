@@ -155,9 +155,9 @@ public class FilmDbStorage implements FilmStorage {
             sqlQuery = "SELECT * FROM FILMS WHERE FILM_ID IN (SELECT FILM_ID FROM FILM_DIRECTOR WHERE DIRECTOR_ID = ?) " +
                     "ORDER BY EXTRACT(YEAR FROM RELEASE_DATE)";
         } else {
-            sqlQuery = "SELECT FILMS.*, AVG(SCORE) AS LIKES FROM FILMS LEFT JOIN FILM_SCORE FL on FILMS.FILM_ID = FL.FILM_ID " +
+            sqlQuery = "SELECT FILMS.*, AVG(SCORE) AS SCORE FROM FILMS LEFT JOIN FILM_SCORE FL on FILMS.FILM_ID = FL.FILM_ID " +
                     "WHERE FILMS.FILM_ID IN (SELECT FILM_ID FROM FILM_DIRECTOR WHERE DIRECTOR_ID = ?)\n" +
-                    "group by FILMS.FILM_ID ORDER BY LIKES DESC";
+                    "group by FILMS.FILM_ID ORDER BY SCORE DESC";
         }
         Integer resultCheck = jdbcTemplate.query(sqlQuery, (rs, rowNum) ->
                 rs.getInt("FILM_ID"), directorId).stream().findFirst().orElse(null);
