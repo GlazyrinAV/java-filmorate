@@ -96,7 +96,7 @@ public class FilmDbStorage implements FilmStorage {
         String sqlQuery =
                 "SELECT F.FILM_ID, F.NAME, F.DESCRIPTION, F.RELEASE_DATE, F.DURATION " +
                         "FROM FILMS AS F " +
-                        "LEFT JOIN FILM_LIKES AS FL ON F.FILM_ID = FL.FILM_ID " +
+                        "LEFT JOIN FILM_SCORE AS FL ON F.FILM_ID = FL.FILM_ID " +
                         "GROUP BY F.FILM_ID ORDER BY COUNT(FL.FILM_ID) DESC LIMIT ?";
         return jdbcTemplate.query(sqlQuery, this::mapRowToFilm, count);
     }
@@ -106,7 +106,7 @@ public class FilmDbStorage implements FilmStorage {
         String sql = "SELECT F.FILM_ID, F.NAME, F.DESCRIPTION, F.RELEASE_DATE, F.DURATION\n" +
                 "FROM FILMS AS F\n" +
                 "LEFT JOIN FILM_GENRES AS FG ON F.FILM_ID = FG.FILM_ID\n" +
-                "LEFT JOIN FILM_LIKES AS FL ON F.FILM_ID = FL.FILM_ID\n" +
+                "LEFT JOIN FILM_SCORE AS FL ON F.FILM_ID = FL.FILM_ID\n" +
                 "WHERE FG.GENRE_ID = ?\n" +
                 "AND EXTRACT(YEAR FROM CAST(F.RELEASE_DATE AS DATE)) = ?\n" +
                 "GROUP BY F.FILM_ID\n" +
@@ -120,7 +120,7 @@ public class FilmDbStorage implements FilmStorage {
         String sql = "SELECT F.FILM_ID, F.NAME, F.DESCRIPTION, F.RELEASE_DATE, F.DURATION\n" +
                 "FROM FILMS AS F\n" +
                 "LEFT JOIN FILM_GENRES AS FG ON F.FILM_ID = FG.FILM_ID\n" +
-                "LEFT JOIN FILM_LIKES AS FL ON F.FILM_ID = FL.FILM_ID\n" +
+                "LEFT JOIN FILM_SCORE AS FL ON F.FILM_ID = FL.FILM_ID\n" +
                 "WHERE FG.GENRE_ID = ?\n" +
                 "GROUP BY F.FILM_ID\n" +
                 "ORDER BY COUNT(FL.USER_ID) DESC\n" +
@@ -133,7 +133,7 @@ public class FilmDbStorage implements FilmStorage {
         String sql = "SELECT F.FILM_ID, F.NAME, F.DESCRIPTION, F.RELEASE_DATE, F.DURATION\n" +
                 "FROM FILMS AS F\n" +
                 "LEFT JOIN FILM_GENRES AS FG ON F.FILM_ID = FG.FILM_ID\n" +
-                "LEFT JOIN FILM_LIKES AS FL ON F.FILM_ID = FL.FILM_ID\n" +
+                "LEFT JOIN FILM_SCORE AS FL ON F.FILM_ID = FL.FILM_ID\n" +
                 "WHERE EXTRACT(YEAR FROM CAST(F.RELEASE_DATE AS DATE)) = ?\n" +
                 "GROUP BY F.FILM_ID\n" +
                 "ORDER BY COUNT(FL.USER_ID) DESC\n" +
@@ -142,25 +142,25 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Override
-    public void makeLike(int filmId, int userId) {
-        String sqlQuery = "MERGE INTO film_likes (film_id, user_id) VALUES (?, ?)";
+    public void saveScore(int filmId, int userId, int score) {
+        String sqlQuery = "MERGE INTO FILM_SCORE (film_id, user_id, SCORE) VALUES (?, ?, ?)";
         try {
-            jdbcTemplate.update(sqlQuery, filmId, userId);
+            jdbcTemplate.update(sqlQuery, filmId, userId, score);
         } catch (DataIntegrityViolationException exception) {
             throw new DataIntegrityViolationException("В запросе неправильно указаны данные для добавдения лайка.");
         }
     }
 
     @Override
-    public void removeLike(int filmId, int userId) {
-        String sqlQuery = "DELETE FROM film_likes WHERE film_id = ? AND user_id = ?";
+    public void removeScore(int filmId, int userId) {
+        String sqlQuery = "DELETE FROM FILM_SCORE WHERE film_id = ? AND user_id = ?";
         jdbcTemplate.update(sqlQuery, filmId, userId);
     }
 
     @Override
-    public Collection<Integer> findLikes(int filmId) {
-        String sqlQuery = "SELECT user_id FROM film_likes WHERE film_id = ?";
-        return jdbcTemplate.query(sqlQuery, this::mapRowToUserId, filmId);
+    public Double findScore(int filmId) {
+        String sqlQuery = "SELECT AVG(SCORE) FROM FILM_SCORE WHERE film_id = ?";
+        return jdbcTemplate.queryForObject(sqlQuery, Double.class, filmId);
     }
 
     @Override
@@ -176,7 +176,7 @@ public class FilmDbStorage implements FilmStorage {
             sqlQuery = "SELECT * FROM FILMS WHERE FILM_ID IN (SELECT FILM_ID FROM FILM_DIRECTOR WHERE DIRECTOR_ID = ?) " +
                     "ORDER BY EXTRACT(YEAR FROM RELEASE_DATE)";
         } else {
-            sqlQuery = "SELECT FILMS.*, SUM(FL.USER_ID) AS LIKES FROM FILMS LEFT JOIN FILM_LIKES FL on FILMS.FILM_ID = FL.FILM_ID " +
+            sqlQuery = "SELECT FILMS.*, AVG(SCORE) AS LIKES FROM FILMS LEFT JOIN FILM_SCORE FL on FILMS.FILM_ID = FL.FILM_ID " +
                     "WHERE FILMS.FILM_ID IN (SELECT FILM_ID FROM FILM_DIRECTOR WHERE DIRECTOR_ID = ?)\n" +
                     "group by FILMS.FILM_ID ORDER BY LIKES DESC";
         }
@@ -189,25 +189,11 @@ public class FilmDbStorage implements FilmStorage {
         return jdbcTemplate.query(sqlQuery, this::mapRowToFilm, directorId);
     }
 
-    private Film mapRowToFilm(ResultSet resultSet, int rowNum) throws SQLException {
-        return Film.builder()
-                .id(resultSet.getInt("film_id"))
-                .name(resultSet.getString("name"))
-                .description(resultSet.getString("description"))
-                .releaseDate(resultSet.getDate("release_date").toLocalDate())
-                .duration((resultSet.getLong("duration")))
-                .build();
-    }
-
-    private Integer mapRowToUserId(ResultSet resultSet, int rowNum) throws SQLException {
-        return resultSet.getInt("user_id");
-    }
-
     @Override
     public Collection<Film> findCommonFilms(int userId, int friendId) {
         String sqlQuery = "SELECT FILMS.FILM_ID, FILMS.NAME, FILMS.DESCRIPTION, FILMS.DURATION, FILMS.RELEASE_DATE, COUNT(FL.USER_ID) " +
-                " FROM FILMS LEFT JOIN FILM_LIKES FL on FILMS.FILM_ID = FL.FILM_ID WHERE Films.FILM_ID in (select FILM_ID from  FILM_LIKES " +
-                " where USER_ID = ? AND FILM_ID in (select FILM_ID from FILM_LIKES where USER_ID = ?))" +
+                " FROM FILMS LEFT JOIN FILM_SCORE FL on FILMS.FILM_ID = FL.FILM_ID WHERE Films.FILM_ID in (select FILM_ID from  FILM_SCORE " +
+                " where USER_ID = ? AND FILM_ID in (select FILM_ID from FILM_SCORE where USER_ID = ?))" +
                 "GROUP BY FILMS.FILM_ID ORDER BY COUNT(FL.USER_ID) desc ";
 
         return jdbcTemplate.query(sqlQuery, this::mapRowToFilm, userId, friendId);
@@ -216,7 +202,7 @@ public class FilmDbStorage implements FilmStorage {
     public Collection<Film> getRecommendation(int id) {
 
         String sqlQuery = "SELECT *" +
-                " FROM FILM_LIKES as F  WHERE F.FILM_ID in (select FILM_ID from  FILM_LIKES where USER_ID = ?) and not F.USER_ID = ?" +
+                " FROM FILM_SCORE as F  WHERE F.FILM_ID in (select FILM_ID from  FILM_SCORE where USER_ID = ?) and not F.USER_ID = ?" +
                 "GROUP BY F.USER_ID ORDER BY COUNT(FILM_ID) desc LIMIT 1";
 
         Integer idRecommendationUser = jdbcTemplate.query(sqlQuery, (rs, rowNum) ->
@@ -225,8 +211,8 @@ public class FilmDbStorage implements FilmStorage {
             return new ArrayList<>();
 
         String sqlQuery2 = "SELECT *" +
-                " FROM FILMS LEFT JOIN FILM_LIKES FL on FILMS.FILM_ID = FL.FILM_ID WHERE Films.FILM_ID in (select FILM_ID from  FILM_LIKES " +
-                " where USER_ID = ? AND FILM_ID not in (select FILM_ID from FILM_LIKES where USER_ID = ?))" +
+                " FROM FILMS LEFT JOIN FILM_SCORE FL on FILMS.FILM_ID = FL.FILM_ID WHERE Films.FILM_ID in (select FILM_ID from  FILM_SCORE " +
+                " where USER_ID = ? AND FILM_ID not in (select FILM_ID from FILM_SCORE where USER_ID = ?))" +
                 "GROUP BY FILMS.FILM_ID ";
 
         return jdbcTemplate.query(sqlQuery2, this::mapRowToFilm, idRecommendationUser, id);
@@ -236,7 +222,7 @@ public class FilmDbStorage implements FilmStorage {
     public Collection<Film> searchByTitle(String query) {
         String searchByTitle = "SELECT F.*, COUNT(FL.FILM_ID) AS LIKES_COUNT " +
                 "FROM FILMS AS F " +
-                "LEFT OUTER JOIN FILM_LIKES AS FL ON F.FILM_ID = FL.FILM_ID " +
+                "LEFT OUTER JOIN FILM_SCORE AS FL ON F.FILM_ID = FL.FILM_ID " +
                 "WHERE UPPER(F.NAME) LIKE UPPER(CONCAT('%', ?, '%')) " +
                 "GROUP BY F.FILM_ID " +
                 "ORDER BY F.FILM_ID DESC";
@@ -250,7 +236,7 @@ public class FilmDbStorage implements FilmStorage {
                 "FROM FILMS F " +
                 "LEFT OUTER JOIN FILM_DIRECTOR FD ON F.FILM_ID = FD.FILM_ID " +
                 "LEFT OUTER JOIN DIRECTORS D ON FD.DIRECTOR_ID = D.DIRECTOR_ID " +
-                "LEFT OUTER JOIN FILM_LIKES FL ON F.FILM_ID = FL.FILM_ID " +
+                "LEFT OUTER JOIN FILM_SCORE FL ON F.FILM_ID = FL.FILM_ID " +
                 "WHERE UPPER(D.DIRECTOR_NAME) LIKE UPPER(CONCAT('%', ?, '%')) " +
                 "GROUP BY F.FILM_ID " +
                 "ORDER BY F.FILM_ID DESC";
@@ -264,11 +250,22 @@ public class FilmDbStorage implements FilmStorage {
                 "FROM FILMS AS F " +
                 "LEFT OUTER JOIN FILM_DIRECTOR AS FD ON F.FILM_ID = FD.FILM_ID " +
                 "LEFT OUTER JOIN DIRECTORS AS D ON FD.DIRECTOR_ID = D.DIRECTOR_ID " +
-                "LEFT OUTER JOIN FILM_LIKES AS FL ON F.FILM_ID = FL.FILM_ID " +
+                "LEFT OUTER JOIN FILM_SCORE AS FL ON F.FILM_ID = FL.FILM_ID " +
                 "WHERE UPPER(F.NAME) LIKE UPPER(CONCAT('%', ?, '%')) OR UPPER(D.DIRECTOR_NAME) LIKE UPPER(CONCAT('%', ?, '%')) " +
                 "GROUP BY F.FILM_ID, D.DIRECTOR_NAME " +
                 "ORDER BY F.FILM_ID DESC";
 
         return jdbcTemplate.query(search, this::mapRowToFilm, query, query);
+    }
+
+    private Film mapRowToFilm(ResultSet resultSet, int rowNum) throws SQLException {
+        return Film.builder()
+                .id(resultSet.getInt("film_id"))
+                .name(resultSet.getString("name"))
+                .description(resultSet.getString("description"))
+                .releaseDate(resultSet.getDate("release_date").toLocalDate())
+                .duration((resultSet.getLong("duration")))
+                .score(findScore(resultSet.getInt("film_id")))
+                .build();
     }
 }
