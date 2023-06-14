@@ -19,20 +19,20 @@ public class RatingDbStorage implements RatingStorage {
 
     @Override
     public List<Rating> findAll() {
-        String sqlQuery = "SELECT * FROM RATINGS";
+        String sqlQuery = "SELECT * FROM MPA";
         return jdbcTemplate.query(sqlQuery, this::mapRowToRating);
     }
 
     @Override
     public Rating findById(int ratingId) {
-        String sqlQuery = "SELECT * FROM RATINGS WHERE rating_id = ?";
+        String sqlQuery = "SELECT * FROM MPA WHERE rating_id = ?";
         return jdbcTemplate.query(sqlQuery, this::mapRowToRating, ratingId).stream().findFirst()
                 .orElseThrow(() -> new RatingNotFoundException("Рейтинг с ID " + ratingId + " не найден."));
     }
 
     @Override
     public Rating saveRatingToFilmFromDB(int filmId) {
-        String sqlQuery = "SELECT R.RATING_ID, R.RATING_NAME FROM RATINGS AS R " +
+        String sqlQuery = "SELECT R.RATING_ID, R.RATING_NAME FROM MPA AS R " +
                 "JOIN FILMS F ON R.RATING_ID = F.RATING_ID WHERE F.FILM_ID = ?";
         return jdbcTemplate.queryForObject(sqlQuery, this::mapRowToRating, filmId);
     }
