@@ -142,7 +142,7 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Override
-    public void makeLike(int filmId, int userId) {
+    public void saveRating(int filmId, int userId) {
         String sqlQuery = "MERGE INTO FILM_RATING (film_id, user_id) VALUES (?, ?)";
         try {
             jdbcTemplate.update(sqlQuery, filmId, userId);
@@ -152,13 +152,13 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Override
-    public void removeLike(int filmId, int userId) {
+    public void removeRating(int filmId, int userId) {
         String sqlQuery = "DELETE FROM FILM_RATING WHERE film_id = ? AND user_id = ?";
         jdbcTemplate.update(sqlQuery, filmId, userId);
     }
 
     @Override
-    public Collection<Integer> findLikes(int filmId) {
+    public Collection<Integer> findRating(int filmId) {
         String sqlQuery = "SELECT user_id FROM FILM_RATING WHERE film_id = ?";
         return jdbcTemplate.query(sqlQuery, this::mapRowToUserId, filmId);
     }

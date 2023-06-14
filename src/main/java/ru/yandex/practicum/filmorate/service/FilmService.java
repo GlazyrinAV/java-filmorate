@@ -57,7 +57,7 @@ public class FilmService {
         userService.findById(userId);
         findById(filmId);
         log.info("К фильму добавлен лайк.");
-        filmStorage.makeLike(filmId, userId);
+        filmStorage.saveRating(filmId, userId);
         feedStorage.saveFeed(userId, filmId, EventType.LIKE.getEventTypeId(), Operation.ADD.getOperationId());
     }
 
@@ -65,7 +65,7 @@ public class FilmService {
         userService.findById(userId);
         findById(filmId);
         log.info("У фильма удален лайк.");
-        filmStorage.removeLike(filmId, userId);
+        filmStorage.removeRating(filmId, userId);
         feedStorage.saveFeed(userId, filmId, EventType.LIKE.getEventTypeId(), Operation.REMOVE.getOperationId());
     }
 
@@ -89,7 +89,7 @@ public class FilmService {
 
     public Collection<Integer> findLikes(int filmId) {
         log.info("Лайки к фильму найдены.");
-        return filmStorage.findLikes(filmId);
+        return filmStorage.findRating(filmId);
     }
 
     public Collection<Film> findByDirectorId(Integer directorId, SortType sortBy) {
