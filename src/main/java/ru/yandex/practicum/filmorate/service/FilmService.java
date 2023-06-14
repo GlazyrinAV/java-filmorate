@@ -91,7 +91,7 @@ public class FilmService {
 
     public Collection<Film> findByDirectorId(Integer directorId, SortType sortBy) {
         directorsService.findById(directorId);
-        if (!(sortBy.equals(SortType.year) || sortBy.equals(SortType.rating))) {
+        if (!(sortBy.equals(SortType.year) || sortBy.equals(SortType.score))) {
             throw new ValidationException("Недопустимый параметр сортировки.");
         }
 
