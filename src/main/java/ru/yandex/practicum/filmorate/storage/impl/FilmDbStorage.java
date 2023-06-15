@@ -221,40 +221,40 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public Collection<Film> searchByTitle(String query) {
-        String searchByTitle = "SELECT F.*, COUNT(FL.FILM_ID) AS LIKES_COUNT " +
+        String searchByTitle = "SELECT F.*, AVG(FL.SCORE) AS SCORE " +
                 "FROM FILMS AS F " +
                 "LEFT OUTER JOIN FILM_SCORE AS FL ON F.FILM_ID = FL.FILM_ID " +
                 "WHERE UPPER(F.NAME) LIKE UPPER(CONCAT('%', ?, '%')) " +
                 "GROUP BY F.FILM_ID " +
-                "ORDER BY F.FILM_ID DESC";
+                "ORDER BY SCORE DESC";
 
         return jdbcTemplate.query(searchByTitle, this::mapRowToFilm, query);
     }
 
     @Override
     public Collection<Film> searchByDirector(String query) {
-        String searchByDir = "SELECT F.*, COUNT(FL.FILM_ID) AS LIKES_COUNT " +
+        String searchByDir = "SELECT F.*, AVG(FL.SCORE) AS SCORE " +
                 "FROM FILMS F " +
                 "LEFT OUTER JOIN FILM_DIRECTOR FD ON F.FILM_ID = FD.FILM_ID " +
                 "LEFT OUTER JOIN DIRECTORS D ON FD.DIRECTOR_ID = D.DIRECTOR_ID " +
                 "LEFT OUTER JOIN FILM_SCORE FL ON F.FILM_ID = FL.FILM_ID " +
                 "WHERE UPPER(D.DIRECTOR_NAME) LIKE UPPER(CONCAT('%', ?, '%')) " +
                 "GROUP BY F.FILM_ID " +
-                "ORDER BY F.FILM_ID DESC";
+                "ORDER BY SCORE DESC";
 
         return jdbcTemplate.query(searchByDir, this::mapRowToFilm, query);
     }
 
     @Override
     public Collection<Film> searchByFilmAndDirector(String query) {
-        String search = "SELECT F.*, D.DIRECTOR_NAME, COUNT(FL.FILM_ID) AS LIKES_COUNT " +
+        String search = "SELECT F.*, D.DIRECTOR_NAME, AVG(FL.SCORE) AS SCORE " +
                 "FROM FILMS AS F " +
                 "LEFT OUTER JOIN FILM_DIRECTOR AS FD ON F.FILM_ID = FD.FILM_ID " +
                 "LEFT OUTER JOIN DIRECTORS AS D ON FD.DIRECTOR_ID = D.DIRECTOR_ID " +
                 "LEFT OUTER JOIN FILM_SCORE AS FL ON F.FILM_ID = FL.FILM_ID " +
                 "WHERE UPPER(F.NAME) LIKE UPPER(CONCAT('%', ?, '%')) OR UPPER(D.DIRECTOR_NAME) LIKE UPPER(CONCAT('%', ?, '%')) " +
                 "GROUP BY F.FILM_ID, D.DIRECTOR_NAME " +
-                "ORDER BY F.FILM_ID DESC";
+                "ORDER BY SCORE DESC";
 
         return jdbcTemplate.query(search, this::mapRowToFilm, query, query);
     }

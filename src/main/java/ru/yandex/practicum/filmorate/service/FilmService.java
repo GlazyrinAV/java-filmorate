@@ -86,7 +86,7 @@ public class FilmService {
 
     public Collection<Film> findByDirectorId(Integer directorId, SortType sortBy) {
         directorsService.findById(directorId);
-        if (!(sortBy.equals(SortType.year) || sortBy.equals(SortType.score))) {
+        if (!(sortBy.equals(SortType.year) || sortBy.equals(SortType.ratings))) {
             throw new ValidationException("Недопустимый параметр сортировки.");
         }
 
@@ -98,7 +98,7 @@ public class FilmService {
         film.setGenres(genresService.saveGenresToFilmFromDB(film.getId()));
         film.setMpa(mpaService.saveRatingToFilmFromDB(film.getId()));
         film.setDirectors(directorsService.saveDirectorsToFilmFromDB(film.getId()));
-        film.setScore(filmStorage.findScore(film.getId()));
+        film.setRating(filmStorage.findScore(film.getId()));
     }
 
     private void saveAdditionalInfoToDb(Film film, int filmId) {

@@ -314,7 +314,7 @@ class DirectorServiceTests {
     void findByDirectorIdNormalByScore() {
         Assertions.assertEquals("[Film(name=other film, description=other description, releaseDate=2000-04-30, duration=100, id=2, genres=[], mpa=Mpa(id=2, name=PG), directors=[Director(id=1, name=Director)], score=10.0), " +
                         "Film(name=film, description=description, releaseDate=1999-04-30, duration=100, id=1, genres=[], mpa=Mpa(id=1, name=G), directors=[Director(id=1, name=Director)], score=0.0)]",
-                filmService.findByDirectorId(1, SortType.score).toString(),
+                filmService.findByDirectorId(1, SortType.ratings).toString(),
                 "Ошибка при нормальном поиске фильмов по режиссеру.");
     }
 

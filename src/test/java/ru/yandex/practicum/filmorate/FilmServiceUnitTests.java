@@ -120,7 +120,7 @@ class FilmServiceUnitTests {
     @Test
     void addScoreNormal() {
         filmService.saveScore(scoreNormal);
-        Assertions.assertEquals("7.5", filmService.findById(2).getScore().toString(),
+        Assertions.assertEquals("7.5", filmService.findById(2).getRating().toString(),
                 "Ошибка при нормальном добавлении лайка.");
 
         List<Feed> feeds = new ArrayList<>(feedStorage.findFeed(1));
@@ -183,9 +183,9 @@ class FilmServiceUnitTests {
 
     @Test
     void removeScoreNormal() {
-        Assertions.assertEquals(7.5, filmService.findById(2).getScore());
+        Assertions.assertEquals(7.5, filmService.findById(2).getRating());
         filmService.removeScore(2, 2);
-        Assertions.assertEquals(10.0, filmService.findById(2).getScore(),
+        Assertions.assertEquals(10.0, filmService.findById(2).getRating(),
                 "Ошибка при нормальном удалении лайка.");
 
         List<Feed> feeds = new ArrayList<>(feedStorage.findFeed(2));
