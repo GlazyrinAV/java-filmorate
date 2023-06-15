@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.RequiredArgsConstructor;
 import ru.yandex.practicum.filmorate.customconstraints.releasedateconstraint.ReleaseDateConstraint;
 
 import javax.validation.constraints.NotBlank;
@@ -16,7 +15,6 @@ import java.util.List;
 
 @Data
 @AllArgsConstructor
-@RequiredArgsConstructor
 @Builder
 public class Film {
 
@@ -42,5 +40,5 @@ public class Film {
 
     private List<Director> directors;
 
-    private Double score;
+    private Double rating = 0.0;
 }

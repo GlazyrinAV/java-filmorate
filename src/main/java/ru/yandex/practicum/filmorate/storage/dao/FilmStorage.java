@@ -23,15 +23,15 @@ public interface FilmStorage {
 
     Collection<Film> findPopularByYear(int count, int year);
 
+    void removeFilm(int filmId);
+
+    Collection<Film> findByDirectorId(int directorId, SortType sortBy);
+
     void saveScore(int filmId, int userId, int score);
 
     void removeScore(int filmId, int userId);
 
-    Double findScore(int filmId);
-
-    void removeFilm(int filmId);
-
-    Collection<Film> findByDirectorId(int directorId, SortType sortBy);
+    Double findRating(int filmId);
 
     Collection<Film> findCommonFilms(int userId, int friendId);
 

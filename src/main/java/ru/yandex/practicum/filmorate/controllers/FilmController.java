@@ -44,13 +44,13 @@ public class FilmController {
         return filmService.findById(id);
     }
 
-    @PutMapping("/score")
+    @PutMapping("films/score")
     @ResponseStatus(HttpStatus.OK)
     public void saveScore(@Valid @RequestBody Score score) {
         filmService.saveScore(score);
     }
 
-    @DeleteMapping("/films/{id}/rating/{userId}")
+    @DeleteMapping("/films/{id}/score/{userId}")
     @ResponseStatus(HttpStatus.OK)
     public void removeScore(@PathVariable int id, @PathVariable int userId) {
         filmService.removeScore(id, userId);

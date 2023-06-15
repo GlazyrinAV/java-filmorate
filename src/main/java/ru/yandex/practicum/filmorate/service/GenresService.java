@@ -33,15 +33,15 @@ public class GenresService {
         return genre;
     }
 
-    public void saveGenresToDBFromFilm(Optional<List<Genre>> genres, int filmId) {
-        genres.ifPresent(genreList -> genresStorage.saveGenresToDBFromFilm(genreList, filmId));
+    public void save(Optional<List<Genre>> genres, int filmId) {
+        genres.ifPresent(genreList -> genresStorage.save(genreList, filmId));
     }
 
     public void removeFilmGenres(int filmId) {
         genresStorage.removeFilmGenres(filmId);
     }
 
-    public List<Genre> saveGenresToFilmFromDB(int filmId) {
-        return genresStorage.saveGenresToFilmFromDB(filmId);
+    public List<Genre> findByFilmId(int filmId) {
+        return genresStorage.findByFilmId(filmId);
     }
 }
