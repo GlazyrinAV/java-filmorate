@@ -110,7 +110,7 @@ public class FilmDbStorage implements FilmStorage {
                 "WHERE FG.GENRE_ID = ?\n" +
                 "AND EXTRACT(YEAR FROM CAST(F.RELEASE_DATE AS DATE)) = ?\n" +
                 "GROUP BY F.FILM_ID\n" +
-                "ORDER BY COUNT(FL.USER_ID) DESC\n" +
+                "ORDER BY AVG(FL.SCORE) DESC\n" +
                 "LIMIT ?";
         return jdbcTemplate.query(sql, this::mapRowToFilm, genreId, year, count);
     }
@@ -123,7 +123,7 @@ public class FilmDbStorage implements FilmStorage {
                 "LEFT JOIN FILM_SCORE AS FL ON F.FILM_ID = FL.FILM_ID\n" +
                 "WHERE FG.GENRE_ID = ?\n" +
                 "GROUP BY F.FILM_ID\n" +
-                "ORDER BY COUNT(FL.USER_ID) DESC\n" +
+                "ORDER BY AVG(FL.SCORE) DESC\n" +
                 "LIMIT ?";
         return jdbcTemplate.query(sql, this::mapRowToFilm, genreId, count);
     }
@@ -136,7 +136,7 @@ public class FilmDbStorage implements FilmStorage {
                 "LEFT JOIN FILM_SCORE AS FL ON F.FILM_ID = FL.FILM_ID\n" +
                 "WHERE EXTRACT(YEAR FROM CAST(F.RELEASE_DATE AS DATE)) = ?\n" +
                 "GROUP BY F.FILM_ID\n" +
-                "ORDER BY COUNT(FL.USER_ID) DESC\n" +
+                "ORDER BY AVG(FL.SCORE) DESC\n" +
                 "LIMIT ?";
         return jdbcTemplate.query(sql, this::mapRowToFilm, year, count);
     }
