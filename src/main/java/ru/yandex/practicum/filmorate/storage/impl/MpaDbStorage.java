@@ -31,7 +31,7 @@ public class MpaDbStorage implements MpaStorage {
     }
 
     @Override
-    public Mpa saveRatingToFilmFromDB(int filmId) {
+    public Mpa findByFilmId(int filmId) {
         String sqlQuery = "SELECT R.MPA_ID, R.MPA_NAME FROM MPA AS R " +
                 "JOIN FILMS F ON R.MPA_ID = F.MPA_ID WHERE F.FILM_ID = ?";
         return jdbcTemplate.queryForObject(sqlQuery, this::mapRowToMpa, filmId);

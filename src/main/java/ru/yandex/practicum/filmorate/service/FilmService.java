@@ -26,7 +26,7 @@ public class FilmService {
 
     public Film saveNew(Film film) {
         int filmId = filmStorage.saveNew(film);
-        saveAdditionalInfoToDb(film, filmId);
+        saveAdditionalInfo(film, filmId);
         return findById(filmId);
     }
 
@@ -34,18 +34,18 @@ public class FilmService {
         int filmId = filmStorage.update(film);
         genresService.removeFilmGenres(filmId);
         directorsService.removeFromFilmByFilmId(filmId);
-        saveAdditionalInfoToDb(film, filmId);
+        saveAdditionalInfo(film, filmId);
         return findById(filmId);
     }
 
     public Collection<Film> findAll() {
-        return filmStorage.findAll().stream().peek(this::saveAdditionalInfoFromDb).collect(Collectors.toList());
+        return filmStorage.findAll().stream().peek(this::findAdditionalInfo).collect(Collectors.toList());
     }
 
     public Film findById(int filmId) {
         Film film;
         film = filmStorage.findById(filmId);
-        saveAdditionalInfoFromDb(film);
+        findAdditionalInfo(film);
         return film;
     }
 
@@ -80,7 +80,7 @@ public class FilmService {
         }
 
         log.info("Популярные фильмы найдены.");
-        return films.stream().peek(this::saveAdditionalInfoFromDb).collect(Collectors.toList());
+        return films.stream().peek(this::findAdditionalInfo).collect(Collectors.toList());
     }
 
     public Collection<Film> findByDirectorId(Integer directorId, SortType sortBy) {
@@ -89,20 +89,20 @@ public class FilmService {
             throw new ValidationException("Недопустимый параметр сортировки.");
         }
 
-        return filmStorage.findByDirectorId(directorId, sortBy).stream().peek(this::saveAdditionalInfoFromDb)
+        return filmStorage.findByDirectorId(directorId, sortBy).stream().peek(this::findAdditionalInfo)
                 .collect(Collectors.toList());
     }
 
-    private void saveAdditionalInfoFromDb(Film film) {
-        film.setGenres(genresService.saveGenresToFilmFromDB(film.getId()));
-        film.setMpa(mpaService.saveRatingToFilmFromDB(film.getId()));
-        film.setDirectors(directorsService.saveDirectorsToFilmFromDB(film.getId()));
-        film.setRating(filmStorage.findScore(film.getId()));
+    private void findAdditionalInfo(Film film) {
+        film.setGenres(genresService.findByFilmId(film.getId()));
+        film.setMpa(mpaService.findByFilmId(film.getId()));
+        film.setDirectors(directorsService.findByFilmId(film.getId()));
+        film.setRating(filmStorage.findRating(film.getId()));
     }
 
-    private void saveAdditionalInfoToDb(Film film, int filmId) {
-        genresService.saveGenresToDBFromFilm(Optional.ofNullable(film.getGenres()), filmId);
-        directorsService.saveDirectorsToDBFromFilm(Optional.ofNullable(film.getDirectors()), filmId);
+    private void saveAdditionalInfo(Film film, int filmId) {
+        genresService.save(Optional.ofNullable(film.getGenres()), filmId);
+        directorsService.save(Optional.ofNullable(film.getDirectors()), filmId);
     }
 
     public void removeFilm(int filmId) {
@@ -120,7 +120,7 @@ public class FilmService {
         userService.findById(intUserId);
         userService.findById(intFriendId);
 
-        return filmStorage.findCommonFilms(intUserId, intFriendId).stream().peek(this::saveAdditionalInfoFromDb)
+        return filmStorage.findCommonFilms(intUserId, intFriendId).stream().peek(this::findAdditionalInfo)
                 .collect(Collectors.toList());
     }
 
@@ -133,7 +133,7 @@ public class FilmService {
             log.info("Рекомендации по указанном пользователю найдены.");
         }
 
-        return films.stream().peek(this::saveAdditionalInfoFromDb)
+        return films.stream().peek(this::findAdditionalInfo)
                 .collect(Collectors.toList());
     }
 
@@ -158,7 +158,7 @@ public class FilmService {
         } else {
             log.info("Фильмы по поиску найдены.");
             for (Film film : films) {
-                saveAdditionalInfoFromDb(film);
+                findAdditionalInfo(film);
             }
         }
         return films;

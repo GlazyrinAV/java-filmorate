@@ -19,7 +19,7 @@ public class GenresDbStorage implements GenresStorage {
     private final JdbcTemplate jdbcTemplate;
 
     @Override
-    public void saveGenresToDBFromFilm(List<Genre> genres, int filmId) {
+    public void save(List<Genre> genres, int filmId) {
         String sqlQueryForGenres = "MERGE INTO film_genres (film_id, genre_id) VALUES (?, ?)";
         jdbcTemplate.batchUpdate(sqlQueryForGenres, genres, genres.size(), (ps, genre) -> {
             ps.setInt(1, filmId);
@@ -34,7 +34,7 @@ public class GenresDbStorage implements GenresStorage {
     }
 
     @Override
-    public List<Genre> saveGenresToFilmFromDB(int filmId) {
+    public List<Genre> findByFilmId(int filmId) {
         String sqlQuery = "SELECT FG.GENRE_ID, G2.GENRE_NAME " +
                 "FROM FILM_GENRES AS FG JOIN GENRES G2 on G2.GENRE_ID = FG.GENRE_ID WHERE FILM_ID = ?";
         return jdbcTemplate.query(sqlQuery, this::mapRowToGenre, filmId);

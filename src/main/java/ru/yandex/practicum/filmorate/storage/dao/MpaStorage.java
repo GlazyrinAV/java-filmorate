@@ -10,5 +10,5 @@ public interface MpaStorage {
 
     Mpa findById(int ratingId);
 
-    Mpa saveRatingToFilmFromDB(int filmId);
+    Mpa findByFilmId(int filmId);
 }

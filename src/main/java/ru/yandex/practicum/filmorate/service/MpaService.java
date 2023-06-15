@@ -31,7 +31,7 @@ public class MpaService {
         return rating;
     }
 
-    public Mpa saveRatingToFilmFromDB(int filmId) {
-        return mpaStorage.saveRatingToFilmFromDB(filmId);
+    public Mpa findByFilmId(int filmId) {
+        return mpaStorage.findByFilmId(filmId);
     }
 }

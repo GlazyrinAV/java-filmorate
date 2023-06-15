@@ -31,7 +31,7 @@ public interface FilmStorage {
 
     void removeScore(int filmId, int userId);
 
-    Double findScore(int filmId);
+    Double findRating(int filmId);
 
     Collection<Film> findCommonFilms(int userId, int friendId);
 
