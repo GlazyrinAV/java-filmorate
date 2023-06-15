@@ -299,7 +299,6 @@ class FilmServiceUnitTests {
                 () -> filmService.findCommonFilms(Optional.of(userId), Optional.of(2)));
         Assertions.assertEquals(exception.getMessage(), "Пользователь c ID " + userId + " не найден.",
                 "Ошибка при поиске общих фильмов c ид юзера " + userId + ".");
-
     }
 
     @ParameterizedTest
@@ -309,6 +308,89 @@ class FilmServiceUnitTests {
                 () -> filmService.findCommonFilms(Optional.of(1), Optional.of(friendId)));
         Assertions.assertEquals(exception.getMessage(), "Пользователь c ID " + friendId + " не найден.",
                 "Ошибка при посике общих фильмов c ид друга " + friendId + ".");
+    }
+
+    @Test
+    void findPopularByGenreAndYearNormal() {
+
+    }
+
+    @Test
+    void findPopularByGenreAndYearNull() {
+
+    }
+
+    @ParameterizedTest
+    @MethodSource("wrongIdParameters")
+    void findPopularByGenreAndYearWrongGenre() {
+
+    }
+
+    @ParameterizedTest
+    @MethodSource("wrongIdParameters")
+    void findPopularByGenreAndYearWrongYear() {
+
+    }
+
+    @Test
+    void findPopularByGenreAndYearCountNegative() {
+
+    }
+
+    @Test
+    void findPopularByGenreAndYearCountZero() {
+
+    }
+
+    @Test
+    void findPopularByGenreNormal() {
+
+    }
+
+    @Test
+    void findPopularByGenreNormalNull() {
+
+    }
+
+    @ParameterizedTest
+    @MethodSource("wrongIdParameters")
+    void findPopularByGenreWrongGenre() {
+
+    }
+
+    @Test
+    void findPopularByGenreCountNegative() {
+
+    }
+
+    @Test
+    void findPopularByGenreCountZero() {
+
+    }
+
+    @Test
+    void findPopularByYearNormal() {
+
+    }
+
+    @Test
+    void findPopularByYearNormalNull() {
+
+    }
+
+    @ParameterizedTest
+    @MethodSource("wrongIdParameters")
+    void findPopularByYearWrongYear() {
+
+    }
+
+    @Test
+    void findPopularByYearCountNegative() {
+
+    }
+
+    @Test
+    void findPopularByYearCountZero() {
 
     }
 }
