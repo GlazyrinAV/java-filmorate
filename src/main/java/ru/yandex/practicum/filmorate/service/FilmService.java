@@ -3,7 +3,6 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exceptions.exceptions.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.*;
 import ru.yandex.practicum.filmorate.storage.dao.FeedStorage;
@@ -152,7 +151,7 @@ public class FilmService {
                 films = filmStorage.searchByFilmAndDirector(query);
                 break;
             default:
-                throw new FilmNotFoundException("Недопустимый параметр запроса. Поиск по" + by + "еще не реализован.");
+                throw new ValidationException("Недопустимый параметр запроса. Поиск по" + by + " еще не реализован.");
         }
         if (films.isEmpty()) {
             log.info("Фильмы не найдены.");

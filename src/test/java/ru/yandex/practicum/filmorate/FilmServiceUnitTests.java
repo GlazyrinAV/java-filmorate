@@ -439,51 +439,80 @@ class FilmServiceUnitTests {
 
     @Test
     void searchByFilmAndDirectorNormalTitleOnly() {
-
+        Assertions.assertEquals("[Film(name=final film, description=final description, releaseDate=1987-04-22, duration=100, id=4, genres=[], mpa=Mpa(id=2, name=PG), directors=[], rating=3.0)]",
+                filmService.searchByFilmAndDirector("FiNaL", "title").toString(),
+                "Ошибка при нормальном поиске по названию.");
     }
 
     @Test
     void searchByFilmAndDirectorNormalDirectorOnly() {
-
+        Assertions.assertEquals("[Film(name=second film, description=second description, releaseDate=2000-04-22, duration=100, id=2, genres=[Genre(id=1, name=Комедия)], mpa=Mpa(id=1, name=G), directors=[Director(id=2, name=Other Director)], rating=7.5), " +
+                        "Film(name=third film, description=third description, releaseDate=1976-04-22, duration=100, id=3, genres=[], mpa=Mpa(id=3, name=PG-13), directors=[Director(id=3, name=Other Man)], rating=0.0)]",
+                filmService.searchByFilmAndDirector("OthER", "director").toString(),
+                "Ошибка при нормальном поиске по режиссеру.");
     }
 
     @Test
     void searchByFilmAndDirectorNormalDirectorTitle() {
-
+        Assertions.assertEquals("[Film(name=second film, description=second description, releaseDate=2000-04-22, duration=100, id=2, genres=[Genre(id=1, name=Комедия)], mpa=Mpa(id=1, name=G), directors=[Director(id=2, name=Other Director)], rating=7.5), " +
+                        "Film(name=third film, description=third description, releaseDate=1976-04-22, duration=100, id=3, genres=[], mpa=Mpa(id=3, name=PG-13), directors=[Director(id=3, name=Other Man)], rating=0.0)]",
+                filmService.searchByFilmAndDirector("Th", "director,title").toString(),
+                "Ошибка при нормальном поиске по режиссеру-названию.");
     }
 
     @Test
     void searchByFilmAndDirectorNormalTitleDirector() {
-
+        Assertions.assertEquals("[Film(name=second film, description=second description, releaseDate=2000-04-22, duration=100, id=2, genres=[Genre(id=1, name=Комедия)], mpa=Mpa(id=1, name=G), directors=[Director(id=2, name=Other Director)], rating=7.5), " +
+                        "Film(name=third film, description=third description, releaseDate=1976-04-22, duration=100, id=3, genres=[], mpa=Mpa(id=3, name=PG-13), directors=[Director(id=3, name=Other Man)], rating=0.0)]",
+                filmService.searchByFilmAndDirector("Th", "title,director").toString(),
+                "Ошибка при нормальном поиске по названию-режиссеру.");
     }
 
     @Test
     void searchByFilmAndDirectorNormalTitleOnlyNull() {
-
+        Assertions.assertEquals("[]",
+                filmService.searchByFilmAndDirector("FiRsT", "title").toString(),
+                "Ошибка при нормальном пустом поиске по названию.");
     }
 
     @Test
     void searchByFilmAndDirectorNormalDirectorOnlyNull() {
-
+        Assertions.assertEquals("[]",
+                filmService.searchByFilmAndDirector("Tarantino", "director").toString(),
+                "Ошибка при нормальном пустом поиске по режиссеру.");
     }
 
     @Test
     void searchByFilmAndDirectorNormalDirectorTitleNull() {
-
+        Assertions.assertEquals("[]",
+                filmService.searchByFilmAndDirector("AA", "director,title").toString(),
+                "Ошибка при нормальном пустом поиске по режиссеру-названию.");
     }
 
     @Test
     void searchByFilmAndDirectorNormalTitleDirectorNull() {
-
+        Assertions.assertEquals("[]",
+                filmService.searchByFilmAndDirector("AA", "title,director").toString(),
+                "Ошибка при нормальном пустом поиске по названию-режиссеру.");
     }
 
     @Test
     void searchByFilmAndDirectorArgument() {
-
+        ValidationException exception = Assertions.assertThrows(ValidationException.class,
+                () -> filmService.searchByFilmAndDirector("OthER", "title,AA")
+                );
+        Assertions.assertEquals("Недопустимый параметр запроса. Поиск поtitle,AA еще не реализован.",
+                exception.getMessage(),
+                "Ошибка при поиске по несуществующему аргументу.");
     }
 
     @Test
     void searchByFilmAndDirectorQueryNull() {
-
+        Assertions.assertEquals("[Film(name=second film, description=second description, releaseDate=2000-04-22, duration=100, id=2, genres=[Genre(id=1, name=Комедия)], mpa=Mpa(id=1, name=G), directors=[Director(id=2, name=Other Director)], rating=7.5), " +
+                        "Film(name=final film, description=final description, releaseDate=1987-04-22, duration=100, id=4, genres=[], mpa=Mpa(id=2, name=PG), directors=[], rating=3.0), " +
+                        "Film(name=new film, description=new description, releaseDate=2000-04-22, duration=100, id=1, genres=[Genre(id=1, name=Комедия)], mpa=Mpa(id=1, name=G), directors=[Director(id=1, name=Director)], rating=0.0), " +
+                        "Film(name=third film, description=third description, releaseDate=1976-04-22, duration=100, id=3, genres=[], mpa=Mpa(id=3, name=PG-13), directors=[Director(id=3, name=Other Man)], rating=0.0)]",
+                filmService.searchByFilmAndDirector(null, "title,director").toString(),
+                "Ошибка при поиске по названию-режиссеруп по пустой строке.");
     }
 }
