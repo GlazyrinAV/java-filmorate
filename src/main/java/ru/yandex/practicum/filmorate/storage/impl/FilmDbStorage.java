@@ -192,10 +192,10 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public Collection<Film> findCommonFilms(int userId, int friendId) {
-        String sqlQuery = "SELECT FILMS.FILM_ID, FILMS.NAME, FILMS.DESCRIPTION, FILMS.DURATION, FILMS.RELEASE_DATE, COUNT(FL.USER_ID) " +
-                " FROM FILMS LEFT JOIN FILM_SCORE FL on FILMS.FILM_ID = FL.FILM_ID WHERE Films.FILM_ID in (select FILM_ID from  FILM_SCORE " +
+        String sqlQuery = "SELECT FILMS.FILM_ID, FILMS.NAME, FILMS.DESCRIPTION, FILMS.DURATION, FILMS.RELEASE_DATE, AVG(FS.SCORE) AS SCORE " +
+                " FROM FILMS LEFT JOIN FILM_SCORE FS on FILMS.FILM_ID = FS.FILM_ID WHERE Films.FILM_ID in (select FILM_ID from  FILM_SCORE " +
                 " where USER_ID = ? AND FILM_ID in (select FILM_ID from FILM_SCORE where USER_ID = ?))" +
-                "GROUP BY FILMS.FILM_ID ORDER BY COUNT(FL.USER_ID) desc ";
+                "GROUP BY FILMS.FILM_ID ORDER BY SCORE DESC";
 
         return jdbcTemplate.query(sqlQuery, this::mapRowToFilm, userId, friendId);
     }

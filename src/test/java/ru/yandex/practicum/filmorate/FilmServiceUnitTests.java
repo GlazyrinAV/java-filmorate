@@ -49,6 +49,10 @@ class FilmServiceUnitTests {
         );
     }
 
+    static Stream<Integer> wrongIdParameters() {
+        return Stream.of(-1, 0, 99);
+    }
+
     private final static Score scoreNormal = new Score(1, 1, 5);
     private final static Score scoreZeroFilmId = new Score(0, 1, 5);
     private final static Score scoreNegativeFilmId = new Score(-1, 1, 5);
@@ -84,8 +88,9 @@ class FilmServiceUnitTests {
     @Test
     void getAllFilmsNormal() {
         Assertions.assertEquals("[Film(name=new film, description=new description, releaseDate=2000-04-22, duration=100, id=1, genres=[], mpa=Mpa(id=1, name=G), directors=[], score=0.0), " +
-                        "Film(name=second film, description=second description, releaseDate=2000-04-22, duration=100, id=2, genres=[], mpa=Mpa(id=1, name=G), directors=[], score=5.0), " +
-                        "Film(name=third film, description=third description, releaseDate=2000-04-22, duration=100, id=3, genres=[], mpa=Mpa(id=1, name=G), directors=[], score=0.0)]", filmService.findAll().toString(),
+                        "Film(name=second film, description=second description, releaseDate=1999-04-22, duration=100, id=2, genres=[], mpa=Mpa(id=1, name=G), directors=[], score=7.5), " +
+                        "Film(name=third film, description=third description, releaseDate=1976-04-22, duration=100, id=3, genres=[], mpa=Mpa(id=3, name=PG-13), directors=[], score=0.0), Film(name=final film, description=final description, releaseDate=1987-04-22, duration=100, id=4, genres=[], mpa=Mpa(id=2, name=PG), directors=[], score=3.0)]",
+                filmService.findAll().toString(),
                 "Ошибка при получении из хранилища существующего фильма.");
     }
 
@@ -115,7 +120,7 @@ class FilmServiceUnitTests {
     @Test
     void addScoreNormal() {
         filmService.saveScore(scoreNormal);
-        Assertions.assertEquals("5.0", filmService.findById(2).getScore().toString(),
+        Assertions.assertEquals("7.5", filmService.findById(2).getScore().toString(),
                 "Ошибка при нормальном добавлении лайка.");
 
         List<Feed> feeds = new ArrayList<>(feedStorage.findFeed(1));
@@ -178,8 +183,9 @@ class FilmServiceUnitTests {
 
     @Test
     void removeScoreNormal() {
+        Assertions.assertEquals(7.5, filmService.findById(2).getScore());
         filmService.removeScore(2, 2);
-        Assertions.assertEquals(0.0, filmService.findById(2).getScore(),
+        Assertions.assertEquals(10.0, filmService.findById(2).getScore(),
                 "Ошибка при нормальном удалении лайка.");
 
         List<Feed> feeds = new ArrayList<>(feedStorage.findFeed(2));
@@ -242,17 +248,17 @@ class FilmServiceUnitTests {
 
     @Test
     void findPopularNormalWithCount() {
-        Assertions.assertEquals(filmService.findPopular(1, Optional.empty(), Optional.empty()).toString(),
-                "[Film(name=second film, description=second description, releaseDate=2000-04-22, duration=100, id=2, genres=[], mpa=Mpa(id=1, name=G), directors=[], score=5.0)]",
+        Assertions.assertEquals("[Film(name=second film, description=second description, releaseDate=1999-04-22, duration=100, id=2, genres=[], mpa=Mpa(id=1, name=G), directors=[], score=7.5)]",
+                filmService.findPopular(1, Optional.empty(), Optional.empty()).toString(),
                 "Ошибка при получении списка из 1 популярных фильмов.");
     }
 
     @Test
     void findPopularNormalWithNoCount() {
-        Assertions.assertEquals(filmService.findPopular(10, Optional.empty(), Optional.empty()).toString(),
-                "[Film(name=second film, description=second description, releaseDate=2000-04-22, duration=100, id=2, genres=[], mpa=Mpa(id=1, name=G), directors=[], score=5.0), " +
-                        "Film(name=new film, description=new description, releaseDate=2000-04-22, duration=100, id=1, genres=[], mpa=Mpa(id=1, name=G), directors=[], score=0.0), " +
-                        "Film(name=third film, description=third description, releaseDate=2000-04-22, duration=100, id=3, genres=[], mpa=Mpa(id=1, name=G), directors=[], score=0.0)]",
+        Assertions.assertEquals("[Film(name=second film, description=second description, releaseDate=1999-04-22, duration=100, id=2, genres=[], mpa=Mpa(id=1, name=G), directors=[], score=7.5), " +
+                        "Film(name=final film, description=final description, releaseDate=1987-04-22, duration=100, id=4, genres=[], mpa=Mpa(id=2, name=PG), directors=[], score=3.0), " +
+                        "Film(name=new film, description=new description, releaseDate=2000-04-22, duration=100, id=1, genres=[], mpa=Mpa(id=1, name=G), directors=[], score=0.0), Film(name=third film, description=third description, releaseDate=1976-04-22, duration=100, id=3, genres=[], mpa=Mpa(id=3, name=PG-13), directors=[], score=0.0)]",
+                filmService.findPopular(10, Optional.empty(), Optional.empty()).toString(),
                 "Ошибка при нормальном получении списка из 10 пополурных фильмов.");
     }
 
@@ -269,5 +275,40 @@ class FilmServiceUnitTests {
                 () -> filmService.findPopular(-1, Optional.empty(), Optional.empty()));
         Assertions.assertEquals("Значение выводимых фильмов не может быть меньше или равно нулю.", exception.getMessage(),
                 "Ошибка при получении ошибки получения популярных -1 фильмов");
+    }
+
+    @Test
+    void findCommonFilmsNormalNull() {
+        Assertions.assertEquals(filmService.findCommonFilms(Optional.of(1), Optional.of(3)).toString(), "[]",
+                "Ошибка в нормальном получени пустых общих фильмов.");
+    }
+
+
+    @Test
+    void findCommonFilmsNormal() {
+        Assertions.assertEquals("[Film(name=second film, description=second description, releaseDate=1999-04-22, duration=100, id=2, genres=[], mpa=Mpa(id=1, name=G), directors=[], score=7.5), " +
+                        "Film(name=final film, description=final description, releaseDate=1987-04-22, duration=100, id=4, genres=[], mpa=Mpa(id=2, name=PG), directors=[], score=3.0)]",
+                filmService.findCommonFilms(Optional.of(1), Optional.of(2)).toString(),
+                "Ошибка в нормальном получени общих фильмов.");
+    }
+
+    @ParameterizedTest
+    @MethodSource("wrongIdParameters")
+    void findCommonFilmsWrongUserId(int userId) {
+        UserNotFoundException exception = Assertions.assertThrows(UserNotFoundException.class,
+                () -> filmService.findCommonFilms(Optional.of(userId), Optional.of(2)));
+        Assertions.assertEquals(exception.getMessage(), "Пользователь c ID " + userId + " не найден.",
+                "Ошибка при поиске общих фильмов c ид юзера " + userId + ".");
+
+    }
+
+    @ParameterizedTest
+    @MethodSource("wrongIdParameters")
+    void findCommonFilmsWrongFriendId(int friendId) {
+        UserNotFoundException exception = Assertions.assertThrows(UserNotFoundException.class,
+                () -> filmService.findCommonFilms(Optional.of(1), Optional.of(friendId)));
+        Assertions.assertEquals(exception.getMessage(), "Пользователь c ID " + friendId + " не найден.",
+                "Ошибка при посике общих фильмов c ид друга " + friendId + ".");
+
     }
 }
