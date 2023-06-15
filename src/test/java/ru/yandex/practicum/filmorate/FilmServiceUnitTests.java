@@ -87,17 +87,17 @@ class FilmServiceUnitTests {
 
     @Test
     void getAllFilmsNormal() {
-        Assertions.assertEquals("[Film(name=new film, description=new description, releaseDate=2000-04-22, duration=100, id=1, genres=[], mpa=Mpa(id=1, name=G), directors=[], score=0.0), " +
-                        "Film(name=second film, description=second description, releaseDate=1999-04-22, duration=100, id=2, genres=[], mpa=Mpa(id=1, name=G), directors=[], score=7.5), " +
-                        "Film(name=third film, description=third description, releaseDate=1976-04-22, duration=100, id=3, genres=[], mpa=Mpa(id=3, name=PG-13), directors=[], score=0.0), Film(name=final film, description=final description, releaseDate=1987-04-22, duration=100, id=4, genres=[], mpa=Mpa(id=2, name=PG), directors=[], score=3.0)]",
+        Assertions.assertEquals("[Film(name=new film, description=new description, releaseDate=2000-04-22, duration=100, id=1, genres=[Genre(id=1, name=Комедия)], mpa=Mpa(id=1, name=G), directors=[], score=0.0), " +
+                        "Film(name=second film, description=second description, releaseDate=2000-04-22, duration=100, id=2, genres=[Genre(id=1, name=Комедия)], mpa=Mpa(id=1, name=G), directors=[], score=7.5), " +
+                        "Film(name=third film, description=third description, releaseDate=1976-04-22, duration=100, id=3, genres=[], mpa=Mpa(id=3, name=PG-13), directors=[], score=0.0), " +
+                        "Film(name=final film, description=final description, releaseDate=1987-04-22, duration=100, id=4, genres=[], mpa=Mpa(id=2, name=PG), directors=[], score=3.0)]",
                 filmService.findAll().toString(),
                 "Ошибка при получении из хранилища существующего фильма.");
     }
 
     @Test
     void findByIdFilmNormal() {
-        Assertions.assertEquals("Film(name=new film, description=new description, releaseDate=2000-04-22, " +
-                        "duration=100, id=1, genres=[], mpa=Mpa(id=1, name=G), directors=[], score=0.0)",
+        Assertions.assertEquals("Film(name=new film, description=new description, releaseDate=2000-04-22, duration=100, id=1, genres=[Genre(id=1, name=Комедия)], mpa=Mpa(id=1, name=G), directors=[], score=0.0)",
                 filmService.findById(1).toString(),
                 "Ошибка при получении из хранилища существующего фильма.");
     }
@@ -248,16 +248,17 @@ class FilmServiceUnitTests {
 
     @Test
     void findPopularNormalWithCount() {
-        Assertions.assertEquals("[Film(name=second film, description=second description, releaseDate=1999-04-22, duration=100, id=2, genres=[], mpa=Mpa(id=1, name=G), directors=[], score=7.5)]",
+        Assertions.assertEquals("[Film(name=second film, description=second description, releaseDate=2000-04-22, duration=100, id=2, genres=[Genre(id=1, name=Комедия)], mpa=Mpa(id=1, name=G), directors=[], score=7.5)]",
                 filmService.findPopular(1, Optional.empty(), Optional.empty()).toString(),
                 "Ошибка при получении списка из 1 популярных фильмов.");
     }
 
     @Test
     void findPopularNormalWithNoCount() {
-        Assertions.assertEquals("[Film(name=second film, description=second description, releaseDate=1999-04-22, duration=100, id=2, genres=[], mpa=Mpa(id=1, name=G), directors=[], score=7.5), " +
+        Assertions.assertEquals("[Film(name=second film, description=second description, releaseDate=2000-04-22, duration=100, id=2, genres=[Genre(id=1, name=Комедия)], mpa=Mpa(id=1, name=G), directors=[], score=7.5), " +
                         "Film(name=final film, description=final description, releaseDate=1987-04-22, duration=100, id=4, genres=[], mpa=Mpa(id=2, name=PG), directors=[], score=3.0), " +
-                        "Film(name=new film, description=new description, releaseDate=2000-04-22, duration=100, id=1, genres=[], mpa=Mpa(id=1, name=G), directors=[], score=0.0), Film(name=third film, description=third description, releaseDate=1976-04-22, duration=100, id=3, genres=[], mpa=Mpa(id=3, name=PG-13), directors=[], score=0.0)]",
+                        "Film(name=new film, description=new description, releaseDate=2000-04-22, duration=100, id=1, genres=[Genre(id=1, name=Комедия)], mpa=Mpa(id=1, name=G), directors=[], score=0.0), " +
+                        "Film(name=third film, description=third description, releaseDate=1976-04-22, duration=100, id=3, genres=[], mpa=Mpa(id=3, name=PG-13), directors=[], score=0.0)]",
                 filmService.findPopular(10, Optional.empty(), Optional.empty()).toString(),
                 "Ошибка при нормальном получении списка из 10 пополурных фильмов.");
     }
@@ -286,7 +287,7 @@ class FilmServiceUnitTests {
 
     @Test
     void findCommonFilmsNormal() {
-        Assertions.assertEquals("[Film(name=second film, description=second description, releaseDate=1999-04-22, duration=100, id=2, genres=[], mpa=Mpa(id=1, name=G), directors=[], score=7.5), " +
+        Assertions.assertEquals("[Film(name=second film, description=second description, releaseDate=2000-04-22, duration=100, id=2, genres=[Genre(id=1, name=Комедия)], mpa=Mpa(id=1, name=G), directors=[], score=7.5), " +
                         "Film(name=final film, description=final description, releaseDate=1987-04-22, duration=100, id=4, genres=[], mpa=Mpa(id=2, name=PG), directors=[], score=3.0)]",
                 filmService.findCommonFilms(Optional.of(1), Optional.of(2)).toString(),
                 "Ошибка в нормальном получени общих фильмов.");
@@ -312,85 +313,127 @@ class FilmServiceUnitTests {
 
     @Test
     void findPopularByGenreAndYearNormal() {
-
+        Assertions.assertEquals("[Film(name=second film, description=second description, releaseDate=2000-04-22, duration=100, id=2, genres=[Genre(id=1, name=Комедия)], mpa=Mpa(id=1, name=G), directors=[], score=7.5), " +
+                        "Film(name=new film, description=new description, releaseDate=2000-04-22, duration=100, id=1, genres=[Genre(id=1, name=Комедия)], mpa=Mpa(id=1, name=G), directors=[], score=0.0)]",
+                filmService.findPopular(5, Optional.of(1), Optional.of(2000)).toString(),
+                "Ошибка при нормальном получении популярных фильмов.");
     }
 
     @Test
     void findPopularByGenreAndYearNull() {
-
+        Assertions.assertEquals("[]", filmService.findPopular(5, Optional.of(2), Optional.of(2000)).toString(),
+                "Ошибка при нормальном получении пустого списка популярных фильмов.");
     }
 
     @ParameterizedTest
     @MethodSource("wrongIdParameters")
-    void findPopularByGenreAndYearWrongGenre() {
-
+    void findPopularByGenreAndYearWrongGenre(int genre) {
+        Assertions.assertEquals("[]", filmService.findPopular(5, Optional.of(genre), Optional.of(2000)).toString(),
+                "Ошибка при поиске популярных фильмов по жанру " + genre);
     }
 
     @ParameterizedTest
     @MethodSource("wrongIdParameters")
-    void findPopularByGenreAndYearWrongYear() {
-
+    void findPopularByGenreAndYearWrongYear(int year) {
+        Assertions.assertEquals("[]", filmService.findPopular(5, Optional.of(1), Optional.of(year)).toString(),
+                "Ошибка при поиске популярных фильмов по году " + year);
     }
 
     @Test
     void findPopularByGenreAndYearCountNegative() {
-
+        ValidationException exception = Assertions.assertThrows(ValidationException.class,
+                () -> filmService.findPopular(-1, Optional.of(1), Optional.of(2000))
+        );
+        Assertions.assertEquals("Значение выводимых фильмов не может быть меньше или равно нулю.", exception.getMessage(),
+                "Ошибка при поиске популярных фильмов с отрицательным счетчиком.");
     }
 
     @Test
     void findPopularByGenreAndYearCountZero() {
-
+        ValidationException exception = Assertions.assertThrows(ValidationException.class,
+                () -> filmService.findPopular(0, Optional.of(1), Optional.of(2000))
+        );
+        Assertions.assertEquals("Значение выводимых фильмов не может быть меньше или равно нулю.", exception.getMessage(),
+                "Ошибка при поиске популярных фильмов с нулевым счетчиком.");
     }
 
     @Test
     void findPopularByGenreNormal() {
-
+        Assertions.assertEquals("[Film(name=second film, description=second description, releaseDate=2000-04-22, duration=100, id=2, genres=[Genre(id=1, name=Комедия)], mpa=Mpa(id=1, name=G), directors=[], score=7.5), " +
+                        "Film(name=new film, description=new description, releaseDate=2000-04-22, duration=100, id=1, genres=[Genre(id=1, name=Комедия)], mpa=Mpa(id=1, name=G), directors=[], score=0.0)]",
+                filmService.findPopular(5, Optional.of(1), Optional.empty()).toString(),
+                "Ошибка при нормально получении популярных фильмов по жанру.");
     }
 
     @Test
     void findPopularByGenreNormalNull() {
-
+        Assertions.assertEquals("[]",
+                filmService.findPopular(5, Optional.of(2), Optional.empty()).toString(),
+                "Ошибка при нормально получении пустого листа популярных фильмов по жанру.");
     }
 
     @ParameterizedTest
     @MethodSource("wrongIdParameters")
-    void findPopularByGenreWrongGenre() {
-
+    void findPopularByGenreWrongGenre(int genre) {
+        Assertions.assertEquals("[]", filmService.findPopular(5, Optional.of(genre), Optional.empty()).toString(),
+                "Ошибка при поиске популярных фильмов по жанру " + genre);
     }
 
     @Test
     void findPopularByGenreCountNegative() {
-
+        ValidationException exception = Assertions.assertThrows(ValidationException.class,
+                () -> filmService.findPopular(-1, Optional.of(1), Optional.empty())
+        );
+        Assertions.assertEquals("Значение выводимых фильмов не может быть меньше или равно нулю.", exception.getMessage(),
+                "Ошибка при поиске популярных фильмов по жанру с отрицательным счетчиком.");
     }
 
     @Test
     void findPopularByGenreCountZero() {
-
+        ValidationException exception = Assertions.assertThrows(ValidationException.class,
+                () -> filmService.findPopular(0, Optional.of(1), Optional.empty())
+        );
+        Assertions.assertEquals("Значение выводимых фильмов не может быть меньше или равно нулю.", exception.getMessage(),
+                "Ошибка при поиске популярных фильмов по жанру с нулевым счетчиком.");
     }
 
     @Test
     void findPopularByYearNormal() {
-
+        Assertions.assertEquals("[Film(name=second film, description=second description, releaseDate=2000-04-22, duration=100, id=2, genres=[Genre(id=1, name=Комедия)], mpa=Mpa(id=1, name=G), directors=[], score=7.5), " +
+                        "Film(name=new film, description=new description, releaseDate=2000-04-22, duration=100, id=1, genres=[Genre(id=1, name=Комедия)], mpa=Mpa(id=1, name=G), directors=[], score=0.0)]",
+                filmService.findPopular(5, Optional.empty(), Optional.of(2000)).toString(),
+                "Ошибка при нормальном поиске популярных фильмов по году.");
     }
 
     @Test
     void findPopularByYearNormalNull() {
-
+        Assertions.assertEquals("[]",
+                filmService.findPopular(5, Optional.empty(), Optional.of(1999)).toString(),
+                "Ошибка при нормальном поиске пустого списка популярных фильмов по году.");
     }
 
     @ParameterizedTest
     @MethodSource("wrongIdParameters")
-    void findPopularByYearWrongYear() {
-
+    void findPopularByYearWrongYear(int year) {
+        Assertions.assertEquals("[]", filmService.findPopular(5, Optional.empty(), Optional.of(year)).toString(),
+                "Ошибка при поиске популярных фильмов по году " + year);
     }
 
     @Test
     void findPopularByYearCountNegative() {
-
+        ValidationException exception = Assertions.assertThrows(ValidationException.class,
+                () -> filmService.findPopular(-1, Optional.empty(), Optional.of(2000))
+        );
+        Assertions.assertEquals("Значение выводимых фильмов не может быть меньше или равно нулю.", exception.getMessage(),
+                "Ошибка при поиске популярных фильмов по году с отрицательным счетчиком.");
     }
 
     @Test
     void findPopularByYearCountZero() {
-
+        ValidationException exception = Assertions.assertThrows(ValidationException.class,
+                () -> filmService.findPopular(0, Optional.empty(), Optional.of(2000))
+        );
+        Assertions.assertEquals("Значение выводимых фильмов не может быть меньше или равно нулю.", exception.getMessage(),
+                "Ошибка при поиске популярных фильмов по году с нулевым счетчиком.");
     }
 }

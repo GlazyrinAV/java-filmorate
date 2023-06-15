@@ -84,11 +84,6 @@ public class FilmService {
         return films.stream().peek(this::saveAdditionalInfoFromDb).collect(Collectors.toList());
     }
 
-    public Double findScore(int filmId) {
-        log.info("Лайки к фильму найдены.");
-        return filmStorage.findScore(filmId);
-    }
-
     public Collection<Film> findByDirectorId(Integer directorId, SortType sortBy) {
         directorsService.findById(directorId);
         if (!(sortBy.equals(SortType.year) || sortBy.equals(SortType.score))) {
