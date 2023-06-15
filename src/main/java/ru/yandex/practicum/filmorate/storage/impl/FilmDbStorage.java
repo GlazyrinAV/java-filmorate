@@ -97,7 +97,7 @@ public class FilmDbStorage implements FilmStorage {
                 "SELECT F.FILM_ID, F.NAME, F.DESCRIPTION, F.RELEASE_DATE, F.DURATION " +
                         "FROM FILMS AS F " +
                         "LEFT JOIN FILM_SCORE AS FL ON F.FILM_ID = FL.FILM_ID " +
-                        "GROUP BY F.FILM_ID ORDER BY COUNT(FL.FILM_ID) DESC LIMIT ?";
+                        "GROUP BY F.FILM_ID ORDER BY AVG(FL.SCORE) DESC LIMIT ?";
         return jdbcTemplate.query(sqlQuery, this::mapRowToFilm, count);
     }
 
