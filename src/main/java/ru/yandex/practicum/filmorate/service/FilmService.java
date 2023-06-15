@@ -8,7 +8,6 @@ import ru.yandex.practicum.filmorate.exceptions.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.*;
 import ru.yandex.practicum.filmorate.storage.dao.FeedStorage;
 import ru.yandex.practicum.filmorate.storage.dao.FilmStorage;
-import ru.yandex.practicum.filmorate.storage.dao.ScoreStorage;
 
 import java.util.Collection;
 import java.util.Optional;
@@ -25,7 +24,6 @@ public class FilmService {
     private final GenresService genresService;
     private final MpaService mpaService;
     private final FeedStorage feedStorage;
-    private final ScoreStorage scoreStorage;
 
     public Film saveNew(Film film) {
         int filmId = filmStorage.saveNew(film);
@@ -56,7 +54,7 @@ public class FilmService {
         userService.findById(score.getUserId());
         findById(score.getFilmId());
         log.info("К фильму добавлен лайк.");
-        scoreStorage.saveScore(score.getFilmId(), score.getUserId(), score.getScore());
+        filmStorage.saveScore(score.getFilmId(), score.getUserId(), score.getScore());
         feedStorage.saveFeed(score.getUserId(), score.getFilmId(), EventType.SCORE.getEventTypeId(), Operation.ADD.getOperationId());
     }
 
@@ -64,7 +62,7 @@ public class FilmService {
         userService.findById(userId);
         findById(filmId);
         log.info("У фильма удален лайк.");
-        scoreStorage.removeScore(filmId, userId);
+        filmStorage.removeScore(filmId, userId);
         feedStorage.saveFeed(userId, filmId, EventType.SCORE.getEventTypeId(), Operation.REMOVE.getOperationId());
     }
 
@@ -88,7 +86,7 @@ public class FilmService {
 
     public Double findScore(int filmId) {
         log.info("Лайки к фильму найдены.");
-        return scoreStorage.findScore(filmId);
+        return filmStorage.findScore(filmId);
     }
 
     public Collection<Film> findByDirectorId(Integer directorId, SortType sortBy) {
@@ -105,7 +103,7 @@ public class FilmService {
         film.setGenres(genresService.saveGenresToFilmFromDB(film.getId()));
         film.setMpa(mpaService.saveRatingToFilmFromDB(film.getId()));
         film.setDirectors(directorsService.saveDirectorsToFilmFromDB(film.getId()));
-        film.setScore(scoreStorage.findScore(film.getId()));
+        film.setScore(filmStorage.findScore(film.getId()));
     }
 
     private void saveAdditionalInfoToDb(Film film, int filmId) {

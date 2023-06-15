@@ -149,6 +149,28 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Override
+    public void saveScore(int filmId, int userId, int score) {
+        String sqlQuery = "MERGE INTO FILM_SCORE (film_id, user_id, SCORE) VALUES (?, ?, ?)";
+        try {
+            jdbcTemplate.update(sqlQuery, filmId, userId, score);
+        } catch (DataIntegrityViolationException exception) {
+            throw new DataIntegrityViolationException("В запросе неправильно указаны данные для добавдения оценки.");
+        }
+    }
+
+    @Override
+    public void removeScore(int filmId, int userId) {
+        String sqlQuery = "DELETE FROM FILM_SCORE WHERE film_id = ? AND user_id = ?";
+        jdbcTemplate.update(sqlQuery, filmId, userId);
+    }
+
+    @Override
+    public Double findScore(int filmId) {
+        String sqlQuery = "SELECT AVG(SCORE) AS score FROM FILM_SCORE WHERE film_id = ?";
+        return jdbcTemplate.queryForObject(sqlQuery, this::mapRowToScore, filmId);
+    }
+
+    @Override
     public Collection<Film> findByDirectorId(int directorId, SortType sortBy) {
         String sqlQuery;
         if (sortBy.equals(SortType.year)) {
@@ -245,5 +267,9 @@ public class FilmDbStorage implements FilmStorage {
                 .releaseDate(resultSet.getDate("release_date").toLocalDate())
                 .duration((resultSet.getLong("duration")))
                 .build();
+    }
+
+    private Double mapRowToScore(ResultSet resultSet, int rowNum) throws SQLException {
+        return resultSet.getDouble("score");
     }
 }

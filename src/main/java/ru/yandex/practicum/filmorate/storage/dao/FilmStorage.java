@@ -27,6 +27,12 @@ public interface FilmStorage {
 
     Collection<Film> findByDirectorId(int directorId, SortType sortBy);
 
+    void saveScore(int filmId, int userId, int score);
+
+    void removeScore(int filmId, int userId);
+
+    Double findScore(int filmId);
+
     Collection<Film> findCommonFilms(int userId, int friendId);
 
     Collection<Film> getRecommendation(int id);
