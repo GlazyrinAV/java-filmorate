@@ -10,7 +10,7 @@ import javax.validation.constraints.Positive;
 @Data
 @AllArgsConstructor
 @Builder
-public class Rating {
+public class Mpa {
 
     @Positive
     private final Integer id;

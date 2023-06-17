@@ -48,12 +48,12 @@ public class DirectorsService {
         directorStorage.removeById(id);
     }
 
-    public List<Director> saveDirectorsToFilmFromDB(int filmId) {
-        return directorStorage.saveDirectorsToFilmFromDB(filmId);
+    public List<Director> findByFilmId(int filmId) {
+        return directorStorage.findByFilmId(filmId);
     }
 
-    public void saveDirectorsToDBFromFilm(Optional<List<Director>> directors, int filmId) {
-        directors.ifPresent(directorList -> directorStorage.saveDirectorsToDBFromFilm(directorList, filmId));
+    public void save(Optional<List<Director>> directors, int filmId) {
+        directors.ifPresent(directorList -> directorStorage.save(directorList, filmId));
     }
 
     public void removeFromFilmByFilmId(int filmId) {

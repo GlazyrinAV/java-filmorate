@@ -74,14 +74,14 @@ public class DirectorDbStorage implements DirectorStorage {
     }
 
     @Override
-    public List<Director> saveDirectorsToFilmFromDB(int filmId) {
+    public List<Director> findByFilmId(int filmId) {
         String sqlQuery = "SELECT FD.DIRECTOR_ID, D2.DIRECTOR_NAME " +
                 "FROM FILM_DIRECTOR AS FD JOIN DIRECTORS D2 on D2.DIRECTOR_ID = FD.DIRECTOR_ID WHERE FILM_ID = ?";
         return jdbcTemplate.query(sqlQuery, this::mapRowToDirector, filmId);
     }
 
     @Override
-    public void saveDirectorsToDBFromFilm(List<Director> directors, int filmId) {
+    public void save(List<Director> directors, int filmId) {
         String sqlQueryForGenres = "MERGE INTO FILM_DIRECTOR (film_id, DIRECTOR_ID) VALUES (?, ?)";
         try {
             jdbcTemplate.batchUpdate(sqlQueryForGenres, directors, directors.size(), (ps, director) -> {

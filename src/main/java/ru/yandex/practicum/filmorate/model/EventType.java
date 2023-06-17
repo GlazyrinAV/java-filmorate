@@ -6,7 +6,7 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public enum EventType {
-    LIKE(1),
+    SCORE(1),
     REVIEW(2),
     FRIEND(3);
     final int eventTypeId;
