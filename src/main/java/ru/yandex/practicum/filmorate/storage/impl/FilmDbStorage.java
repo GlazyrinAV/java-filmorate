@@ -202,19 +202,21 @@ public class FilmDbStorage implements FilmStorage {
 
     public Collection<Film> getRecommendation(int id) {
 
-        String sqlQuery = "SELECT *" +
-                " FROM FILM_SCORE as F  WHERE F.FILM_ID in (select FILM_ID from  FILM_SCORE where USER_ID = ?) and not F.USER_ID = ?" +
-                "GROUP BY F.USER_ID ORDER BY COUNT(FILM_ID) desc LIMIT 1";
+        String sqlQuery = "SELECT FS.USER_ID FROM FILM_SCORE AS FS\n" +
+                "LEFT JOIN (SELECT FILM_ID, SCORE AS RATING_BYUSER FROM FILM_SCORE WHERE USER_ID = ?) AS FR2 ON FS.FILM_ID = FR2.FILM_ID\n" +
+                "WHERE FS.FILM_ID in (select FILM_ID from  FILM_SCORE where USER_ID = ?) AND NOT FS.USER_ID = ?\n" +
+                "AND ((SCORE-RATING_BYUSER) <= 0 AND  (SCORE-RATING_BYUSER) >= -2) OR ((SCORE-RATING_BYUSER) > 0 AND  (SCORE-RATING_BYUSER) <= 2)\n" +
+                "GROUP BY FS.USER_ID ORDER BY COUNT(FS.USER_ID) DESC LIMIT 1";
 
         Integer idRecommendationUser = jdbcTemplate.query(sqlQuery, (rs, rowNum) ->
-                rs.getInt("USER_ID"), id, id).stream().findFirst().orElse(null);
+                rs.getInt("USER_ID"), id, id, id).stream().findFirst().orElse(null);
         if (idRecommendationUser == null)
             return new ArrayList<>();
 
-        String sqlQuery2 = "SELECT *" +
-                " FROM FILMS LEFT JOIN FILM_SCORE FL on FILMS.FILM_ID = FL.FILM_ID WHERE Films.FILM_ID in (select FILM_ID from  FILM_SCORE " +
-                " where USER_ID = ? AND FILM_ID not in (select FILM_ID from FILM_SCORE where USER_ID = ?))" +
-                "GROUP BY FILMS.FILM_ID ";
+        String sqlQuery2 = "SELECT * FROM FILMS AS F LEFT JOIN " +
+                "(SELECT FILM_ID, AVG(SCORE) AS RAING FROM FILM_SCORE GROUP BY FILM_ID) AS FR ON F.FILM_ID = FR.FILM_ID\n" +
+                "WHERE F.FILM_ID IN (SELECT FS.FILM_ID FROM FILM_SCORE AS FS WHERE FS.USER_ID = ? " +
+                "AND FS.FILM_ID NOT IN (SELECT FS2.FILM_ID FROM FILM_SCORE AS FS2 WHERE FS2.USER_ID = ?)) AND RAING > 5";
 
         return jdbcTemplate.query(sqlQuery2, this::mapRowToFilm, idRecommendationUser, id);
     }
