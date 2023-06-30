@@ -36,7 +36,9 @@ public class Film {
 
     private List<Genre> genres;
 
-    private Rating mpa;
+    private Mpa mpa;
 
     private List<Director> directors;
+
+    private Double rating = 0.0;
 }
